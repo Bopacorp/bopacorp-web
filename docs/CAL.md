@@ -4,8 +4,8 @@ name: Cal.com
 description: A clean, calendar-software-first interface anchored on white canvas with black primary CTAs and custom Cal Sans display typography. The system reads as friendly modern SaaS — generous whitespace, soft-rounded cards (~12px), product UI fragments shown directly inside cards, and a dark navy footer that visually closes long-scroll pages. Brand voltage comes from the Cal Sans display headline (a custom geometric face) and from product UI artifacts shown in-card rather than from accent colors.
 
 colors:
-  primary: "#111111"
-  primary-active: "#242424"
+  primary: "#1f75ae"
+  primary-active: "#365c9e"
   primary-disabled: "#e5e7eb"
   ink: "#111111"
   body: "#374151"
