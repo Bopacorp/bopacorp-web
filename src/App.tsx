@@ -3,22 +3,13 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from '@/components/ui/sidebar'
-import {
-  Sidebar,
-  SidebarContent,
-  SidebarGroup,
-  SidebarGroupContent,
-  SidebarGroupLabel,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-} from '@/components/ui/sidebar'
 import { BarChart3, Users, FileText, Bell, Handshake } from 'lucide-react'
 import { Plus } from 'lucide-react'
+import SidebarNav from '@/components/SidebarNav'
 import CRM from '@/components/sections/CRM';
 import Empleabilidad from '@/components/sections/Empleabilidad';
 import { Button } from '@/components/ui/button'
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 const menu = [
   { id: 'dashboard', title: 'Dashboard', icon: BarChart3 },
@@ -87,47 +78,34 @@ function App() {
   const [activeSection, setActiveSection] = useState<keyof typeof sections>('crm')
   const currentSection = sections[activeSection]
 
+  useEffect(() => {
+    const applyHash = () => {
+      const h = location.hash.replace('#', '')
+      if (h && Object.prototype.hasOwnProperty.call(sections, h)) {
+        setActiveSection(h as keyof typeof sections)
+      }
+    }
+
+    applyHash()
+    window.addEventListener('hashchange', applyHash)
+    return () => window.removeEventListener('hashchange', applyHash)
+  }, [])
+
   return (
     <SidebarProvider defaultOpen>
       <div className="flex min-h-screen w-full bg-background text-foreground">
-        <Sidebar>
-          <SidebarContent>
-            <SidebarGroup>
-              <SidebarGroupLabel>BOPACORP</SidebarGroupLabel>
-              <SidebarGroupContent>
-                <SidebarMenu>
-                  {menu.map((item) => (
-                    <SidebarMenuItem key={item.title}>
-                      <SidebarMenuButton
-                        asChild
-                        isActive={activeSection === item.id}
-                      >
-                        <button
-                          type="button"
-                          onClick={() => setActiveSection(item.id as keyof typeof sections)}
-                        >
-                          <item.icon />
-                          <span>{item.title}</span>
-                        </button>
-                      </SidebarMenuButton>
-                    </SidebarMenuItem>
-                  ))}
-                </SidebarMenu>
-              </SidebarGroupContent>
-            </SidebarGroup>
-          </SidebarContent>
-        </Sidebar>
+        <SidebarNav menu={menu} activeSection={activeSection} />
 
         <SidebarInset className="flex-1">
             <header className="flex h-14 items-center gap-3 border-b px-4">
-              <SidebarTrigger />
+              <SidebarTrigger aria-label="Toggle sidebar" />
               <div className="flex-1">
                 <h1 className="text-lg font-semibold">{currentSection.title}</h1>
                 <p className="text-sm text-muted-foreground">{currentSection.description}</p>
               </div>
               <Button>
                 <Plus data-icon="inline-start" />
-                Nueva negociación
+                Nuevo cliente
               </Button>
             </header>
             <main className="flex-1 overflow-auto">{currentSection.content}</main>
@@ -138,3 +116,4 @@ function App() {
 }
 
 export default App
+
