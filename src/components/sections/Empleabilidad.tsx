@@ -1,10 +1,6 @@
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import {
-    Collapsible,
-    CollapsibleContent,
-    CollapsibleTrigger,
-} from '@/components/ui/collapsible'
+import StageSection, { type Stage } from '@/components/StageSection'
 import {
     Dialog,
     DialogClose,
@@ -28,7 +24,6 @@ import {
 import {
     BriefcaseBusiness,
     CalendarDays,
-    ChevronDown,
     Download,
     Eye,
     FileEdit,
@@ -39,24 +34,6 @@ import {
     Users,
 } from 'lucide-react'
 import { useState } from 'react'
-
-type Applicant = {
-    name: string
-    avatar?: string
-    initials?: string
-    note: string
-    role: string
-    experience: string
-    location: string
-    resumeLabel: string
-}
-
-type Stage = {
-    title: string
-    icon: typeof Sparkles
-    defaultOpen?: boolean
-    applicants: Applicant[]
-}
 
 type JobOffering = {
     id: string
@@ -77,8 +54,6 @@ const stages: Stage[] = [
         applicants: [
             {
                 name: 'Sarah Chen',
-                avatar:
-                    'https://lh3.googleusercontent.com/aida-public/AB6AXuBOHnnLyZFpbKVeCaeBE8Y-iOl5Wlt4JYK_SH7tXjRWHDtgFcyJQfZrSItW4V79g--61BYnKzyV_sXPljwYaonW5bMLjRErHm8MjEfio2MJ8bSXPbpx4YNt0GHnr2FAeQ5D7xLD79q7RDKiOuDWANa03JEHLP7cC6wzFCKvWH0FUWab984AXJIIqZbS5FSwS12qJMuz5vDojV1VGykGR0IlIaeByBURG8INX4gtCNjtnIjmalnL-MV2AXnAFUO126lufOAAEcIF7yw',
                 note: 'Applied 2h ago',
                 role: initialJobOfferings[0].title,
                 experience: '6 Years',
@@ -93,7 +68,6 @@ const stages: Stage[] = [
         applicants: [
             {
                 name: 'Aria Lee',
-                initials: 'AL',
                 note: 'Reviewed Yesterday',
                 role: initialJobOfferings[0].title,
                 experience: '4 Years',
@@ -108,8 +82,6 @@ const stages: Stage[] = [
         applicants: [
             {
                 name: 'Elena Rodriguez',
-                avatar:
-                    'https://lh3.googleusercontent.com/aida-public/AB6AXuC1mCiJzZOHch81f-bumf5e2IGoXGv4ZdlL1itWLJXF0bMa5fuOmUS-yiK-WFSVTThyhIqCWdEN1676UQfjWpmiDLQnnsgrULy6_4asUHafB6FMwSbKTSA291ccMoer7nUxC7QnNY5r9N-9uEJLSPX025zilD4nSFO2TeG7rPhx6DLjeedDJn1JNsYTNEmubXPAzfRCqM7U5oAUqVEo5TC0z3MF8gb6ovij2hWdGZUeYR2vMiLN7bMyXA4TnCwFVNivindCdnt2Bmo',
                 note: 'Interview: Oct 24, 10:00 AM',
                 role: initialJobOfferings[0].title,
                 experience: '10 Years',
@@ -122,98 +94,6 @@ const stages: Stage[] = [
 
 const totalApplicants = stages.reduce((count, stage) => count + stage.applicants.length, 0)
 const newTodayCount = stages[0]?.applicants.length ?? 0
-
-function ApplicantCard({ applicant, activeRole }: { applicant: Applicant; activeRole: string }) {
-    return (
-        <article className="flex flex-col gap-4 rounded-xl border border-border bg-background p-4 shadow-sm md:flex-row md:items-center md:justify-between">
-            <div className="flex items-center gap-4">
-                {applicant.avatar ? (
-                    <img
-                        alt={applicant.name}
-                        className="size-12 rounded-full object-cover"
-                        src={applicant.avatar}
-                    />
-                ) : (
-                    <div className="flex size-12 items-center justify-center rounded-full bg-secondary text-sm font-semibold text-secondary-foreground">
-                        {applicant.initials}
-                    </div>
-                )}
-
-                <div>
-                    <h4 className="text-sm font-semibold text-foreground">{applicant.name}</h4>
-                    <p className="text-sm text-muted-foreground">{applicant.note}</p>
-                </div>
-            </div>
-
-            <div className="grid gap-4 sm:grid-cols-3 md:gap-8">
-                <div>
-                    <p className="text-xs font-medium uppercase tracking-[0.16em] text-muted-foreground">
-                        Role
-                    </p>
-                    <p className="text-sm text-foreground">{activeRole || applicant.role}</p>
-                </div>
-                <div>
-                    <p className="text-xs font-medium uppercase tracking-[0.16em] text-muted-foreground">
-                        Experience
-                    </p>
-                    <p className="text-sm text-foreground">{applicant.experience}</p>
-                </div>
-                <div>
-                    <p className="text-xs font-medium uppercase tracking-[0.16em] text-muted-foreground">
-                        Location
-                    </p>
-                    <p className="text-sm text-foreground">{applicant.location}</p>
-                </div>
-            </div>
-
-            <div className="flex flex-wrap items-center gap-3 md:justify-end">
-                <Button variant="link" asChild className="px-0 text-sm font-semibold">
-                    <a href="#">{applicant.resumeLabel}</a>
-                </Button>
-                <Button size="sm">
-                    <Mail data-icon="inline-start" />
-                    Email
-                </Button>
-            </div>
-        </article>
-    )
-}
-
-function StageSection({ stage, activeRole }: { stage: Stage; activeRole: string }) {
-    const StageIcon = stage.icon
-
-    return (
-        <Collapsible defaultOpen={stage.defaultOpen}>
-            <div className="overflow-hidden rounded-xl border border-border bg-card">
-                <CollapsibleTrigger asChild>
-                    <button
-                        type="button"
-                        className="flex w-full items-center justify-between gap-4 bg-card px-5 py-4 text-left transition-colors hover:bg-muted/50"
-                    >
-                        <div className="flex items-center gap-3">
-                            <StageIcon className="size-5 text-primary" />
-                            <span className="text-base font-semibold text-foreground">{stage.title}</span>
-                            <Badge variant={stage.defaultOpen ? 'default' : 'secondary'}>
-                                {stage.applicants.length}
-                            </Badge>
-                        </div>
-                        <ChevronDown className="size-5 text-muted-foreground transition-transform duration-200 data-[state=open]:rotate-180" />
-                    </button>
-                </CollapsibleTrigger>
-
-                <CollapsibleContent className="overflow-hidden data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down">
-                    <div className="border-t border-border bg-background p-5">
-                        <div className="flex flex-col gap-4">
-                            {stage.applicants.map((applicant) => (
-                                <ApplicantCard key={applicant.name} applicant={applicant} activeRole={activeRole} />
-                            ))}
-                        </div>
-                    </div>
-                </CollapsibleContent>
-            </div>
-        </Collapsible>
-    )
-}
 
 function Empleabilidad() {
     const [jobOfferings, setJobOfferings] = useState<JobOffering[]>(initialJobOfferings)
