@@ -32,8 +32,10 @@ import {
     Sparkles,
     Trash2,
     Users,
+    Handshake,
 } from 'lucide-react'
 import { useState } from 'react'
+import type React from 'react'
 
 type JobOffering = {
     id: string
@@ -94,6 +96,26 @@ const stages: Stage[] = [
 
 const totalApplicants = stages.reduce((count, stage) => count + stage.applicants.length, 0)
 const newTodayCount = stages[0]?.applicants.length ?? 0
+
+export const menu = [
+    { id: 'empleabilidad', title: 'Empleabilidad', icon: Handshake },
+]
+
+export const sections = {
+    empleabilidad: {
+        title: 'Empleabilidad',
+        description: 'Seguimiento de talento y vacantes',
+        content: <Empleabilidad />,
+    },
+} as const
+
+export type AppSectionKey = keyof typeof sections
+
+export type AppMenuItem = {
+    id: string
+    title: string
+    icon: React.ComponentType<React.SVGProps<SVGSVGElement>>
+}
 
 function Empleabilidad() {
     const [jobOfferings, setJobOfferings] = useState<JobOffering[]>(initialJobOfferings)
