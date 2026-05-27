@@ -3,11 +3,12 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from '@/components/ui/sidebar'
-import { BarChart3, Users, FileText, Bell, Handshake } from 'lucide-react'
+import { BarChart3, Users, FileText, Bell, Handshake, Layout } from 'lucide-react'
 import { Plus } from 'lucide-react'
 import SidebarNav from '@/components/SidebarNav'
 import CRM from '@/components/sections/CRM';
 import Empleabilidad from '@/components/sections/Empleabilidad';
+import CmsDemoPage from '@/modules/landing/pages/CmsDemoPage';
 import { Button } from '@/components/ui/button'
 import { useState, useEffect } from 'react';
 
@@ -17,6 +18,7 @@ const menu = [
   { id: 'matrices', title: 'Matrices', icon: FileText },
   { id: 'alertas', title: 'Alertas', icon: Bell },
   { id: 'empleabilidad', title: 'Empleabilidad', icon: Handshake },
+  { id: 'cms-demo', title: 'CMS Demo', icon: Layout },
 ]
 
 const sections = {
@@ -71,6 +73,11 @@ const sections = {
     title: 'Empleabilidad',
     description: 'Seguimiento de talento y vacantes',
     content: <Empleabilidad />,
+  },
+  'cms-demo': {
+    title: 'CMS Demo',
+    description: 'Landing page con bloques CMS desde la API',
+    content: <CmsDemoPage />,
   },
 } as const
 
