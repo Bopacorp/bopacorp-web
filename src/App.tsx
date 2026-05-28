@@ -19,6 +19,7 @@ const menu = [
   { id: 'alertas', title: 'Alertas', icon: Bell },
   { id: 'empleabilidad', title: 'Empleabilidad', icon: Handshake },
   { id: 'cms-demo', title: 'CMS Demo', icon: Layout },
+  { id: 'cms', title: 'CMS', icon: Layout },
 ]
 
 const sections = {
@@ -78,6 +79,20 @@ const sections = {
     title: 'CMS Demo',
     description: 'Landing page con bloques CMS desde la API',
     content: <CmsDemoPage />,
+  },
+  cms: {
+    title: 'CMS',
+    description: 'Gestión de contenido para la plataforma',
+    content: (
+      <div className="grid gap-4 p-4">
+        <div className="rounded-lg border bg-card p-6 text-card-foreground">
+          <h2 className="text-xl font-semibold">CMS</h2>
+          <p className="text-sm text-muted-foreground">
+            Sección lista para integrar herramientas de gestión de contenido.
+          </p>
+        </div>
+      </div>
+    ),
   },
 } as const
 
