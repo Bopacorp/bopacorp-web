@@ -1,0 +1,21 @@
+import { Empty, EmptyHeader, EmptyTitle, EmptyDescription } from '@/components/ui/empty';
+import { Button } from '@/components/ui/button';
+
+interface ErrorStateProps {
+  message: string;
+  onRetry: () => void;
+}
+
+export function ErrorState({ message, onRetry }: ErrorStateProps) {
+  return (
+    <div className="flex items-center justify-center py-20">
+      <Empty>
+        <EmptyHeader>
+          <EmptyTitle>Error al cargar el contenido</EmptyTitle>
+          <EmptyDescription>{message}</EmptyDescription>
+        </EmptyHeader>
+        <Button onClick={onRetry}>Reintentar</Button>
+      </Empty>
+    </div>
+  );
+}

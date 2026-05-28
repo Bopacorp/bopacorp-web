@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { Card } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Empty, EmptyHeader, EmptyTitle, EmptyDescription } from '@/components/ui/empty';
-import { Button } from '@/components/ui/button';
+import { PageLoader, ErrorState } from '@/shared/ui';
 import type { CmsLandingResponse, ContentBlockResponse } from '@bopacorp/shared/catalog';
 
 type CmsBlocks = Record<string, ContentBlockResponse>;
@@ -137,38 +137,6 @@ function FooterSection({ blocks }: { blocks: CmsBlocks }) {
   );
 }
 
-function LoadingState() {
-  return (
-    <div className="flex flex-col gap-6 p-6">
-      <Skeleton className="h-[500px] w-full rounded-none" />
-      <div className="max-w-7xl mx-auto w-full flex flex-col gap-6">
-        <div className="flex flex-col gap-2 items-center">
-          <Skeleton className="h-8 w-64" />
-          <Skeleton className="h-4 w-96" />
-        </div>
-        <div className="grid gap-6 md:grid-cols-3">
-          <Skeleton className="h-48" />
-          <Skeleton className="h-48" />
-          <Skeleton className="h-48" />
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function ErrorState({ message, onRetry }: { message: string; onRetry: () => void }) {
-  return (
-    <div className="flex items-center justify-center py-20">
-      <Empty>
-        <EmptyHeader>
-          <EmptyTitle>Error al cargar el contenido</EmptyTitle>
-          <EmptyDescription>{message}</EmptyDescription>
-        </EmptyHeader>
-        <Button onClick={onRetry}>Reintentar</Button>
-      </Empty>
-    </div>
-  );
-}
 
 export default function CmsDemoPage() {
   const [blocks, setBlocks] = useState<CmsBlocks | null>(null);
@@ -206,7 +174,24 @@ export default function CmsDemoPage() {
     setRetryCount((n) => n + 1);
   }, []);
 
-  if (loading) return <LoadingState />;
+  if (loading) return (
+    <PageLoader>
+      <div className="flex flex-col gap-6 p-6">
+        <Skeleton className="h-[500px] w-full rounded-none" />
+        <div className="max-w-7xl mx-auto w-full flex flex-col gap-6">
+          <div className="flex flex-col gap-2 items-center">
+            <Skeleton className="h-8 w-64" />
+            <Skeleton className="h-4 w-96" />
+          </div>
+          <div className="grid gap-6 md:grid-cols-3">
+            <Skeleton className="h-48" />
+            <Skeleton className="h-48" />
+            <Skeleton className="h-48" />
+          </div>
+        </div>
+      </div>
+    </PageLoader>
+  );
   if (error) return <ErrorState message={error} onRetry={retry} />;
   if (!blocks || Object.keys(blocks).length === 0) {
     return (
