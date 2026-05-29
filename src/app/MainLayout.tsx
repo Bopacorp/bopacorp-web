@@ -64,9 +64,6 @@ export default function MainLayout() {
               <button className="border border-input bg-background hover:bg-accent hover:text-accent-foreground text-xs font-bold px-4 py-2 rounded-lg transition-colors">
                 Cotizar Servicios
               </button>
-              <button className="bg-primary text-primary-foreground text-xs font-bold px-5 py-2 rounded-lg hover:opacity-90 transition-all">
-                Mi Bopacorp
-              </button>
             </div>
           </div>
         </div>
