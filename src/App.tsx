@@ -3,14 +3,12 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from '@/components/ui/sidebar'
-import { BarChart3, Users, FileText, Bell, Handshake, Layout, LogOut } from 'lucide-react'
+import { BarChart3, Users, FileText, Bell, Handshake, Layout } from 'lucide-react'
 import { Plus } from 'lucide-react'
 import SidebarNav from '@/components/SidebarNav'
 import CRM from '@/components/sections/CRM';
 import Empleabilidad from '@/components/sections/Empleabilidad';
 import CmsDemoPage from '@/modules/landing/pages/CmsDemoPage';
-import LoginPage from '@/modules/auth/pages/LoginPage';
-import { useAuth } from '@/modules/auth/context/AuthContext.js';
 import { Button } from '@/components/ui/button'
 import { useState, useEffect } from 'react';
 
@@ -99,7 +97,6 @@ const sections = {
 } as const
 
 function App() {
-  const { user, isLoading, logout } = useAuth();
   const [activeSection, setActiveSection] = useState<keyof typeof sections>('crm')
   const currentSection = sections[activeSection]
 
@@ -116,18 +113,6 @@ function App() {
     return () => window.removeEventListener('hashchange', applyHash)
   }, [])
 
-  if (isLoading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-background">
-        <div className="size-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
-      </div>
-    );
-  }
-
-  if (!user) {
-    return <LoginPage />;
-  }
-
   return (
     <SidebarProvider defaultOpen>
       <div className="flex min-h-screen w-full bg-background text-foreground">
@@ -140,18 +125,10 @@ function App() {
                 <h1 className="text-lg font-semibold">{currentSection.title}</h1>
                 <p className="text-sm text-muted-foreground">{currentSection.description}</p>
               </div>
-              <div className="flex items-center gap-2">
-                <span className="text-sm text-muted-foreground hidden sm:inline">
-                  {user.email}
-                </span>
-                <Button variant="ghost" size="icon" onClick={logout} aria-label="Cerrar sesion">
-                  <LogOut data-icon="inline-start" />
-                </Button>
-                <Button>
-                  <Plus data-icon="inline-start" />
-                  Nuevo cliente
-                </Button>
-              </div>
+              <Button>
+                <Plus data-icon="inline-start" />
+                Nuevo cliente
+              </Button>
             </header>
             <main className="flex-1 overflow-auto">{currentSection.content}</main>
         </SidebarInset>
