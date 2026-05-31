@@ -24,6 +24,7 @@ No test runner is configured. There is no `test` script.
 
 - `@bopacorp/shared` (v0.1.4) is a **private scoped package** not on the public npm registry. `npm install` will 404 unless you have access to the private registry or the package is linked locally. If you hit this, ask the team for the `.npmrc` or local tarball.
 - Node package manager: **npm** (`package-lock.json` present). `pnpm-lock.yaml` was removed.
+- There is a `.env.example` in the repo root. Copy it to `.env` and set `VITE_API_URL` before running `npm run dev`.
 
 ## Architecture
 
