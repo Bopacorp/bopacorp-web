@@ -26,3 +26,6 @@ dist-ssr
 
 # Shared packages 
 .npmrc
+
+# Environment variables
+.env
