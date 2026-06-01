@@ -11,6 +11,7 @@ import Empleabilidad from '@/components/sections/Empleabilidad';
 import CmsDemoPage from '@/modules/landing/pages/CmsDemoPage';
 import { Button } from '@/components/ui/button'
 import { useState, useEffect } from 'react';
+import { CmsPage } from './modules/cms/CmsAdminPage';
 
 const menu = [
   { id: 'dashboard', title: 'Dashboard', icon: BarChart3 },
@@ -84,14 +85,7 @@ const sections = {
     title: 'CMS',
     description: 'Gestión de contenido para la plataforma',
     content: (
-      <div className="grid gap-4 p-4">
-        <div className="rounded-lg border bg-card p-6 text-card-foreground">
-          <h2 className="text-xl font-semibold">CMS</h2>
-          <p className="text-sm text-muted-foreground">
-            Sección lista para integrar herramientas de gestión de contenido.
-          </p>
-        </div>
-      </div>
+      <CmsPage />
     ),
   },
 } as const
