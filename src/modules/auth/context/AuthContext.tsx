@@ -1,13 +1,6 @@
-import { createContext, type ReactNode, useCallback, useContext, useState } from 'react';
+import { createContext, type ReactNode, useCallback, useContext, useEffect, useState } from 'react';
 import * as authService from '@/services/auth.service.js';
-
-interface AuthUser {
-  id: string;
-  username: string;
-  email: string;
-  roles: string[];
-  permissions: string[];
-}
+import { type AuthUser, fetchMe } from '@/services/auth.service.js';
 
 interface AuthState {
   user: AuthUser | null;
@@ -23,7 +16,30 @@ const STORAGE_KEY = 'bopacorp_auth';
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(() => getStoredUser());
-  const [isLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    setIsLoading(false);
+  }, []);
+
+  useEffect(() => {
+    const handleTokenRefresh = async () => {
+      try {
+        const userData = await fetchMe();
+        const tokens = getStoredTokens();
+        if (tokens) {
+          saveAuth(userData, tokens);
+        }
+        setUser(userData);
+      } catch {
+        clearAuthStorage();
+        setUser(null);
+      }
+    };
+
+    window.addEventListener('bopacorp:token-refreshed', handleTokenRefresh);
+    return () => window.removeEventListener('bopacorp:token-refreshed', handleTokenRefresh);
+  }, []);
 
   const login = useCallback(async (data: { email: string; password: string }) => {
     const response = await authService.login(data);
@@ -63,6 +79,23 @@ function getStoredUser(): AuthUser | null {
     if (!raw) return null;
     const parsed = JSON.parse(raw) as { user: AuthUser };
     return parsed.user;
+  } catch {
+    return null;
+  }
+}
+
+function getStoredTokens(): {
+  accessToken: string;
+  refreshToken: string;
+  expiresIn: number;
+} | null {
+  try {
+    const accessToken = localStorage.getItem('accessToken');
+    const refreshToken = localStorage.getItem('refreshToken');
+    const expiresAt = localStorage.getItem('tokenExpiresAt');
+    if (!accessToken || !refreshToken || !expiresAt) return null;
+    const expiresIn = Math.max(0, Math.floor((Number(expiresAt) - Date.now()) / 1000));
+    return { accessToken, refreshToken, expiresIn };
   } catch {
     return null;
   }

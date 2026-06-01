@@ -2,6 +2,7 @@ import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import MainLayout from '@/app/MainLayout.js';
 import AdminApp from '@/modules/admin/AdminApp.js';
 import RequireAuth from '@/modules/auth/components/RequireAuth.js';
+import LoginPage from '@/modules/auth/pages/LoginPage.js';
 import AboutPage from '@/modules/landing/pages/AboutPage';
 import LandingPage from '@/modules/landing/pages/LandingPage';
 import ServicesPage from '@/modules/landing/pages/ServicesPage';
@@ -10,7 +11,6 @@ export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Public site routes */}
         <Route element={<MainLayout />}>
           <Route path="/" element={<LandingPage />} />
           <Route path="/services" element={<ServicesPage />} />
@@ -21,9 +21,10 @@ export default function App() {
           />
         </Route>
 
-        {/* Protected admin panel — shows login inline if unauthenticated */}
+        <Route path="/login" element={<LoginPage />} />
+
         <Route
-          path="/admin-dashboard"
+          path="/admin/*"
           element={
             <RequireAuth>
               <AdminApp />
@@ -31,7 +32,6 @@ export default function App() {
           }
         />
 
-        {/* Catch all */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>

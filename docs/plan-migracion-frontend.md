@@ -57,21 +57,20 @@
 - JWT access token expira en `15m`. Payload: `{ sub, email, roles[], permissions[] }`.
 - Refresh token es opaco, expira en `7d`, rota en cada uso.
 - Permissions son granulares: `content_blocks.read`, `users.create`, etc.
-- El seed actual solo crea permisos de CMS. Permisos de CRM, Employability y Users no existen aún.
+- El seed `01_rbac_permissions.seed.sql` crea permisos para todos los modulos: Users, RBAC, Organization, Catalog, CMS, CRM (contact_requests), y Employability.
 
 ### Tareas
 
 - [ ] Actualizar `src/modules/auth/context/AuthContext.tsx`:
-  - Decodificar claim `exp` del JWT para saber expiración.
-  - Refresh proactivo: si el token expira en < 2 min, refrescar antes del siguiente request.
-  - En refresh exitoso: reemplazar **ambos** tokens en localStorage (rotación).
+  - Agregar `profile` a `AuthUser` (el backend ya lo devuelve en login response).
+  - Escuchar evento `bopacorp:token-refreshed` del interceptor para actualizar datos del usuario via `GET /api/v1/auth/me`.
   - En refresh fallido: limpiar todo y redirigir a `/login`.
 - [ ] Crear `src/hooks/usePermission.ts`:
   - `hasPermission(code: string)` — match exacto.
   - `hasAnyPermission(codes: string[])` — match de cualquiera.
 - [ ] Crear `src/modules/auth/components/Can.tsx`:
-  - `<Can permission="crm.read">{children}</Can>`.
-  - `<Can any={['crm.read', 'crm.write']}>{children}</Can>`.
+  - `<Can permission="contact_requests.read">{children}</Can>`.
+  - `<Can any={['job_vacancies.read', 'job_vacancies.create']}>{children}</Can>`.
 - [ ] Actualizar `src/modules/auth/components/RequireAuth.tsx`:
   - Mostrar `PageLoader` mientras verifica auth.
   - Redirigir a `/login` si no hay usuario (no renderizar inline).
@@ -84,20 +83,29 @@
   - Agregar ruta pública `/login`.
   - Proteger `/admin-dashboard` con `RequireAuth`.
 
-### Nota sobre permisos
+### Mapeo de permisos reales
 
-Como el backend no tiene aún permisos de CRM/Employability, usaremos códigos placeholder:
-- `crm.read`, `crm.write`, `crm.delete`
-- `employability.read`, `employability.write`
-- `users.read`, `users.write`, `users.delete`
+| Sección Frontend | Permiso Backend |
+|------------------|-----------------|
+| CRM | `contact_requests.read` |
+| Empleabilidad | `job_vacancies.read` |
+| Usuarios | `users.read` |
+| Catálogo | `catalog_items.read` |
+| Organización | `departments.read` |
+| CMS | `content_blocks.read` |
+| RBAC | `roles.read` |
 
-El backend debe crearlos posteriormente (o se agregará un seed en backend como tarea aparte).
+### Dependencias de backend
+
+- `GET /api/v1/auth/me` — Devuelve datos del usuario autenticado (id, email, roles, permissions, profile). Llamado después de cada refresh proactivo para mantener permisos actualizados.
+- `GET /catalog/content-blocks` — Tiene `authorize` comentado; solo requiere autenticación, no permiso específico.
 
 ### Verificación
 
 - Token expirado dispara refresh automáticamente y reintenta el request original.
-- Usuario sin permiso `crm.read` no ve el item "CRM" en el sidebar.
-- Usuario no autenticado que accede a `/admin-dashboard` es redirigido a `/login`.
+- Usuario sin permiso `contact_requests.read` no ve el item "CRM" en el sidebar.
+- Usuario no autenticado que accede a `/admin` es redirigido a `/login`.
+- Después de login exitoso, redirige de vuelta a la ruta original protegida.
 
 ---
 
@@ -228,7 +236,7 @@ El backend debe crearlos posteriormente (o se agregará un seed en backend como 
 | **Sin TanStack Query** | App pequeña, sin problemas de rendimiento. Se agregará solo si aparece repetición de requests o pantallas lentas. [Referencia](https://dev.to/iceonfire/you-might-not-need-tanstack-query-2f3l) |
 | **Axios en vez de fetch** | Los interceptores permiten manejo limpio de refresh tokens con cola de requests. Con fetch puro se reimplementaría lo mismo con más bugs. |
 | **Sin React Hook Form inicialmente** | Fase 1–3 no requieren formularios complejos. Se agrega en Fase 4 cuando conectamos CRUD reales. |
-| **RBAC con placeholders** | Backend no tiene aún permisos de CRM/Employability. Usamos códigos estándar (`crm.read`, etc.) y el backend los creará posteriormente. |
+| **RBAC con permisos reales** | El seed `01_rbac_permissions.seed.sql` define permisos granulares para todos los modulos. No se usan placeholders. |
 | **Vite proxy en dev** | Evita problemas de CORS. `VITE_API_URL=/api/v1` en dev, URL absoluta en prod. |
 | **Imports con `.js` extension** | Convención existente del proyecto (`moduleResolution: bundler`). No cambiar para mantener consistencia. |
 
@@ -239,7 +247,7 @@ El backend debe crearlos posteriormente (o se agregará un seed en backend como 
 | Riesgo | Mitigación |
 |--------|------------|
 | `@bopacorp/shared` sigue sin estar disponible | Pedir `.npmrc` al equipo o link local. Documentar en `AGENTS.md`. |
-| Backend no expone endpoints de CRM/Employability aún | Implementar placeholders en servicios frontend; conectar cuando backend esté listo. |
+| Frontend usa datos locales en CRM/Employability | Conectar a endpoints reales en Fase 4. |
 | Rotación de refresh token causa race conditions | Implementar cola de requests en interceptor (axios lo facilita). Probar con throttling de red. |
 | `noUnusedLocals` falla al refactorizar | Correr `npm run build` después de cada cambio mayor para detectar rápido. |
 | CORS se cierra en backend | Coordinar con backend el valor exacto de `CORS_ORIGIN`. Actualizar `.env` y proxy. |

@@ -37,8 +37,25 @@ export async function request<T>(config: AxiosRequestConfig): Promise<T> {
 
 export default api;
 
+function getTokenExpiry(): number | null {
+  const raw = localStorage.getItem('tokenExpiresAt');
+  return raw ? Number(raw) : null;
+}
+
 function injectAuthHeader(config: InternalAxiosRequestConfig) {
   const token = localStorage.getItem('accessToken');
+  const expiresAt = getTokenExpiry();
+
+  if (token && expiresAt && expiresAt - Date.now() < 120000 && !isRefreshing) {
+    return triggerProactiveRefresh().then(() => {
+      const newToken = localStorage.getItem('accessToken');
+      if (newToken) {
+        config.headers.Authorization = `Bearer ${newToken}`;
+      }
+      return config;
+    });
+  }
+
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
@@ -77,10 +94,11 @@ async function refreshWithRetry(request: RetryConfig) {
     if (!token) throw new Error('No refresh token');
 
     const res = await axios.post(`${baseURL}/auth/refresh`, { refreshToken: token });
-    const { accessToken, refreshToken: newRefreshToken } = res.data.data;
+    const { accessToken, refreshToken: newRefreshToken, expiresIn } = res.data.data;
 
-    saveTokens(accessToken, newRefreshToken);
+    saveTokensWithExpiry(accessToken, newRefreshToken, expiresIn);
     notifySubscribers(accessToken);
+    dispatchTokenRefreshed();
 
     return api(request);
   } catch (err) {
@@ -90,13 +108,34 @@ async function refreshWithRetry(request: RetryConfig) {
   }
 }
 
+async function triggerProactiveRefresh() {
+  isRefreshing = true;
+
+  try {
+    const token = getRefreshToken();
+    if (!token) throw new Error('No refresh token');
+
+    const res = await axios.post(`${baseURL}/auth/refresh`, { refreshToken: token });
+    const { accessToken, refreshToken: newRefreshToken, expiresIn } = res.data.data;
+
+    saveTokensWithExpiry(accessToken, newRefreshToken, expiresIn);
+    dispatchTokenRefreshed();
+  } catch {
+    clearAuth();
+    redirectToLogin();
+  } finally {
+    isRefreshing = false;
+  }
+}
+
 function getRefreshToken() {
   return localStorage.getItem('refreshToken');
 }
 
-function saveTokens(accessToken: string, refreshToken: string) {
+function saveTokensWithExpiry(accessToken: string, refreshToken: string, expiresIn: number) {
   localStorage.setItem('accessToken', accessToken);
   localStorage.setItem('refreshToken', refreshToken);
+  localStorage.setItem('tokenExpiresAt', String(Date.now() + expiresIn * 1000));
   api.defaults.headers.common.Authorization = `Bearer ${accessToken}`;
 }
 
@@ -105,6 +144,10 @@ function notifySubscribers(token: string) {
     cb(token);
   }
   refreshSubscribers = [];
+}
+
+function dispatchTokenRefreshed() {
+  window.dispatchEvent(new Event('bopacorp:token-refreshed'));
 }
 
 function handleRefreshError(error: AxiosError) {

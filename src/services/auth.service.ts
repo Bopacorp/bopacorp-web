@@ -1,14 +1,16 @@
 import { request } from './api.js';
 
+export interface AuthUser {
+  id: string;
+  username: string;
+  email: string;
+  roles: string[];
+  permissions: string[];
+  profile: unknown | null;
+}
+
 interface LoginResponse {
-  user: {
-    id: string;
-    username: string;
-    email: string;
-    roles: string[];
-    permissions: string[];
-    profile: unknown | null;
-  };
+  user: AuthUser;
   tokens: {
     accessToken: string;
     refreshToken: string;
@@ -43,5 +45,12 @@ export async function logout(refreshToken: string) {
     method: 'POST',
     url: '/auth/logout',
     data: { refreshToken },
+  });
+}
+
+export async function fetchMe() {
+  return request<AuthUser>({
+    method: 'GET',
+    url: '/auth/me',
   });
 }
