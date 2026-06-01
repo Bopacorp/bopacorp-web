@@ -1,7 +1,7 @@
-import { useState, type FormEvent } from 'react';
+import { type FormEvent, useState } from 'react';
+import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { useAuth } from '../context/AuthContext.js';
 
@@ -31,9 +31,7 @@ export default function LoginPage() {
       <Card className="w-full max-w-sm">
         <CardHeader className="text-center">
           <CardTitle className="text-xl">BOPADIGITAL</CardTitle>
-          <CardDescription>
-            Inicia sesion con tu cuenta corporativa
-          </CardDescription>
+          <CardDescription>Inicia sesion con tu cuenta corporativa</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
