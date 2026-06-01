@@ -212,7 +212,7 @@ function StageSection({ stage, activeRole }: { stage: Stage; activeRole: string 
   );
 }
 
-function Empleabilidad() {
+function EmpleabilidadPage() {
   const [jobOfferings, setJobOfferings] = useState<JobOffering[]>(initialJobOfferings);
   const [activeJobId, setActiveJobId] = useState<string>(initialJobOfferings[0].id);
   const [newJobTitle, setNewJobTitle] = useState('');
@@ -412,4 +412,4 @@ function Empleabilidad() {
   );
 }
 
-export default Empleabilidad;
+export default EmpleabilidadPage;

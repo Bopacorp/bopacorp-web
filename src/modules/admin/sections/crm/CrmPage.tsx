@@ -84,7 +84,7 @@ function NegotiationsTable({ rows }: { rows: Negotiation[] }) {
   );
 }
 
-function CRM() {
+function CrmPage() {
   const [data] = useState<Negotiation[]>(initialData);
   const [loading] = useState(false);
   const [error] = useState<string | null>(null);
@@ -109,4 +109,4 @@ function CRM() {
   );
 }
 
-export default CRM;
+export default CrmPage;

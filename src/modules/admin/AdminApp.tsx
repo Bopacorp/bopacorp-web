@@ -1,112 +1,19 @@
-import { BarChart3, Bell, FileText, Handshake, Layout, LogOut, Plus, Users } from 'lucide-react';
-import type { ReactNode } from 'react';
+import { LogOut, Plus } from 'lucide-react';
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import SidebarNav from '@/components/SidebarNav';
-import CRM from '@/components/sections/CRM';
-import Empleabilidad from '@/components/sections/Empleabilidad';
 import { Button } from '@/components/ui/button';
 import { SidebarInset, SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
-import { usePermission } from '@/hooks/usePermission.js';
 import { useAuth } from '@/modules/auth/context/AuthContext.js';
+import { usePermission } from '@/modules/auth/hooks/usePermission.js';
 import CmsDemoPage from '@/modules/landing/pages/CmsDemoPage';
-
-const allMenuItems = [
-  { id: 'dashboard', title: 'Dashboard', icon: BarChart3, permission: null as string | null },
-  { id: 'crm', title: 'CRM', icon: Users, permission: 'contact_requests.read' },
-  { id: 'matrices', title: 'Matrices', icon: FileText, permission: null },
-  { id: 'alertas', title: 'Alertas', icon: Bell, permission: null },
-  {
-    id: 'empleabilidad',
-    title: 'Empleabilidad',
-    icon: Handshake,
-    permission: 'job_vacancies.read',
-  },
-  { id: 'cms-demo', title: 'CMS Demo', icon: Layout, permission: null },
-  { id: 'cms', title: 'CMS', icon: Layout, permission: 'content_blocks.read' },
-];
-
-const sectionMeta: Record<string, { title: string; description: string }> = {
-  dashboard: { title: 'Dashboard', description: 'Vista general de la operacion' },
-  crm: { title: 'BOPADIGITAL CRM', description: 'Panel interno de negociaciones' },
-  matrices: { title: 'Matrices', description: 'Documentos y estructuras operativas' },
-  alertas: { title: 'Alertas', description: 'Seguimiento de eventos importantes' },
-  empleabilidad: { title: 'Empleabilidad', description: 'Seguimiento de talento y vacantes' },
-  'cms-demo': { title: 'CMS Demo', description: 'Landing page con bloques CMS desde la API' },
-  cms: { title: 'CMS', description: 'Gestion de contenido para la plataforma' },
-};
-
-function PermissionRoute({
-  permission,
-  children,
-}: {
-  permission: string | null;
-  children: ReactNode;
-}) {
-  const { hasPermission } = usePermission();
-
-  if (permission && !hasPermission(permission)) {
-    return (
-      <div className="flex flex-col items-center justify-center gap-4 p-8 min-h-[50vh]">
-        <h2 className="text-xl font-semibold">Acceso denegado</h2>
-        <p className="text-muted-foreground">No tienes permisos para acceder a esta seccion.</p>
-      </div>
-    );
-  }
-
-  return <>{children}</>;
-}
-
-function DashboardSection() {
-  return (
-    <div className="grid gap-4 md:grid-cols-2 p-4">
-      <div className="rounded-lg border bg-card p-6 text-card-foreground">
-        <h2 className="text-xl font-semibold">Dashboard</h2>
-        <p className="text-sm text-muted-foreground">
-          Aqui puedes resumir metricas clave y accesos rapidos.
-        </p>
-      </div>
-    </div>
-  );
-}
-
-function MatricesSection() {
-  return (
-    <div className="grid gap-4 p-4">
-      <div className="rounded-lg border bg-card p-6 text-card-foreground">
-        <h2 className="text-xl font-semibold">Matrices</h2>
-        <p className="text-sm text-muted-foreground">
-          Seccion lista para cargar matrices y plantillas.
-        </p>
-      </div>
-    </div>
-  );
-}
-
-function AlertasSection() {
-  return (
-    <div className="grid gap-4 p-4">
-      <div className="rounded-lg border bg-card p-6 text-card-foreground">
-        <h2 className="text-xl font-semibold">Alertas</h2>
-        <p className="text-sm text-muted-foreground">
-          Seccion lista para mostrar notificaciones y avisos.
-        </p>
-      </div>
-    </div>
-  );
-}
-
-function CmsSection() {
-  return (
-    <div className="grid gap-4 p-4">
-      <div className="rounded-lg border bg-card p-6 text-card-foreground">
-        <h2 className="text-xl font-semibold">CMS</h2>
-        <p className="text-sm text-muted-foreground">
-          Seccion lista para integrar herramientas de gestion de contenido.
-        </p>
-      </div>
-    </div>
-  );
-}
+import { PermissionRoute } from './components/PermissionRoute.js';
+import { allMenuItems, sectionMeta } from './config/menu.js';
+import AlertasPage from './sections/alertas/AlertasPage.js';
+import CmsPage from './sections/cms/CmsPage.js';
+import CrmPage from './sections/crm/CrmPage.js';
+import DashboardPage from './sections/dashboard/DashboardPage.js';
+import EmpleabilidadPage from './sections/empleabilidad/EmpleabilidadPage.js';
+import MatricesPage from './sections/matrices/MatricesPage.js';
 
 export default function AdminApp() {
   const { user, logout } = useAuth();
@@ -149,7 +56,7 @@ export default function AdminApp() {
                 path="dashboard"
                 element={
                   <PermissionRoute permission={null}>
-                    <DashboardSection />
+                    <DashboardPage />
                   </PermissionRoute>
                 }
               />
@@ -157,7 +64,7 @@ export default function AdminApp() {
                 path="crm"
                 element={
                   <PermissionRoute permission="contact_requests.read">
-                    <CRM />
+                    <CrmPage />
                   </PermissionRoute>
                 }
               />
@@ -165,7 +72,7 @@ export default function AdminApp() {
                 path="matrices"
                 element={
                   <PermissionRoute permission={null}>
-                    <MatricesSection />
+                    <MatricesPage />
                   </PermissionRoute>
                 }
               />
@@ -173,7 +80,7 @@ export default function AdminApp() {
                 path="alertas"
                 element={
                   <PermissionRoute permission={null}>
-                    <AlertasSection />
+                    <AlertasPage />
                   </PermissionRoute>
                 }
               />
@@ -181,7 +88,7 @@ export default function AdminApp() {
                 path="empleabilidad"
                 element={
                   <PermissionRoute permission="job_vacancies.read">
-                    <Empleabilidad />
+                    <EmpleabilidadPage />
                   </PermissionRoute>
                 }
               />
@@ -197,7 +104,7 @@ export default function AdminApp() {
                 path="cms"
                 element={
                   <PermissionRoute permission="content_blocks.read">
-                    <CmsSection />
+                    <CmsPage />
                   </PermissionRoute>
                 }
               />
