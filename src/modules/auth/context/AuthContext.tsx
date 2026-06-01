@@ -1,6 +1,6 @@
 import { createContext, type ReactNode, useCallback, useContext, useEffect, useState } from 'react';
 import * as authService from '@/services/auth.service.js';
-import { type AuthUser, fetchMe } from '@/services/auth.service.js';
+import { type AuthUser, buildAuthUser, fetchMe } from '@/services/auth.service.js';
 import {
   clearAll,
   getAccessToken,
@@ -29,9 +29,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (!token) return;
 
     fetchMe()
-      .then((userData) => {
-        saveUser(userData);
-        setUser(userData);
+      .then((meData) => {
+        const fullUser = buildAuthUser(meData);
+        saveUser(fullUser);
+        setUser(fullUser);
       })
       .catch(() => {
         clearAll();
@@ -43,9 +44,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const handleTokenRefresh = async () => {
       try {
-        const userData = await fetchMe();
-        saveUser(userData);
-        setUser(userData);
+        const meData = await fetchMe();
+        const fullUser = buildAuthUser(meData);
+        saveUser(fullUser);
+        setUser(fullUser);
       } catch {
         clearAll();
         setUser(null);
