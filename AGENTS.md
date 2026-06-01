@@ -15,6 +15,9 @@ BOPACORP internal CRM web app (BOPADIGITAL). UI is in Spanish.
 - `npm run build` — `tsc -b && vite build` (type-check is part of build)
 - `npm run check` — Biome lint and format check
 - `npm run check:fix` — Biome lint and format fix
+- `npm run lint` — Biome lint check
+- `npm run lint:fix` — Biome lint fix
+- `npm run format` — Biome format write
 - `npx shadcn@latest add <component>` — add shadcn primitive
 - `npx shadcn@latest search <query>` — find components before building custom UI
 - `npx shadcn@latest apply b0` — re-apply design preset (rewrites `src/index.css`)
