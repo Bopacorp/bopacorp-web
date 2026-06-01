@@ -1,13 +1,23 @@
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-import { TooltipProvider } from '@/components/ui/tooltip'
-import './index.css'
-import App from './App.tsx'
+import { StrictMode } from 'react';
+import { createRoot } from 'react-dom/client';
+import { Toaster } from 'sonner';
+import { TooltipProvider } from '@/components/ui/tooltip';
+import { AuthProvider } from '@/modules/auth/context/AuthContext.js';
+import './index.css';
+import App from './App.tsx';
 
-createRoot(document.getElementById('root')!).render(
+const rootElement = document.getElementById('root');
+if (!rootElement) {
+  throw new Error('Root element not found');
+}
+
+createRoot(rootElement).render(
   <StrictMode>
     <TooltipProvider>
-      <App />
+      <AuthProvider>
+        <App />
+        <Toaster position="bottom-right" richColors closeButton />
+      </AuthProvider>
     </TooltipProvider>
   </StrictMode>,
-)
+);
