@@ -44,10 +44,10 @@ const SERVICES = [
 export default function ServicesPage() {
   return (
     <div className="w-full flex flex-col font-sans">
-      <section className="w-full relative py-24 px-6 border-b border-border/50 bg-[#06152b] overflow-hidden min-h-[350px] flex items-center">
+      <section className="w-full relative py-24 px-6 border-b border-border/50 bg-hero overflow-hidden min-h-[350px] flex items-center">
         <div className="max-w-4xl mx-auto text-center relative z-10 flex flex-col items-center gap-6">
           <h1 className="text-4xl md:text-6xl font-semibold tracking-tight text-white leading-tight">
-            Cátalogo de <span className="text-[#008be2]">Servicios</span>
+            Cátalogo de <span className="text-primary">Servicios</span>
           </h1>
           <p className="text-lg text-white/80 max-w-2xl font-normal leading-relaxed">
             Soluciones integrales de telecomunicaciones diseñadas para impulsar el crecimiento
@@ -56,27 +56,27 @@ export default function ServicesPage() {
         </div>
       </section>
 
-      <section className="w-full py-24 px-6 bg-slate-50 min-h-screen">
+      <section className="w-full py-24 px-6 bg-muted min-h-screen">
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {SERVICES.map((service) => (
               <Card
                 key={service.id}
-                className="group border-slate-200 shadow-sm hover:shadow-lg transition-all"
+                className="group border-border shadow-sm hover:shadow-lg transition-all"
               >
-                <div className="aspect-[16/9] bg-slate-100 flex items-center justify-center">
-                  <service.icon className="size-12 text-[#008be2]/40" />
+                <div className="aspect-[16/9] bg-muted flex items-center justify-center">
+                  <service.icon className="size-12 text-primary/40" />
                 </div>
                 <CardHeader>
-                  <CardTitle className="text-xl font-semibold text-slate-900">
+                  <CardTitle className="text-xl font-semibold text-card-foreground">
                     {service.title}
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-6">
-                  <p className="text-sm text-slate-600 leading-relaxed">{service.desc}</p>
+                <CardContent className="flex flex-col gap-6">
+                  <p className="text-sm text-muted-foreground leading-relaxed">{service.desc}</p>
                   <Button
                     variant="outline"
-                    className="w-full gap-2 group-hover:bg-[#008be2] group-hover:text-white transition-colors"
+                    className="w-full gap-2 group-hover:bg-primary group-hover:text-primary-foreground transition-colors"
                   >
                     Más información <ArrowRight className="size-4" />
                   </Button>

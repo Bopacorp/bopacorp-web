@@ -1,10 +1,21 @@
 import type { AxiosError, AxiosRequestConfig, InternalAxiosRequestConfig } from 'axios';
 import axios from 'axios';
+import {
+  clearAll,
+  getAccessToken,
+  getRefreshToken,
+  getTokenExpiresAt,
+  saveTokens,
+} from './auth-storage.js';
 
 const baseURL = import.meta.env.VITE_API_URL as string;
 
 if (!baseURL) {
   throw new Error('VITE_API_URL is required');
+}
+
+if (!baseURL.includes('/api/')) {
+  throw new Error('VITE_API_URL must include the API path (e.g. http://localhost:3000/api/v1)');
 }
 
 const api = axios.create({ baseURL });
@@ -37,18 +48,13 @@ export async function request<T>(config: AxiosRequestConfig): Promise<T> {
 
 export default api;
 
-function getTokenExpiry(): number | null {
-  const raw = localStorage.getItem('tokenExpiresAt');
-  return raw ? Number(raw) : null;
-}
-
 function injectAuthHeader(config: InternalAxiosRequestConfig) {
-  const token = localStorage.getItem('accessToken');
-  const expiresAt = getTokenExpiry();
+  const token = getAccessToken();
+  const expiresAt = getTokenExpiresAt();
 
   if (token && expiresAt && expiresAt - Date.now() < 120000 && !isRefreshing) {
     return triggerProactiveRefresh().then(() => {
-      const newToken = localStorage.getItem('accessToken');
+      const newToken = getAccessToken();
       if (newToken) {
         config.headers.Authorization = `Bearer ${newToken}`;
       }
@@ -96,7 +102,7 @@ async function refreshWithRetry(request: RetryConfig) {
     const res = await axios.post(`${baseURL}/auth/refresh`, { refreshToken: token });
     const { accessToken, refreshToken: newRefreshToken, expiresIn } = res.data.data;
 
-    saveTokensWithExpiry(accessToken, newRefreshToken, expiresIn);
+    saveTokens({ accessToken, refreshToken: newRefreshToken, expiresIn });
     notifySubscribers(accessToken);
     dispatchTokenRefreshed();
 
@@ -118,25 +124,14 @@ async function triggerProactiveRefresh() {
     const res = await axios.post(`${baseURL}/auth/refresh`, { refreshToken: token });
     const { accessToken, refreshToken: newRefreshToken, expiresIn } = res.data.data;
 
-    saveTokensWithExpiry(accessToken, newRefreshToken, expiresIn);
+    saveTokens({ accessToken, refreshToken: newRefreshToken, expiresIn });
     dispatchTokenRefreshed();
   } catch {
-    clearAuth();
+    clearAll();
     redirectToLogin();
   } finally {
     isRefreshing = false;
   }
-}
-
-function getRefreshToken() {
-  return localStorage.getItem('refreshToken');
-}
-
-function saveTokensWithExpiry(accessToken: string, refreshToken: string, expiresIn: number) {
-  localStorage.setItem('accessToken', accessToken);
-  localStorage.setItem('refreshToken', refreshToken);
-  localStorage.setItem('tokenExpiresAt', String(Date.now() + expiresIn * 1000));
-  api.defaults.headers.common.Authorization = `Bearer ${accessToken}`;
 }
 
 function notifySubscribers(token: string) {
@@ -151,16 +146,9 @@ function dispatchTokenRefreshed() {
 }
 
 function handleRefreshError(error: AxiosError) {
-  clearAuth();
+  clearAll();
   redirectToLogin();
   return Promise.reject(error);
-}
-
-function clearAuth() {
-  localStorage.removeItem('accessToken');
-  localStorage.removeItem('refreshToken');
-  localStorage.removeItem('bopacorp_auth');
-  localStorage.removeItem('tokenExpiresAt');
 }
 
 function redirectToLogin() {

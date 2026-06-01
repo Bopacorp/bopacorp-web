@@ -1,5 +1,6 @@
 import { Card } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
+import { sanitizeHtml } from '@/lib/sanitize.js';
 import { EmptyState, ErrorState } from '@/shared/ui';
 import { useCmsLanding } from '../hooks/use-cms-landing.js';
 
@@ -18,8 +19,8 @@ function getSection(key: string, blocks: CmsBlocks) {
 }
 
 function HtmlBlock({ html }: { html: string }) {
-  // biome-ignore lint/security/noDangerouslySetInnerHtml: CMS renders trusted HTML from backend
-  return <div dangerouslySetInnerHTML={{ __html: html }} />;
+  // biome-ignore lint/security/noDangerouslySetInnerHtml: sanitized via DOMPurify
+  return <div dangerouslySetInnerHTML={{ __html: sanitizeHtml(html) }} />;
 }
 
 function HeroSection({ blocks }: { blocks: CmsBlocks }) {

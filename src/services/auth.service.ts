@@ -1,3 +1,4 @@
+import type { AuthTokensResponse, ProfileResponse } from '@bopacorp/shared/auth';
 import { request } from './api.js';
 
 export interface AuthUser {
@@ -6,22 +7,12 @@ export interface AuthUser {
   email: string;
   roles: string[];
   permissions: string[];
-  profile: unknown | null;
+  profile: ProfileResponse | null;
 }
 
 interface LoginResponse {
   user: AuthUser;
-  tokens: {
-    accessToken: string;
-    refreshToken: string;
-    expiresIn: number;
-  };
-}
-
-interface RefreshResponse {
-  accessToken: string;
-  refreshToken: string;
-  expiresIn: number;
+  tokens: AuthTokensResponse;
 }
 
 export async function login(data: { email: string; password: string }) {
@@ -33,7 +24,7 @@ export async function login(data: { email: string; password: string }) {
 }
 
 export async function refresh(refreshToken: string) {
-  return request<RefreshResponse>({
+  return request<AuthTokensResponse>({
     method: 'POST',
     url: '/auth/refresh',
     data: { refreshToken },

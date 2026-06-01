@@ -4,7 +4,7 @@ import logoBopacorp from '@/assets/logo.png';
 
 export default function MainLayout() {
   return (
-    <div className="min-h-screen w-full bg-[#040914] flex flex-col font-sans overflow-x-hidden">
+    <div className="min-h-screen w-full bg-background flex flex-col font-sans overflow-x-hidden">
       <header className="w-full bg-background border-b border-border fixed top-0 left-0 z-50">
         <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
           <div className="flex items-center gap-3 cursor-pointer">
@@ -81,39 +81,41 @@ export default function MainLayout() {
         <Outlet />
       </main>
 
-      <footer className="w-full text-white pt-16 pb-12 px-6 bg-[#040914] relative z-10 border-t border-[#06152b] -mt-px">
+      <footer className="w-full text-hero-foreground pt-16 pb-12 px-6 bg-background relative z-10 border-t border-hero -mt-px">
         <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-12 gap-12 w-full relative z-10">
           <div className="md:col-span-5 flex flex-col gap-6 w-full">
             <div className="flex flex-col gap-1 w-full">
-              <span className="text-2xl font-semibold text-white tracking-tight">BOPACORP</span>
-              <span className="text-xs font-medium text-white/60 uppercase tracking-widest">
+              <span className="text-2xl font-semibold text-foreground tracking-tight">
+                BOPACORP
+              </span>
+              <span className="text-xs font-medium text-muted-foreground uppercase tracking-widest">
                 Partner Movistar
               </span>
             </div>
-            <p className="text-sm text-white/80 leading-relaxed max-w-sm w-full font-normal">
+            <p className="text-sm text-muted-foreground leading-relaxed max-w-sm w-full font-normal">
               Bohorquez & Pauta Corp S.A. — Soluciones de telecomunicaciones corporativas en Ecuador
               desde 2019.
             </p>
           </div>
           <div className="md:col-span-3 flex flex-col gap-4 w-full">
-            <h4 className="text-sm font-semibold text-white/90 w-full">SERVICIOS</h4>
+            <h4 className="text-sm font-semibold text-foreground w-full">SERVICIOS</h4>
             <div className="flex flex-col gap-3 w-full">
               <div className="flex flex-col gap-3 w-full">
                 <a
                   href="/services"
-                  className="text-sm text-white/80 hover:text-white transition-colors font-normal w-full"
+                  className="text-sm text-muted-foreground hover:text-foreground transition-colors font-normal w-full"
                 >
                   Conectividad Empresarial
                 </a>
                 <a
                   href="/services"
-                  className="text-sm text-white/80 hover:text-white transition-colors font-normal w-full"
+                  className="text-sm text-muted-foreground hover:text-foreground transition-colors font-normal w-full"
                 >
                   Planes Corporativos
                 </a>
                 <a
                   href="/services"
-                  className="text-sm text-white/80 hover:text-white transition-colors font-normal w-full"
+                  className="text-sm text-muted-foreground hover:text-foreground transition-colors font-normal w-full"
                 >
                   Servicios Digitales
                 </a>
@@ -121,34 +123,34 @@ export default function MainLayout() {
             </div>
           </div>
           <div className="md:col-span-4 flex flex-col gap-4 w-full">
-            <h4 className="text-sm font-semibold text-white/90 w-full">CONTACTO</h4>
+            <h4 className="text-sm font-semibold text-foreground w-full">CONTACTO</h4>
             <div className="flex flex-col gap-3 w-full">
-              <div className="flex items-center gap-2 text-sm text-white/80 font-normal w-full">
-                <MapPin className="size-4 shrink-0 text-white/60" /> Guayaquil
+              <div className="flex items-center gap-2 text-sm text-muted-foreground font-normal w-full">
+                <MapPin className="size-4 shrink-0 text-muted-foreground" /> Guayaquil
               </div>
-              <div className="flex items-center gap-2 text-sm text-white/80 font-normal w-full">
-                <Phone className="size-4 shrink-0 text-white/60" /> +593 0 000 0000
+              <div className="flex items-center gap-2 text-sm text-muted-foreground font-normal w-full">
+                <Phone className="size-4 shrink-0 text-muted-foreground" /> +593 0 000 0000
               </div>
-              <div className="flex items-center gap-2 text-sm text-white/80 font-normal w-full">
-                <Mail className="size-4 shrink-0 text-white/60" /> boopa@bopacorp.com
+              <div className="flex items-center gap-2 text-sm text-muted-foreground font-normal w-full">
+                <Mail className="size-4 shrink-0 text-muted-foreground" /> boopa@bopacorp.com
               </div>
             </div>
           </div>
         </div>
-        <div className="max-w-7xl mx-auto w-full mt-16 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 relative z-10 border-t border-white/10">
-          <span className="text-xs text-white/50 font-normal">
+        <div className="max-w-7xl mx-auto w-full mt-16 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 relative z-10 border-t border-border">
+          <span className="text-xs text-muted-foreground font-normal">
             © 2026 BOPACORP S.A. Todos los derechos reservados.
           </span>
           <div className="flex items-center gap-6">
             <a
               href="/terms"
-              className="text-xs text-white/50 hover:text-white transition-colors font-normal"
+              className="text-xs text-muted-foreground hover:text-foreground transition-colors font-normal"
             >
               Términos y Condiciones
             </a>
             <a
               href="/privacy"
-              className="text-xs text-white/50 hover:text-white transition-colors font-normal"
+              className="text-xs text-muted-foreground hover:text-foreground transition-colors font-normal"
             >
               Políticas de Privacidad
             </a>
