@@ -10,7 +10,7 @@ BOPACORP internal CRM web app (BOPADIGITAL). UI is in Spanish. React 19 + TypeSc
 
 - `npm run dev` — start dev server (Vite HMR)
 - `npm run build` — type-check then build (`tsc -b && vite build`)
-- `npm run check` — Biome lint and format check
+- `npm run check` — Biome lint/format fix + TypeScript type-check (`biome check --write . && tsc -b --noEmit`)
 - `npm run check:fix` — Biome lint and format fix
 - `npm run lint` — Biome lint check
 - `npm run lint:fix` — Biome lint fix

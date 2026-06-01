@@ -13,7 +13,7 @@ BOPACORP internal CRM web app (BOPADIGITAL). UI is in Spanish.
 
 - `npm run dev` — Vite HMR dev server
 - `npm run build` — `tsc -b && vite build` (type-check is part of build)
-- `npm run check` — Biome lint and format check
+- `npm run check` — Biome lint/format fix + TypeScript type-check (`biome check --write . && tsc -b --noEmit`)
 - `npm run check:fix` — Biome lint and format fix
 - `npm run lint` — Biome lint check
 - `npm run lint:fix` — Biome lint fix
