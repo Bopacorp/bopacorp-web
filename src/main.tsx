@@ -1,5 +1,6 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
+import { Toaster } from 'sonner';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { AuthProvider } from '@/modules/auth/context/AuthContext.js';
 import './index.css';
@@ -15,6 +16,7 @@ createRoot(rootElement).render(
     <TooltipProvider>
       <AuthProvider>
         <App />
+        <Toaster position="bottom-right" richColors closeButton />
       </AuthProvider>
     </TooltipProvider>
   </StrictMode>,

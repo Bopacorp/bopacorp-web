@@ -1,7 +1,6 @@
 import { Card } from '@/components/ui/card';
-import { Empty, EmptyDescription, EmptyHeader, EmptyTitle } from '@/components/ui/empty';
 import { Skeleton } from '@/components/ui/skeleton';
-import { ErrorState, PageLoader } from '@/shared/ui';
+import { EmptyState, ErrorState } from '@/shared/ui';
 import { useCmsLanding } from '../hooks/use-cms-landing.js';
 
 interface CmsBlocks {
@@ -144,7 +143,14 @@ export default function CmsDemoPage() {
 
   if (loading) return <LoadingView />;
   if (error) return <ErrorState message={error} onRetry={retry} />;
-  if (!blocks || Object.keys(blocks).length === 0) return <EmptyView />;
+  if (!blocks || Object.keys(blocks).length === 0) {
+    return (
+      <EmptyState
+        title="Sin contenido"
+        description="No hay bloques CMS publicados. Ejecuta el script de seed para poblarlos."
+      />
+    );
+  }
 
   return (
     <div className="flex flex-col bg-background">
@@ -160,36 +166,19 @@ export default function CmsDemoPage() {
 
 function LoadingView() {
   return (
-    <PageLoader>
-      <div className="flex flex-col gap-6 p-6">
-        <Skeleton className="h-[500px] w-full rounded-none" />
-        <div className="max-w-7xl mx-auto w-full flex flex-col gap-6">
-          <div className="flex flex-col gap-2 items-center">
-            <Skeleton className="h-8 w-64" />
-            <Skeleton className="h-4 w-96" />
-          </div>
-          <div className="grid gap-6 md:grid-cols-3">
-            <Skeleton className="h-48" />
-            <Skeleton className="h-48" />
-            <Skeleton className="h-48" />
-          </div>
+    <div className="flex flex-col gap-6 p-6">
+      <Skeleton className="h-[500px] w-full rounded-none" />
+      <div className="max-w-7xl mx-auto w-full flex flex-col gap-6">
+        <div className="flex flex-col gap-2 items-center">
+          <Skeleton className="h-8 w-64" />
+          <Skeleton className="h-4 w-96" />
+        </div>
+        <div className="grid gap-6 md:grid-cols-3">
+          <Skeleton className="h-48" />
+          <Skeleton className="h-48" />
+          <Skeleton className="h-48" />
         </div>
       </div>
-    </PageLoader>
-  );
-}
-
-function EmptyView() {
-  return (
-    <div className="flex items-center justify-center py-20">
-      <Empty>
-        <EmptyHeader>
-          <EmptyTitle>Sin contenido</EmptyTitle>
-          <EmptyDescription>
-            No hay bloques CMS publicados. Ejecuta el script de seed para poblarlos.
-          </EmptyDescription>
-        </EmptyHeader>
-      </Empty>
     </div>
   );
 }

@@ -35,6 +35,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { EmptyState, ErrorState, PageLoader } from '@/shared/ui';
 
 type Applicant = {
   name: string;
@@ -215,6 +216,8 @@ function Empleabilidad() {
   const [jobOfferings, setJobOfferings] = useState<JobOffering[]>(initialJobOfferings);
   const [activeJobId, setActiveJobId] = useState<string>(initialJobOfferings[0].id);
   const [newJobTitle, setNewJobTitle] = useState('');
+  const [loading] = useState(false);
+  const [error] = useState<string | null>(null);
 
   const activeJob = jobOfferings.find((offering) => offering.id === activeJobId) ?? jobOfferings[0];
 
@@ -253,6 +256,18 @@ function Empleabilidad() {
       setActiveJobId(nextOfferings[0].id);
     }
   };
+
+  if (loading) {
+    return <PageLoader message="Cargando empleabilidad..." />;
+  }
+
+  if (error) {
+    return <ErrorState message={error} onRetry={() => window.location.reload()} />;
+  }
+
+  if (stages.length === 0) {
+    return <EmptyState title="Sin aplicantes" description="No hay aplicantes registrados." />;
+  }
 
   return (
     <section className="flex flex-col gap-6 p-4 md:p-6">

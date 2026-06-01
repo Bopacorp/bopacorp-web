@@ -1,15 +1,23 @@
+import { Loader2 } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 
 interface PageLoaderProps {
-  children?: React.ReactNode;
+  message?: string;
 }
 
-export function PageLoader({ children }: PageLoaderProps) {
-  if (children) return <>{children}</>;
+export function PageLoader({ message }: PageLoaderProps) {
+  if (message) {
+    return (
+      <div className="flex min-h-[50vh] flex-col items-center justify-center gap-4 bg-background text-foreground">
+        <Loader2 className="size-8 animate-spin text-primary" />
+        <p className="text-sm text-muted-foreground">{message}</p>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col gap-6 p-6">
-      <div className="flex flex-col gap-2 items-center">
+      <div className="flex flex-col items-center gap-2">
         <Skeleton className="h-8 w-64" />
         <Skeleton className="h-4 w-96" />
       </div>
