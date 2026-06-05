@@ -5,15 +5,9 @@ import { Button } from '@/components/ui/button';
 import { SidebarInset, SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { useAuth } from '@/modules/auth/context/AuthContext.js';
 import { usePermission } from '@/modules/auth/hooks/usePermission.js';
-import CmsDemoPage from '@/modules/landing/pages/CmsDemoPage';
 import { PermissionRoute } from './components/PermissionRoute.js';
 import { allMenuItems, sectionMeta } from './config/menu.js';
-import AlertasPage from './sections/alertas/AlertasPage.js';
 import CmsPage from './sections/cms/CmsPage.js';
-import CrmPage from './sections/crm/CrmPage.js';
-import DashboardPage from './sections/dashboard/DashboardPage.js';
-import EmpleabilidadPage from './sections/empleabilidad/EmpleabilidadPage.js';
-import MatricesPage from './sections/matrices/MatricesPage.js';
 
 export default function AdminApp() {
   const { user, logout } = useAuth();
@@ -51,55 +45,7 @@ export default function AdminApp() {
           </header>
           <main className="flex-1 overflow-auto">
             <Routes>
-              <Route path="/" element={<Navigate to="crm" replace />} />
-              <Route
-                path="dashboard"
-                element={
-                  <PermissionRoute permission={null}>
-                    <DashboardPage />
-                  </PermissionRoute>
-                }
-              />
-              <Route
-                path="crm"
-                element={
-                  <PermissionRoute permission="contact_requests.read">
-                    <CrmPage />
-                  </PermissionRoute>
-                }
-              />
-              <Route
-                path="matrices"
-                element={
-                  <PermissionRoute permission={null}>
-                    <MatricesPage />
-                  </PermissionRoute>
-                }
-              />
-              <Route
-                path="alertas"
-                element={
-                  <PermissionRoute permission={null}>
-                    <AlertasPage />
-                  </PermissionRoute>
-                }
-              />
-              <Route
-                path="empleabilidad"
-                element={
-                  <PermissionRoute permission="job_vacancies.read">
-                    <EmpleabilidadPage />
-                  </PermissionRoute>
-                }
-              />
-              <Route
-                path="cms-demo"
-                element={
-                  <PermissionRoute permission={null}>
-                    <CmsDemoPage />
-                  </PermissionRoute>
-                }
-              />
+              <Route path="/" element={<Navigate to="cms" replace />} />
               <Route
                 path="cms"
                 element={
