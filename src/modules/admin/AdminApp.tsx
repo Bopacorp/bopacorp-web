@@ -5,9 +5,9 @@ import { Button } from '@/components/ui/button';
 import { SidebarInset, SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { useAuth } from '@/modules/auth/context/AuthContext.js';
 import { usePermission } from '@/modules/auth/hooks/usePermission.js';
+import { CmsPage } from '@/modules/cms/CmsAdminPage.js';
 import { PermissionRoute } from './components/PermissionRoute.js';
 import { allMenuItems, sectionMeta } from './config/menu.js';
-import CmsPage from './sections/cms/CmsPage.js';
 
 export default function AdminApp() {
   const { user, logout } = useAuth();
@@ -17,7 +17,7 @@ export default function AdminApp() {
   const menuItems = allMenuItems.filter(
     (item) => !item.permission || hasPermission(item.permission),
   );
-  const sectionId = location.pathname.replace('/admin/', '') || 'dashboard';
+  const sectionId = location.pathname.replace(/^\/admin\/?/, '') || 'dashboard';
   const meta = sectionMeta[sectionId] || sectionMeta.dashboard;
 
   return (

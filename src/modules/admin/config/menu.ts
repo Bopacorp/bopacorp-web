@@ -12,5 +12,9 @@ export const allMenuItems: MenuItem[] = [
 ];
 
 export const sectionMeta: Record<string, { title: string; description: string }> = {
+  dashboard: {
+    title: 'Panel de administracion',
+    description: 'Bienvenido al panel de administracion',
+  },
   cms: { title: 'CMS', description: 'Gestion de contenido para la plataforma' },
 };

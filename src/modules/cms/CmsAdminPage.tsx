@@ -1,111 +1,75 @@
-import { useCallback, useEffect, useState } from "react";
-import { PageLoader, ErrorState } from "@/shared/ui";
-import { Empty, EmptyHeader, EmptyTitle, EmptyDescription } from "@/components/ui/empty";
-import type { PaginationMeta } from "@bopacorp/shared";
-import type { ContentBlockResponse, UpdateContentBlockRequest } from "@bopacorp/shared/catalog";
-import { Separator } from "@/components/ui/separator";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
-import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
-import { Pencil } from "lucide-react";
-import { toast } from "sonner";
+import type { ContentBlockResponse } from '@bopacorp/shared/catalog';
+import { Pencil } from 'lucide-react';
+import { useCallback, useState } from 'react';
+import { toast } from 'sonner';
+import { Button } from '@/components/ui/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { Empty, EmptyDescription, EmptyHeader, EmptyTitle } from '@/components/ui/empty';
+import { Field, FieldGroup, FieldLabel } from '@/components/ui/field';
+import { Separator } from '@/components/ui/separator';
+import { Textarea } from '@/components/ui/textarea';
+import { ApiError } from '@/services/api.js';
+import { ErrorState, PageLoader } from '@/shared/ui';
+import { updateContentBlock } from './cms.service.js';
+import { useContentBlocks } from './useContentBlocks.js';
 
-type ContentBlockListApiResponse = {
-  success: true;
-  data: ContentBlockResponse[];
-  meta: PaginationMeta;
-};
+function getErrorMessage(err: unknown) {
+  if (err instanceof ApiError) return err.message;
+  if (err instanceof Error) return err.message;
+  return 'Error al guardar';
+}
 
-type ContentBlockSingleApiResponse = {
-  success: true;
-  data: ContentBlockResponse;
-};
+function updateBlock(prev: ContentBlockResponse[], id: string, updated: ContentBlockResponse) {
+  return prev.map((block) => (block.id === id ? updated : block));
+}
+
+async function persistEdit(
+  block: ContentBlockResponse,
+  body: string,
+  setBlocks: React.Dispatch<React.SetStateAction<ContentBlockResponse[]>>,
+  onDone: () => void,
+) {
+  const updated = await updateContentBlock(block.id, { body });
+  setBlocks((prev) => updateBlock(prev, block.id, updated));
+  toast.success('Bloque actualizado');
+  onDone();
+}
 
 export function CmsPage() {
-  const [contentBlocks, setContentBlocks] = useState<ContentBlockResponse[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [retryCount, setRetryCount] = useState(0);
-  const [page] = useState(1);
-
+  const { contentBlocks, loading, error, retry, setContentBlocks } = useContentBlocks(1);
   const [editingBlock, setEditingBlock] = useState<ContentBlockResponse | null>(null);
-  const [editBody, setEditBody] = useState("");
+  const [editBody, setEditBody] = useState('');
   const [saving, setSaving] = useState(false);
-
-  useEffect(() => {
-    let cancelled = false;
-
-    fetch(`/api/v1/catalog/content-blocks?page=${page}`)
-      .then((res) => {
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        return res.json() as Promise<ContentBlockListApiResponse>;
-      })
-      .then((json) => {
-        if (cancelled) return;
-        setContentBlocks(json.data);
-        setLoading(false);
-      })
-      .catch((err: Error) => {
-        if (cancelled) return;
-        setError(err.message);
-        setLoading(false);
-      });
-
-    return () => {
-      cancelled = true;
-    };
-  }, [page, retryCount]);
-
-  const retry = useCallback(() => {
-    setLoading(true);
-    setError(null);
-    setRetryCount((n) => n + 1);
-  }, []);
 
   const openEdit = useCallback((block: ContentBlockResponse) => {
     setEditingBlock(block);
-    setEditBody(block.body ?? "");
+    setEditBody(block.body ?? '');
   }, []);
 
   const closeEdit = useCallback(() => {
     setEditingBlock(null);
-    setEditBody("");
+    setEditBody('');
     setSaving(false);
   }, []);
 
   const saveEdit = useCallback(async () => {
     if (!editingBlock) return;
-
     setSaving(true);
-
     try {
-      const payload: UpdateContentBlockRequest = { body: editBody };
-      const res = await fetch(`/api/v1/catalog/content-blocks/${editingBlock.id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-
-      const json = (await res.json()) as ContentBlockSingleApiResponse;
-
-      if (json.success) {
-        setContentBlocks((prev) =>
-          prev.map((b) => (b.id === editingBlock.id ? json.data : b))
-        );
-        toast.success("Bloque actualizado");
-        closeEdit();
-      } else {
-        throw new Error("Respuesta inválida del servidor");
-      }
+      await persistEdit(editingBlock, editBody, setContentBlocks, closeEdit);
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Error al guardar");
+      toast.error(getErrorMessage(err));
     } finally {
       setSaving(false);
     }
-  }, [editingBlock, editBody, closeEdit]);
+  }, [editingBlock, editBody, closeEdit, setContentBlocks]);
 
   if (loading) return <PageLoader />;
   if (error) return <ErrorState message={error} onRetry={retry} />;
@@ -115,9 +79,7 @@ export function CmsPage() {
         <Empty>
           <EmptyHeader>
             <EmptyTitle>Sin contenido</EmptyTitle>
-            <EmptyDescription>
-              No hay bloques CMS publicados.
-            </EmptyDescription>
+            <EmptyDescription>No hay bloques CMS publicados.</EmptyDescription>
           </EmptyHeader>
         </Empty>
       </div>
@@ -132,13 +94,16 @@ export function CmsPage() {
         <div key={block.id} className="border rounded p-4 mt-4">
           <h3 className="text-lg font-semibold">{block.title}</h3>
           <p className="text-sm text-muted-foreground">Tipo: {block.contentType?.name}</p>
-          <p className="text-sm text-muted-foreground">Orden: {block.sortOrder}</p>
           <p className="mt-2">{block.body}</p>
           <Separator />
           <div className="flex items-center justify-between mt-2">
             <div className="flex flex-col gap-1">
-              <p className="text-xs text-muted-foreground">Publicado el {new Date(block.createdAt).toLocaleDateString()}</p>
-              <p className="text-xs text-muted-foreground">Actualizado el {new Date(block.updatedAt).toLocaleDateString()}</p>
+              <p className="text-xs text-muted-foreground">
+                Publicado el {new Date(block.createdAt).toLocaleDateString()}
+              </p>
+              <p className="text-xs text-muted-foreground">
+                Actualizado el {new Date(block.updatedAt).toLocaleDateString()}
+              </p>
             </div>
             <Button variant="outline" size="sm" onClick={() => openEdit(block)}>
               <Pencil data-icon="inline-start" />
@@ -148,13 +113,16 @@ export function CmsPage() {
         </div>
       ))}
 
-      <Dialog open={!!editingBlock} onOpenChange={(open) => { if (!open) closeEdit(); }}>
+      <Dialog
+        open={!!editingBlock}
+        onOpenChange={(open) => {
+          if (!open) closeEdit();
+        }}
+      >
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Editar contenido</DialogTitle>
-            <DialogDescription>
-              {editingBlock?.title || "Bloque CMS"}
-            </DialogDescription>
+            <DialogDescription>{editingBlock?.title || 'Bloque CMS'}</DialogDescription>
           </DialogHeader>
           <FieldGroup>
             <Field>
@@ -172,7 +140,7 @@ export function CmsPage() {
               Cancelar
             </Button>
             <Button onClick={saveEdit} disabled={saving}>
-              {saving ? "Guardando..." : "Guardar"}
+              {saving ? 'Guardando...' : 'Guardar'}
             </Button>
           </DialogFooter>
         </DialogContent>
