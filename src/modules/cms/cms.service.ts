@@ -1,11 +1,11 @@
 import type { ContentBlockResponse, UpdateContentBlockRequest } from '@bopacorp/shared/catalog';
 import { request } from '@/services/api.js';
 
-export function listContentBlocks(page: number) {
+export function listContentBlocks(page: number, search: string) {
   return request<ContentBlockResponse[]>({
     method: 'GET',
     url: '/catalog/content-blocks',
-    params: { page },
+    params: { page, search },
   });
 }
 

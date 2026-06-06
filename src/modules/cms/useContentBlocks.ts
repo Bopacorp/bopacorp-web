@@ -12,11 +12,11 @@ function getErrorMessage(err: unknown) {
 function saveBlocks(
   data: ContentBlockResponse[],
   ctrl: { cancelled: boolean },
-  setBlocks: React.Dispatch<React.SetStateAction<ContentBlockResponse[]>>,
+  setContentBlocks: React.Dispatch<React.SetStateAction<ContentBlockResponse[]>>,
   setLoading: (v: boolean) => void,
 ) {
   if (ctrl.cancelled) return;
-  setBlocks(data);
+  setContentBlocks(data);
   setLoading(false);
 }
 
@@ -33,20 +33,21 @@ function saveError(
 
 async function loadBlocks(
   page: number,
-  setBlocks: React.Dispatch<React.SetStateAction<ContentBlockResponse[]>>,
+  query: string,
+  setContentBlocks: React.Dispatch<React.SetStateAction<ContentBlockResponse[]>>,
   setErr: (msg: string | null) => void,
   setLoading: (v: boolean) => void,
   ctrl: { cancelled: boolean },
 ) {
   try {
-    const data = await listContentBlocks(page);
-    saveBlocks(data, ctrl, setBlocks, setLoading);
+    const data = await listContentBlocks(page, query);
+    saveBlocks(data, ctrl, setContentBlocks, setLoading);
   } catch (err) {
     saveError(err, ctrl, setErr, setLoading);
   }
 }
 
-export function useContentBlocks(page: number) {
+export function useContentBlocks(page: number, query: string) {
   const [contentBlocks, setContentBlocks] = useState<ContentBlockResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -55,11 +56,11 @@ export function useContentBlocks(page: number) {
   // biome-ignore lint/correctness/useExhaustiveDependencies: retryCount is an intentional trigger for refetch
   useEffect(() => {
     const ctrl = { cancelled: false };
-    loadBlocks(page, setContentBlocks, setError, setLoading, ctrl);
+    loadBlocks(page, query, setContentBlocks, setError, setLoading, ctrl);
     return () => {
       ctrl.cancelled = true;
     };
-  }, [page, retryCount]);
+  }, [page, query, retryCount]);
 
   const retry = useCallback(() => {
     setLoading(true);

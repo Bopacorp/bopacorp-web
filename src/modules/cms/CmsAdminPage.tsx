@@ -1,6 +1,7 @@
 import type { ContentBlockResponse } from '@bopacorp/shared/catalog';
 import { useCallback, useMemo, useState } from 'react';
 import { toast } from 'sonner';
+import { useDebounce } from 'use-debounce';
 import { ApiError } from '@/services/api.js';
 import { ErrorState, PageLoader } from '@/shared/ui';
 import { updateContentBlock } from './cms.service.js';
@@ -44,33 +45,21 @@ function computeLastUpdatedAt(blocks: ContentBlockResponse[]): Date | null {
   return new Date(max);
 }
 
-function matchesQuery(block: ContentBlockResponse, query: string): boolean {
-  const q = query.toLowerCase().trim();
-  if (!q) return true;
-  const haystack = [
-    block.title,
-    block.body,
-    block.contentKey,
-    block.contentType?.code,
-    block.contentType?.name,
-  ]
-    .filter(Boolean)
-    .join(' ')
-    .toLowerCase();
-  return haystack.includes(q);
-}
-
 export function CmsPage() {
-  const { contentBlocks, loading, error, retry, setContentBlocks } = useContentBlocks(1);
   const [editingBlock, setEditingBlock] = useState<ContentBlockResponse | null>(null);
   const [editBody, setEditBody] = useState('');
   const [saving, setSaving] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [rawSearchQuery, setSearchQuery] = useState('');
+  const [debouncedQuery] = useDebounce(rawSearchQuery, 300);
+  const { contentBlocks, loading, error, retry, setContentBlocks } = useContentBlocks(
+    1,
+    debouncedQuery,
+  );
 
   const filteredBlocks = useMemo(() => {
-    if (!searchQuery.trim()) return contentBlocks;
-    return contentBlocks.filter((block) => matchesQuery(block, searchQuery));
-  }, [contentBlocks, searchQuery]);
+    if (!rawSearchQuery.trim()) return contentBlocks;
+    return contentBlocks;
+  }, [contentBlocks, rawSearchQuery]);
 
   const lastUpdatedAt = useMemo(() => computeLastUpdatedAt(contentBlocks), [contentBlocks]);
 
@@ -104,19 +93,17 @@ export function CmsPage() {
     <div className="relative grain flex flex-col gap-6 bg-background p-6 md:p-8">
       <CmsMasthead count={contentBlocks.length} lastUpdatedAt={lastUpdatedAt} />
 
-      {contentBlocks.length > 0 && (
-        <CmsSearchBar
-          value={searchQuery}
-          onChange={setSearchQuery}
-          resultCount={filteredBlocks.length}
-          total={contentBlocks.length}
-        />
-      )}
+      <CmsSearchBar
+        value={rawSearchQuery}
+        onChange={setSearchQuery}
+        resultCount={filteredBlocks.length}
+        total={contentBlocks.length}
+      />
 
       {contentBlocks.length === 0 ? (
-        <CmsArchiveEmpty />
+        <CmsArchiveEmpty searchQuery={rawSearchQuery} />
       ) : filteredBlocks.length === 0 ? (
-        <CmsArchiveEmpty searchQuery={searchQuery} />
+        <CmsArchiveEmpty searchQuery={rawSearchQuery} />
       ) : (
         <div className="flex flex-col gap-4">
           {filteredBlocks.map((block, index) => (
