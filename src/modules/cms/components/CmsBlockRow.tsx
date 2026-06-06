@@ -48,13 +48,11 @@ function MetaItem({ label, value }: { label: string; value: string }) {
 function Metadata({ block }: { block: ContentBlockResponse }) {
   const created = format(new Date(block.createdAt), 'dd MMM yyyy', { locale: es });
   const updated = format(new Date(block.updatedAt), 'dd MMM yyyy', { locale: es });
-  const idShort = block.id.slice(0, 8);
 
   return (
     <div className="font-mono flex flex-col gap-1 text-[10px] uppercase tracking-wider text-muted-foreground">
       <MetaItem label="publicado" value={created} />
       <MetaItem label="actualizado" value={updated} />
-      <MetaItem label="id" value={idShort} />
     </div>
   );
 }
