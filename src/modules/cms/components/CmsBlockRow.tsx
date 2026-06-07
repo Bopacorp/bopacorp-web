@@ -11,15 +11,6 @@ interface CmsBlockRowProps {
   onEdit: (block: ContentBlockResponse) => void;
 }
 
-function IndexNumber({ index }: { index: number }) {
-  const padded = String(index + 1).padStart(2, '0');
-  return (
-    <span className="font-mono text-2xl font-normal text-muted-foreground tabular-nums">
-      {padded}
-    </span>
-  );
-}
-
 function TypeBadge({ type }: { type: ContentBlockResponse['contentType'] }) {
   if (!type) return null;
   return (
@@ -60,19 +51,12 @@ function Metadata({ block }: { block: ContentBlockResponse }) {
 export function CmsBlockRow({ block, index, onEdit }: CmsBlockRowProps) {
   return (
     <div
-      className="cms-row-in group relative grid grid-cols-1 gap-4 rounded-xl border border-border border-l-2 border-l-transparent p-5 transition-colors hover:border-l-primary md:grid-cols-[auto_1fr_auto] md:gap-6"
+      className="cms-row-in group relative grid grid-cols-1 gap-4 rounded-xl border border-border border-l-2 border-l-transparent p-5 transition-colors hover:border-l-primary md:grid-cols-[1fr_auto] md:gap-6"
       style={{ animationDelay: `${Math.min(index, 9) * 50}ms` }}
     >
-      <div className="hidden md:flex items-start pt-1">
-        <IndexNumber index={index} />
-      </div>
-
       <div className="flex flex-col gap-2">
         <div className="flex items-center gap-2">
           <TypeBadge type={block.contentType} />
-          <span className="font-mono text-[10px] text-muted-foreground md:hidden">
-            {String(index + 1).padStart(2, '0')}
-          </span>
         </div>
         <h3 className="font-display text-lg font-semibold tracking-tight text-foreground">
           {block.title ?? block.contentKey}

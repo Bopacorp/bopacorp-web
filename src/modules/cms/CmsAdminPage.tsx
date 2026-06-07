@@ -1,7 +1,16 @@
 import type { ContentBlockResponse } from '@bopacorp/shared/catalog';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
 import { useDebounce } from 'use-debounce';
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from '@/components/ui/pagination.js';
 import { ApiError } from '@/services/api.js';
 import { ErrorState, PageLoader } from '@/shared/ui';
 import { updateContentBlock } from './cms.service.js';
@@ -34,8 +43,8 @@ async function persistEdit(
   onDone();
 }
 
-function computeLastUpdatedAt(blocks: ContentBlockResponse[]): Date | null {
-  if (!blocks.length) return null;
+function computeLastUpdatedAt(blocks: ContentBlockResponse[] | undefined): Date | null {
+  if (!blocks?.length) return null;
   let max = blocks[0].updatedAt;
   for (const block of blocks) {
     if (new Date(block.updatedAt) > new Date(max)) {
@@ -45,14 +54,30 @@ function computeLastUpdatedAt(blocks: ContentBlockResponse[]): Date | null {
   return new Date(max);
 }
 
+function getPageNumbers(current: number, total: number) {
+  const pages: (number | string)[] = [];
+  if (total <= 7) {
+    for (let i = 1; i <= total; i++) pages.push(i);
+  } else {
+    if (current > 3) pages.push(1, '...');
+    const start = Math.max(2, current - 1);
+    const end = Math.min(total - 1, current + 1);
+    for (let i = start; i <= end; i++) pages.push(i);
+    if (current < total - 2) pages.push('...');
+    pages.push(total);
+  }
+  return pages;
+}
+
 export function CmsPage() {
   const [editingBlock, setEditingBlock] = useState<ContentBlockResponse | null>(null);
   const [editBody, setEditBody] = useState('');
   const [saving, setSaving] = useState(false);
   const [rawSearchQuery, setSearchQuery] = useState('');
   const [debouncedQuery] = useDebounce(rawSearchQuery, 300);
-  const { contentBlocks, loading, error, retry, setContentBlocks } = useContentBlocks(
-    1,
+  const [page, setPage] = useState(1);
+  const { contentBlocks, meta, loading, error, retry, setContentBlocks } = useContentBlocks(
+    page,
     debouncedQuery,
   );
 
@@ -60,6 +85,14 @@ export function CmsPage() {
     if (!rawSearchQuery.trim()) return contentBlocks;
     return contentBlocks;
   }, [contentBlocks, rawSearchQuery]);
+
+  const totalPages = meta?.totalPages ?? 1;
+  const pageNumbers = useMemo(() => getPageNumbers(page, totalPages), [page, totalPages]);
+
+  // biome-ignore lint/correctness/useExhaustiveDependencies: debouncedQuery is intentionally the trigger to reset pagination
+  useEffect(() => {
+    setPage(1);
+  }, [debouncedQuery]);
 
   const lastUpdatedAt = useMemo(() => computeLastUpdatedAt(contentBlocks), [contentBlocks]);
 
@@ -110,6 +143,54 @@ export function CmsPage() {
             <CmsBlockRow key={block.id} block={block} index={index} onEdit={openEdit} />
           ))}
         </div>
+      )}
+
+      {totalPages > 1 && (
+        <Pagination>
+          <PaginationContent>
+            <PaginationItem>
+              <PaginationPrevious
+                text="Anterior"
+                href="#"
+                onClick={(e) => {
+                  e.preventDefault();
+                  if (page > 1) setPage(page - 1);
+                }}
+              />
+            </PaginationItem>
+            {pageNumbers.map((p, i) =>
+              p === '...' ? (
+                // biome-ignore lint/suspicious/noArrayIndexKey: pagination controls are static and never reorder
+                <PaginationItem key={`ellipsis-${i}`}>
+                  <PaginationEllipsis />
+                </PaginationItem>
+              ) : (
+                <PaginationItem key={p}>
+                  <PaginationLink
+                    href="#"
+                    isActive={p === page}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setPage(Number(p));
+                    }}
+                  >
+                    {p}
+                  </PaginationLink>
+                </PaginationItem>
+              ),
+            )}
+            <PaginationItem>
+              <PaginationNext
+                text="Siguiente"
+                href="#"
+                onClick={(e) => {
+                  e.preventDefault();
+                  if (page < totalPages) setPage(page + 1);
+                }}
+              />
+            </PaginationItem>
+          </PaginationContent>
+        </Pagination>
       )}
 
       <CmsEditDialog

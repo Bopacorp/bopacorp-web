@@ -1,8 +1,9 @@
 import type { ContentBlockResponse, UpdateContentBlockRequest } from '@bopacorp/shared/catalog';
-import { request } from '@/services/api.js';
+import type { PaginationMeta } from '@bopacorp/shared/common';
+import { request, requestPaginated } from '@/services/api.js';
 
 export function listContentBlocks(page: number, search: string) {
-  return request<ContentBlockResponse[]>({
+  return requestPaginated<ContentBlockResponse, PaginationMeta>({
     method: 'GET',
     url: '/catalog/content-blocks',
     params: { page, search },
