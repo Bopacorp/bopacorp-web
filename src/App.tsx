@@ -1,47 +1,37 @@
-import {
-  SidebarInset,
-  SidebarProvider,
-} from '@/components/ui/sidebar'
-import { useState, useEffect } from 'react';
-import CRMSidebar from '@/components/CRMSidebar'
-import TitleBar from '@/components/TitleBar'
-import {
-  menu,
-  sections,
-  type AppSectionKey,
-  type AppMenuItem,
-} from '@/components/sections/Empleabilidad'
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
+import MainLayout from '@/app/MainLayout.js';
+import AdminApp from '@/modules/admin/AdminApp.js';
+import RequireAuth from '@/modules/auth/components/RequireAuth.js';
+import LoginPage from '@/modules/auth/pages/LoginPage.js';
+import AboutPage from '@/modules/landing/pages/AboutPage';
+import JobsPage from '@/modules/landing/pages/JobsPage';
+import LandingPage from '@/modules/landing/pages/LandingPage';
+import ServicesPage from '@/modules/landing/pages/ServicesPage';
 
-function App() {
-  const [activeSection, setActiveSection] = useState<AppSectionKey>('empleabilidad')
-  const currentSection = sections[activeSection]
-
-  useEffect(() => {
-    const applyHash = () => {
-      const h = location.hash.replace('#', '')
-      if (h && Object.prototype.hasOwnProperty.call(sections, h)) {
-        setActiveSection(h as keyof typeof sections)
-      }
-    }
-
-    applyHash()
-    window.addEventListener('hashchange', applyHash)
-    return () => window.removeEventListener('hashchange', applyHash)
-  }, [])
-
+export default function App() {
   return (
-    <SidebarProvider defaultOpen>
-      <div className="flex min-h-screen w-full bg-background text-foreground">
-        <CRMSidebar menu={menu as AppMenuItem[]} activeSection={activeSection} />
+    <BrowserRouter>
+      <Routes>
+        <Route element={<MainLayout />}>
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/services" element={<ServicesPage />} />
+          <Route path="/about" element={<AboutPage />} />
+          <Route path="/jobs" element={<JobsPage />} />
+        </Route>
 
-        <SidebarInset className="flex h-screen flex-1 flex-col">
-            <TitleBar title={currentSection.title} description={currentSection.description} />
-            <main className="flex-1 overflow-auto">{currentSection.content}</main>
-        </SidebarInset>
-      </div>
-    </SidebarProvider>
-  )
+        <Route path="/login" element={<LoginPage />} />
+
+        <Route
+          path="/admin/*"
+          element={
+            <RequireAuth>
+              <AdminApp />
+            </RequireAuth>
+          }
+        />
+
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </BrowserRouter>
+  );
 }
-
-export default App
-

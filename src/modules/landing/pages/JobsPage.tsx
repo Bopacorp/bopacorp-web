@@ -1,11 +1,3 @@
-import { useMemo, useState } from 'react'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Field, FieldDescription, FieldGroup, FieldLabel } from '@/components/ui/field'
-import { Input } from '@/components/ui/input'
-import { Textarea } from '@/components/ui/textarea'
-import { cn } from '@/lib/utils'
 import {
   ArrowRight,
   BriefcaseBusiness,
@@ -18,18 +10,26 @@ import {
   Phone,
   Send,
   Upload,
-} from 'lucide-react'
+} from 'lucide-react';
+import { useMemo, useState } from 'react';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Field, FieldDescription, FieldGroup, FieldLabel } from '@/components/ui/field';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { cn } from '@/lib/utils';
 
 type JobOpening = {
-  id: string
-  title: string
-  department: string
-  location: string
-  type: string
-  seniority: string
-  summary: string
-  highlights: string[]
-}
+  id: string;
+  title: string;
+  department: string;
+  location: string;
+  type: string;
+  seniority: string;
+  summary: string;
+  highlights: string[];
+};
 
 const jobOpenings: JobOpening[] = [
   {
@@ -39,7 +39,8 @@ const jobOpenings: JobOpening[] = [
     location: 'Guayaquil, Ecuador',
     type: 'Presencial',
     seniority: 'Senior',
-    summary: 'Gestiona oportunidades B2B, acompaña prospectos y convierte reuniones en propuestas claras.',
+    summary:
+      'Gestiona oportunidades B2B, acompaña prospectos y convierte reuniones en propuestas claras.',
     highlights: ['Clientes corporativos', 'Seguimiento comercial', 'Cierre consultivo'],
   },
   {
@@ -62,7 +63,7 @@ const jobOpenings: JobOpening[] = [
     summary: 'Centraliza postulación, entrevista y seguimiento de candidatos para roles activos.',
     highlights: ['Screening', 'Entrevistas', 'Seguimiento de candidatos'],
   },
-]
+];
 
 const contactChannels = [
   {
@@ -83,59 +84,59 @@ const contactChannels = [
     note: 'Recepción y entrevistas presenciales.',
     icon: MapPin,
   },
-]
+];
 
 function formatFileName(fileName: string) {
   if (fileName.length <= 32) {
-    return fileName
+    return fileName;
   }
 
-  return `${fileName.slice(0, 29)}...`
+  return `${fileName.slice(0, 29)}...`;
 }
 
 export default function JobsPage() {
-  const [activeJobId, setActiveJobId] = useState(jobOpenings[0].id)
-  const [resumeName, setResumeName] = useState('')
+  const [activeJobId, setActiveJobId] = useState(jobOpenings[0].id);
+  const [resumeName, setResumeName] = useState('');
   const [applicationForm, setApplicationForm] = useState({
     fullName: '',
     email: '',
     phone: '',
     roleInterest: jobOpenings[0].title,
     message: '',
-  })
+  });
   const [contactForm, setContactForm] = useState({
     fullName: '',
     email: '',
     phone: '',
     message: '',
-  })
+  });
 
   const activeJob = useMemo(
     () => jobOpenings.find((job) => job.id === activeJobId) ?? jobOpenings[0],
-    [activeJobId]
-  )
+    [activeJobId],
+  );
 
   const handleSelectJob = (job: JobOpening) => {
-    setActiveJobId(job.id)
-    setApplicationForm((previous) => ({ ...previous, roleInterest: job.title }))
-  }
+    setActiveJobId(job.id);
+    setApplicationForm((previous) => ({ ...previous, roleInterest: job.title }));
+  };
 
   const handleResumeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0]
+    const file = event.target.files?.[0];
 
     if (!file) {
-      setResumeName('')
-      return
+      setResumeName('');
+      return;
     }
 
     if (file.type !== 'application/pdf') {
-      event.target.value = ''
-      setResumeName('')
-      return
+      event.target.value = '';
+      setResumeName('');
+      return;
     }
 
-    setResumeName(file.name)
-  }
+    setResumeName(file.name);
+  };
 
   return (
     <div className="w-full bg-background text-foreground">
@@ -168,21 +169,27 @@ export default function JobsPage() {
                   <CheckCircle2 className="size-5 text-primary" />
                   <div>
                     <p className="text-sm font-medium">1. Elige la vacante</p>
-                    <p className="text-xs text-muted-foreground">Cada rol tiene su aplicación propia.</p>
+                    <p className="text-xs text-muted-foreground">
+                      Cada rol tiene su aplicación propia.
+                    </p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3 rounded-xl border border-border bg-muted/30 p-3">
                   <Upload className="size-5 text-primary" />
                   <div>
                     <p className="text-sm font-medium">2. Sube tu PDF</p>
-                    <p className="text-xs text-muted-foreground">El CV es obligatorio para aplicar.</p>
+                    <p className="text-xs text-muted-foreground">
+                      El CV es obligatorio para aplicar.
+                    </p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3 rounded-xl border border-border bg-muted/30 p-3">
                   <Send className="size-5 text-primary" />
                   <div>
                     <p className="text-sm font-medium">3. Envío final</p>
-                    <p className="text-xs text-muted-foreground">Tus datos quedan listos para el reclutador.</p>
+                    <p className="text-xs text-muted-foreground">
+                      Tus datos quedan listos para el reclutador.
+                    </p>
                   </div>
                 </div>
               </CardContent>
@@ -206,7 +213,7 @@ export default function JobsPage() {
 
             <div className="flex flex-col gap-4">
               {jobOpenings.map((job) => {
-                const isActive = job.id === activeJobId
+                const isActive = job.id === activeJobId;
 
                 return (
                   <button
@@ -217,7 +224,7 @@ export default function JobsPage() {
                       'rounded-2xl border p-5 text-left transition-colors',
                       isActive
                         ? 'border-primary bg-primary/5 shadow-sm'
-                        : 'border-border bg-card hover:border-primary/30 hover:bg-muted/30'
+                        : 'border-border bg-card hover:border-primary/30 hover:bg-muted/30',
                     )}
                   >
                     <div className="flex flex-col gap-4">
@@ -229,7 +236,9 @@ export default function JobsPage() {
 
                       <div className="flex flex-col gap-2">
                         <h3 className="text-lg font-semibold tracking-tight">{job.title}</h3>
-                        <p className="text-sm leading-relaxed text-muted-foreground">{job.summary}</p>
+                        <p className="text-sm leading-relaxed text-muted-foreground">
+                          {job.summary}
+                        </p>
                       </div>
 
                       <div className="flex flex-wrap items-center gap-3 text-xs uppercase tracking-widest text-muted-foreground">
@@ -252,7 +261,9 @@ export default function JobsPage() {
                       </div>
 
                       <div className="flex items-center justify-between border-t border-border pt-4">
-                        <span className="text-sm text-muted-foreground">Aplicación directa disponible</span>
+                        <span className="text-sm text-muted-foreground">
+                          Aplicación directa disponible
+                        </span>
                         <span className="inline-flex items-center gap-1 text-sm font-medium text-primary">
                           Aplicar ahora
                           <ArrowRight className="size-4" />
@@ -260,7 +271,7 @@ export default function JobsPage() {
                       </div>
                     </div>
                   </button>
-                )
+                );
               })}
             </div>
           </div>
@@ -272,7 +283,9 @@ export default function JobsPage() {
                 <Badge variant="secondary">{activeJob.department}</Badge>
                 <Badge variant="outline">{activeJob.type}</Badge>
               </div>
-              <CardTitle className="text-2xl font-semibold tracking-tight">{activeJob.title}</CardTitle>
+              <CardTitle className="text-2xl font-semibold tracking-tight">
+                {activeJob.title}
+              </CardTitle>
               <CardDescription className="max-w-2xl leading-relaxed">
                 {activeJob.summary}
               </CardDescription>
@@ -352,9 +365,17 @@ export default function JobsPage() {
 
                   <Field>
                     <FieldLabel htmlFor="resume">Subir CV en PDF</FieldLabel>
-                    <Input id="resume" type="file" accept="application/pdf" onChange={handleResumeChange} />
+                    <Input
+                      id="resume"
+                      type="file"
+                      accept="application/pdf"
+                      onChange={handleResumeChange}
+                    />
                     <FieldDescription>
-                      El archivo debe estar en formato PDF. {resumeName ? `Archivo cargado: ${formatFileName(resumeName)}` : 'Aún no has cargado un archivo.'}
+                      El archivo debe estar en formato PDF.{' '}
+                      {resumeName
+                        ? `Archivo cargado: ${formatFileName(resumeName)}`
+                        : 'Aún no has cargado un archivo.'}
                     </FieldDescription>
                   </Field>
 
@@ -389,10 +410,13 @@ export default function JobsPage() {
 
               <section className="grid gap-4 sm:grid-cols-3">
                 {contactChannels.map((channel) => {
-                  const Icon = channel.icon
+                  const Icon = channel.icon;
 
                   return (
-                    <div key={channel.label} className="rounded-2xl border border-border bg-muted/20 p-4">
+                    <div
+                      key={channel.label}
+                      className="rounded-2xl border border-border bg-muted/20 p-4"
+                    >
                       <div className="flex items-center gap-3">
                         <div className="flex size-10 items-center justify-center rounded-full bg-primary/10 text-primary">
                           <Icon className="size-4" />
@@ -404,7 +428,7 @@ export default function JobsPage() {
                       </div>
                       <p className="mt-3 text-sm text-muted-foreground">{channel.note}</p>
                     </div>
-                  )
+                  );
                 })}
               </section>
             </CardContent>
@@ -418,9 +442,7 @@ export default function JobsPage() {
             <Badge variant="secondary" className="w-fit">
               Contacto general
             </Badge>
-            <h2 className="text-2xl font-semibold tracking-tight">
-              Formulario directo con RRHH
-            </h2>
+            <h2 className="text-2xl font-semibold tracking-tight">Formulario directo con RRHH</h2>
             <p className="max-w-xl text-sm leading-relaxed text-muted-foreground">
               Este formulario es independiente de las vacantes y sirve para consultas generales,
               referencias, alianzas o preguntas del proceso de talento.
@@ -509,5 +531,5 @@ export default function JobsPage() {
         </div>
       </section>
     </div>
-  )
+  );
 }

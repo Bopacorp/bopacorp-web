@@ -10,14 +10,17 @@ BOPACORP internal CRM web app (BOPADIGITAL). UI is in Spanish. React 19 + TypeSc
 
 - `npm run dev` — start dev server (Vite HMR)
 - `npm run build` — type-check then build (`tsc -b && vite build`)
-- `npm run lint` — ESLint
+- `npm run check` — Biome lint/format fix + TypeScript type-check (`biome check --write . && tsc -b --noEmit`)
+- `npm run lint` — Biome lint check
+- `npm run lint:fix` — Biome lint fix
+- `npm run format` — Biome format write
 - `npm run preview` — preview production build
 - `npx shadcn@latest add <component>` — add shadcn component
 - `npx shadcn@latest search <query>` — find shadcn components before building custom UI
 
 ## Architecture
 
-Single-page app, no router yet. Entry: `src/main.tsx` → `<App />` wrapped in `StrictMode` + `TooltipProvider`.
+Entry: `src/main.tsx` → `<AuthProvider>` → `<App />` inside `<StrictMode>` + `<TooltipProvider>`. React Router v7 declarative `<Routes>` in `src/App.tsx`.
 
 - `src/components/ui/` — shadcn/ui primitives (radix-nova style, configured in `components.json`)
 - `src/lib/utils.ts` — `cn()` helper (clsx + tailwind-merge)
