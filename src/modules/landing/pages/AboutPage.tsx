@@ -1,42 +1,50 @@
 import { Award, Eye, Lightbulb, ShieldCheck, Target } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useCmsLanding } from '../hooks/use-cms-landing.js';
 
-const VALUES = [
-  {
-    id: 'innovation',
-    title: 'Innovación',
-    icon: Lightbulb,
-    desc: 'Buscamos constantemente nuevas tecnologías para mantener a nuestros clientes corporativos siempre a la vanguardia.',
-  },
-  {
-    id: 'trust',
-    title: 'Confianza',
-    icon: ShieldCheck,
-    desc: 'Construimos relaciones transparentes y duraderas basadas en la seguridad de nuestra red y el respaldo técnico.',
-  },
-  {
-    id: 'excellence',
-    title: 'Excelencia',
-    icon: Award,
-    desc: 'Nos exigimos el más alto nivel de calidad en cada enlace, instalación y atención al cliente.',
-  },
-];
+function resolveCms(blocks: Record<string, { body: string }> | null) {
+  return (key: string, fallback: string) => blocks?.[key]?.body ?? fallback;
+}
 
 export default function AboutPage() {
+  const { blocks } = useCmsLanding();
+  const r = resolveCms(blocks);
+
+  const VALUES = [
+    {
+      id: 'innovation',
+      title: 'Innovación',
+      icon: Lightbulb,
+      desc: 'Buscamos constantemente nuevas tecnologías para mantener a nuestros clientes corporativos siempre a la vanguardia.',
+    },
+    {
+      id: 'trust',
+      title: 'Confianza',
+      icon: ShieldCheck,
+      desc: 'Construimos relaciones transparentes y duraderas basadas en la seguridad de nuestra red y el respaldo técnico.',
+    },
+    {
+      id: 'excellence',
+      title: 'Excelencia',
+      icon: Award,
+      desc: 'Nos exigimos el más alto nivel de calidad en cada enlace, instalación y atención al cliente.',
+    },
+  ];
+
   return (
     <div className="w-full flex flex-col font-sans">
       <section className="w-full relative py-24 px-6 border-b border-border/50 bg-hero overflow-hidden">
         <div className="max-w-4xl mx-auto text-center relative z-10 flex flex-col items-center gap-6">
           <div className="inline-flex items-center gap-2 border border-white/10 bg-white/5 px-4 py-1.5 rounded-full text-xs font-normal text-white/90 tracking-wider uppercase">
-            ¿Quienes somos?
+            ¿Quiénes somos?
           </div>
           <h1 className="text-4xl md:text-6xl font-semibold tracking-tight text-white leading-tight">
-            Líderes en telecomunicaciones <br className="hidden md:block" />
-            <span className="text-primary">empresariales</span>
+            Conectando el <br className="hidden md:block" />
+            <span className="text-primary">futuro de tu empresa</span>
           </h1>
           <p className="text-lg text-white/80 max-w-2xl font-normal leading-relaxed">
-            Con más de 7 años transformando la conectividad de negocios en toda la región,
-            construyendo el futuro digital del Ecuador.
+            Distribuidor oficial de Tigo. Soluciones integrales de telecomunicaciones para empresas
+            ecuatorianas desde 2019.
           </p>
         </div>
       </section>
@@ -49,16 +57,17 @@ export default function AboutPage() {
             </h2>
             <div className="flex flex-col gap-4 text-muted-foreground font-normal leading-relaxed text-base">
               <p>
-                Fundada en 2019 con la visión de revolucionar las telecomunicaciones empresariales
-                en Ecuador. Desde nuestros inicios en Guayaquil, nos hemos enfocado en ofrecer
-                soluciones de conectividad robustas y confiables para empresas de todos los tamaños
-                como Partners oficiales de Movistar.
+                Fundada en junio de 2019 en Guayaquil, Ecuador, por José Mario Bohórquez y Christian
+                Pauta. Iniciamos operaciones como socios oficiales de Tigo, enfocándonos en atender
+                las necesidades de empresas en la Región Costa. Gracias a nuestro compromiso, nos
+                hemos posicionado como una de las distribuidoras de soluciones integrales más
+                importantes de la región.
               </p>
               <p>
-                A lo largo de los años, hemos expandido nuestra red de cobertura, incorporado
-                tecnologías de última generación y construido relaciones duraderas con cientos de
-                empresas que confían en nosotros para mantener sus operaciones activas 24/7 sin
-                interrupciones.
+                Con 7 años de trayectoria, hoy brindamos soluciones de telecomunicaciones que
+                incluyen conectividad confiable, telefonía móvil, equipos y servicios digitales
+                personalizados para potenciar el crecimiento de nuestros clientes corporativos a
+                nivel nacional.
               </p>
             </div>
           </div>
@@ -75,9 +84,9 @@ export default function AboutPage() {
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground text-sm leading-relaxed">
-                  Proveer soluciones de telecomunicaciones integrales que impulsen el crecimiento y
-                  la eficiencia operativa de nuestros clientes empresariales, garantizando
-                  conectividad de clase mundial con el mejor soporte técnico.
+                  Somos distribuidores oficiales de Tigo, brindando soluciones integrales de
+                  telecomunicaciones que potencian la productividad y el crecimiento de las empresas
+                  ecuatorianas con un enfoque personalizado de alta calidad.
                 </p>
               </CardContent>
             </Card>
@@ -93,9 +102,9 @@ export default function AboutPage() {
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground text-sm leading-relaxed">
-                  Ser la empresa líder en telecomunicaciones corporativas en la región, reconocida
-                  por nuestra innovación tecnológica, excelencia en servicio y capacidad para
-                  adaptarnos a las necesidades del mercado.
+                  Consolidarnos como el aliado estratégico de telecomunicaciones de referencia en el
+                  Ecuador, manteniendo nuestro liderazgo en la Región Costa y fortaleciendo nuestra
+                  presencia en la Sierra y Amazonía.
                 </p>
               </CardContent>
             </Card>
@@ -115,8 +124,12 @@ export default function AboutPage() {
                 <div className="size-14 rounded-full bg-primary/10 flex items-center justify-center text-primary mb-6">
                   <val.icon className="size-7" />
                 </div>
-                <h3 className="text-xl font-semibold mb-3 text-foreground">{val.title}</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">{val.desc}</p>
+                <h3 className="text-xl font-semibold mb-3 text-foreground">
+                  {r(`about.value_${val.id}_title`, val.title)}
+                </h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  {r(`about.value_${val.id}_desc`, val.desc)}
+                </p>
               </div>
             ))}
           </div>

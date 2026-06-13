@@ -18,7 +18,7 @@ export default function MainLayout() {
                 BOPACORP
               </span>
               <span className="text-[10px] font-bold text-primary tracking-widest uppercase mt-1 leading-none">
-                Partner Movistar
+                Distribuidor Tigo
               </span>
             </div>
           </div>
@@ -86,15 +86,15 @@ export default function MainLayout() {
           <div className="md:col-span-5 flex flex-col gap-6 w-full">
             <div className="flex flex-col gap-1 w-full">
               <span className="text-2xl font-semibold text-foreground tracking-tight">
-                BOPACORP
+                BOHORQUEZ & PAUTA CORP.
               </span>
               <span className="text-xs font-medium text-muted-foreground uppercase tracking-widest">
-                Partner Movistar
+                Distribuidor Oficial Tigo
               </span>
             </div>
             <p className="text-sm text-muted-foreground leading-relaxed max-w-sm w-full font-normal">
-              Bohorquez & Pauta Corp S.A. — Soluciones de telecomunicaciones corporativas en Ecuador
-              desde 2019.
+              Conectando el futuro de tu empresa. Soluciones de telecomunicaciones corporativas
+              integrales en Ecuador desde 2019.
             </p>
           </div>
           <div className="md:col-span-3 flex flex-col gap-4 w-full">
@@ -111,13 +111,13 @@ export default function MainLayout() {
                   href="/services"
                   className="text-sm text-muted-foreground hover:text-foreground transition-colors font-normal w-full"
                 >
-                  Planes Corporativos
+                  Planes Corporativos Tigo
                 </a>
                 <a
                   href="/services"
                   className="text-sm text-muted-foreground hover:text-foreground transition-colors font-normal w-full"
                 >
-                  Servicios Digitales
+                  Equipos y Soluciones de Voz
                 </a>
               </div>
             </div>
@@ -126,13 +126,15 @@ export default function MainLayout() {
             <h4 className="text-sm font-semibold text-foreground w-full">CONTACTO</h4>
             <div className="flex flex-col gap-3 w-full">
               <div className="flex items-center gap-2 text-sm text-muted-foreground font-normal w-full">
-                <MapPin className="size-4 shrink-0 text-muted-foreground" /> Guayaquil
+                <MapPin className="size-4 shrink-0 text-muted-foreground" /> Edificio Elite, Piso 3,
+                Of. 308, Guayaquil
               </div>
               <div className="flex items-center gap-2 text-sm text-muted-foreground font-normal w-full">
-                <Phone className="size-4 shrink-0 text-muted-foreground" /> +593 0 000 0000
+                <Phone className="size-4 shrink-0 text-muted-foreground" /> 0991423895
               </div>
               <div className="flex items-center gap-2 text-sm text-muted-foreground font-normal w-full">
-                <Mail className="size-4 shrink-0 text-muted-foreground" /> boopa@bopacorp.com
+                <Mail className="size-4 shrink-0 text-muted-foreground" /> ch.pauta@bopacorp.com /
+                j.bohorquez@bopacorp.com
               </div>
             </div>
           </div>
