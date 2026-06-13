@@ -12,8 +12,8 @@ importers:
         specifier: ^1.5.0
         version: 1.5.0(@date-fns/tz@1.5.0)(@types/react@19.2.17)(date-fns@4.4.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       '@bopacorp/shared':
-        specifier: latest
-        version: 0.2.8
+        specifier: ^0.2.9
+        version: 0.2.9
       '@fontsource-variable/inter':
         specifier: ^5.2.8
         version: 5.2.8
@@ -343,8 +343,8 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@bopacorp/shared@0.2.8':
-    resolution: {integrity: sha512-I/mQ+nzuENRRNc1mawDdsKmN9XzL72NVnaNL5TXxX2vFPFDPROm0yaIM6qCGAUXPrI6IYTERmj9pb6J+rdl9CA==, tarball: https://npm.pkg.github.com/download/@bopacorp/shared/0.2.8/83f809c1678aeed818ebc1b4db75822b12bb6e52}
+  '@bopacorp/shared@0.2.9':
+    resolution: {integrity: sha512-K754shpmUnc7gaztDNoqRLP3sO3JdMV9/wityF/veyuCnloUGpj5L85OYjbrq09h28dsSqny6qKXtW6xJhOL0g==, tarball: https://npm.pkg.github.com/download/@bopacorp/shared/0.2.9/4875d3b1765b789491b934179c6bb0320fcb2ed4}
 
   '@commitlint/cli@21.0.2':
     resolution: {integrity: sha512-YMmfLbqBg+ZRvvmPhc+cilSQFrh/AgzVgCT1U/OifmUZEwPbvCtA8rN//YNaF9d5eoZphxVMGYtmwA2QgQORgg==}
@@ -3432,7 +3432,7 @@ snapshots:
   '@biomejs/cli-win32-x64@2.4.16':
     optional: true
 
-  '@bopacorp/shared@0.2.8':
+  '@bopacorp/shared@0.2.9':
     dependencies:
       zod: 4.4.3
 
