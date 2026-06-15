@@ -1,4 +1,5 @@
 import { createContext, type ReactNode, useCallback, useContext, useEffect, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import * as authService from '@/services/auth.service.js';
 import { type AuthUser, buildAuthUser, fetchMe } from '@/services/auth.service.js';
 import {
@@ -20,13 +21,35 @@ interface AuthState {
 
 const AuthContext = createContext<AuthState | null>(null);
 
+const PUBLIC_PATH_PREFIXES = ['/services', '/about', '/jobs'];
+const PUBLIC_PATHS = new Set(['/', '/login']);
+
+function isPublicPath(pathname: string): boolean {
+  if (PUBLIC_PATHS.has(pathname)) return true;
+  return PUBLIC_PATH_PREFIXES.some(
+    (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`),
+  );
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
+  const location = useLocation();
   const [user, setUser] = useState<AuthUser | null>(() => getStoredUser<AuthUser>());
-  const [isLoading, setIsLoading] = useState(() => !!getAccessToken());
+  const [isLoading, setIsLoading] = useState(() => {
+    if (!getAccessToken()) return false;
+    return !isPublicPath(window.location.pathname);
+  });
 
   useEffect(() => {
+    if (isPublicPath(location.pathname)) {
+      setIsLoading(false);
+      return;
+    }
+
     const token = getAccessToken();
-    if (!token) return;
+    if (!token) {
+      setIsLoading(false);
+      return;
+    }
 
     fetchMe()
       .then((meData) => {
@@ -39,10 +62,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setUser(null);
       })
       .finally(() => setIsLoading(false));
-  }, []);
+  }, [location.pathname]);
 
   useEffect(() => {
     const handleTokenRefresh = async () => {
+      if (isPublicPath(window.location.pathname)) return;
       try {
         const meData = await fetchMe();
         const fullUser = buildAuthUser(meData);

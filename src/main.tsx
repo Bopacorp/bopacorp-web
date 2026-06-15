@@ -1,5 +1,6 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
+import { BrowserRouter } from 'react-router-dom';
 import { Toaster } from 'sonner';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { AuthProvider } from '@/modules/auth/context/AuthContext.js';
@@ -14,10 +15,12 @@ if (!rootElement) {
 createRoot(rootElement).render(
   <StrictMode>
     <TooltipProvider>
-      <AuthProvider>
-        <App />
-        <Toaster position="bottom-right" richColors closeButton />
-      </AuthProvider>
+      <BrowserRouter>
+        <AuthProvider>
+          <App />
+          <Toaster position="bottom-right" richColors closeButton />
+        </AuthProvider>
+      </BrowserRouter>
     </TooltipProvider>
   </StrictMode>,
 );

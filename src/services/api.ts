@@ -30,18 +30,26 @@ api.interceptors.response.use(
   (error) => handleResponseError(error as AxiosError),
 );
 
+export interface ApiErrorDetail {
+  field: string;
+  message: string;
+}
+
 export class ApiError extends Error {
   code: string;
-  constructor(code: string, message: string) {
+  details?: ApiErrorDetail[];
+  constructor(code: string, message: string, details?: ApiErrorDetail[]) {
     super(message);
     this.code = code;
+    this.details = details;
   }
 }
 
 export async function request<T>(config: AxiosRequestConfig): Promise<T> {
   const response = await api(config);
   if (!response.data.success) {
-    throw new ApiError(response.data.error.code, response.data.error.message);
+    const errorBody = response.data.error as { code: string; message: string; details?: unknown };
+    throw new ApiError(errorBody.code, errorBody.message, normalizeDetails(errorBody.details));
   }
   return response.data.data as T;
 }
@@ -56,14 +64,35 @@ export async function requestPaginated<T, M = unknown>(
 ): Promise<PaginatedResponse<T, M>> {
   const response = await api(config);
   if (!response.data.success) {
-    throw new ApiError(response.data.error.code, response.data.error.message);
+    const errorBody = response.data.error as { code: string; message: string; details?: unknown };
+    throw new ApiError(errorBody.code, errorBody.message, normalizeDetails(errorBody.details));
   }
   return { data: response.data.data as T[], meta: response.data.meta as M };
+}
+
+function normalizeDetails(raw: unknown): ApiErrorDetail[] | undefined {
+  if (!Array.isArray(raw)) return undefined;
+  const out: ApiErrorDetail[] = [];
+  for (const item of raw) {
+    if (item && typeof item === 'object') {
+      const field = (item as { field?: unknown }).field;
+      const message = (item as { message?: unknown }).message;
+      if (typeof field === 'string' && typeof message === 'string') {
+        out.push({ field, message });
+      }
+    }
+  }
+  return out.length > 0 ? out : undefined;
 }
 
 export default api;
 
 function injectAuthHeader(config: InternalAxiosRequestConfig) {
+  if (isPublicPath(config.url)) {
+    delete config.headers.Authorization;
+    return config;
+  }
+
   const token = getAccessToken();
   const expiresAt = getTokenExpiresAt();
 
@@ -87,6 +116,9 @@ type RetryConfig = InternalAxiosRequestConfig & { _retry?: boolean };
 
 function handleResponseError(error: AxiosError) {
   const originalRequest = error.config as RetryConfig;
+  if (isPublicPath(originalRequest?.url)) {
+    return Promise.reject(error);
+  }
   if (!shouldRefresh(error, originalRequest)) {
     return Promise.reject(error);
   }
@@ -168,4 +200,12 @@ function handleRefreshError(error: AxiosError) {
 
 function redirectToLogin() {
   window.location.href = '/login';
+}
+
+function isPublicPath(url: string | undefined): boolean {
+  if (!url) return false;
+  if (url.includes('/employability/vacancies/published')) return true;
+  if (url.includes('/employability/apply')) return true;
+  if (/\/employability\/vacancies\/[^/?]+/.test(url)) return true;
+  return false;
 }

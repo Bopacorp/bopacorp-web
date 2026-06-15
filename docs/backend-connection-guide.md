@@ -183,9 +183,10 @@ Special: `GET /catalog/categories/tree` — returns hierarchical tree, uses `cat
 
 | Endpoint | Method | Permission |
 |----------|--------|------------|
-| `/employability/vacancies/published` | GET | `job_vacancies.read` |
+| `/employability/vacancies/published` | GET | **public** (no auth) |
+| `/employability/vacancies/:id` | GET | **public** (no auth) |
+| `/employability/apply` | POST | **public** (no auth, multipart, rate limited 20/15min) |
 | `/employability/vacancies` | GET | `job_vacancies.read` |
-| `/employability/vacancies/:id` | GET | `job_vacancies.read` |
 | `/employability/vacancies` | POST | `job_vacancies.create` |
 | `/employability/vacancies/:id` | PATCH | `job_vacancies.update` |
 | `/employability/vacancies/:id` | DELETE | `job_vacancies.delete` |
@@ -203,6 +204,27 @@ Special: `GET /catalog/categories/tree` — returns hierarchical tree, uses `cat
 | `/employability/candidate-resumes/:id` | GET | `candidate_resumes.read` |
 | `/employability/candidate-resumes` | POST | `candidate_resumes.create` |
 | `/employability/candidate-resumes/:id` | DELETE | `candidate_resumes.delete` |
+
+### Public apply flow
+
+`POST /api/v1/employability/apply` accepts `multipart/form-data` (no `Authorization` header required). The frontend posts a single request with the PDF resume and the candidate payload as a JSON string.
+
+| Field | Type | Required | Notes |
+|-------|------|----------|-------|
+| `file` | file (PDF) | yes | Max 20 MB |
+| `vacancyId` | UUID | yes | Must reference a published, open vacancy |
+| `coverLetter` | string | no | Free text |
+| `candidate` | string | yes | JSON string with `nationalId`, `firstName`, `lastName`, `email`, optional `phone`, `address` |
+
+Backend errors (frontend should map `error.code` to UX):
+
+| HTTP | `code` | Meaning |
+|------|--------|---------|
+| 422 | `VALIDATION_ERROR` | Zod validation failed; `details: [{ field, message }]` |
+| 404 | `NOT_FOUND` | Vacancy missing, unpublished, or closed |
+| 413 | `MULTER_ERROR` | PDF exceeds 20 MB |
+| 415 | `MULTER_ERROR` | File is not a PDF |
+| 429 | `RATE_LIMITED` | 20 requests / 15 min per IP exceeded |
 
 ## Shared Types — `@bopacorp/shared`
 

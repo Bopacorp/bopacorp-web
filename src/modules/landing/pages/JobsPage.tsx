@@ -1,141 +1,71 @@
-import {
-  ArrowRight,
-  BriefcaseBusiness,
-  Building2,
-  CheckCircle2,
-  CircleAlert,
-  FileText,
-  Mail,
-  MapPin,
-  Phone,
-  Send,
-  Upload,
-} from 'lucide-react';
-import { useMemo, useState } from 'react';
+import type { ListJobVacanciesQuery } from '@bopacorp/shared/employability';
+import { ArrowRight, BriefcaseBusiness, CheckCircle2, Send, Upload } from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Field, FieldDescription, FieldGroup, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { cn } from '@/lib/utils';
+import type { ApplyJobVacancyResponse, JobVacancyListItemResponse } from '@/modules/employability';
+import {
+  ApplyDialog,
+  ApplySuccessDialog,
+  isVacancyClosed,
+  usePublicJobVacancy,
+  usePublishedVacancies,
+  VacanciesEmpty,
+  VacanciesSkeleton,
+  VacancyCard,
+  VacancyDetailPanel,
+} from '@/modules/employability';
+import { ErrorState } from '@/shared/ui';
 
-type JobOpening = {
-  id: string;
-  title: string;
-  department: string;
-  location: string;
-  type: string;
-  seniority: string;
-  summary: string;
-  highlights: string[];
+const LIST_QUERY: ListJobVacanciesQuery = {
+  page: 1,
+  limit: 20,
+  sortBy: 'createdAt',
+  sortOrder: 'desc',
 };
 
-const jobOpenings: JobOpening[] = [
-  {
-    id: 'field-sales',
-    title: 'Asesor Comercial Corporativo',
-    department: 'Ventas',
-    location: 'Guayaquil, Ecuador',
-    type: 'Presencial',
-    seniority: 'Senior',
-    summary:
-      'Gestiona oportunidades B2B, acompaña prospectos y convierte reuniones en propuestas claras.',
-    highlights: ['Clientes corporativos', 'Seguimiento comercial', 'Cierre consultivo'],
-  },
-  {
-    id: 'customer-success',
-    title: 'Customer Success Specialist',
-    department: 'Operaciones',
-    location: 'Remoto LATAM',
-    type: 'Híbrido',
-    seniority: 'Semi Senior',
-    summary: 'Da soporte a cuentas activas y coordina resoluciones con el equipo interno.',
-    highlights: ['Soporte postventa', 'Gestión de cuentas', 'Coordinación interna'],
-  },
-  {
-    id: 'talent-coordinator',
-    title: 'Coordinador de Talento',
-    department: 'Recursos Humanos',
-    location: 'Guayaquil, Ecuador',
-    type: 'Presencial',
-    seniority: 'Semi Senior',
-    summary: 'Centraliza postulación, entrevista y seguimiento de candidatos para roles activos.',
-    highlights: ['Screening', 'Entrevistas', 'Seguimiento de candidatos'],
-  },
-];
-
-const contactChannels = [
-  {
-    label: 'Talento Humano',
-    value: 'hr@bopacorp.com',
-    note: 'Atención para postulaciones generales y dudas del proceso.',
-    icon: Mail,
-  },
-  {
-    label: 'Llamadas',
-    value: '+593 4 000 0000',
-    note: 'Horario de atención: lunes a viernes, 09:00 a 17:00.',
-    icon: Phone,
-  },
-  {
-    label: 'Sede principal',
-    value: 'Guayaquil, Ecuador',
-    note: 'Recepción y entrevistas presenciales.',
-    icon: MapPin,
-  },
-];
-
-function formatFileName(fileName: string) {
-  if (fileName.length <= 32) {
-    return fileName;
-  }
-
-  return `${fileName.slice(0, 29)}...`;
-}
-
 export default function JobsPage() {
-  const [activeJobId, setActiveJobId] = useState(jobOpenings[0].id);
-  const [resumeName, setResumeName] = useState('');
-  const [applicationForm, setApplicationForm] = useState({
-    fullName: '',
-    email: '',
-    phone: '',
-    roleInterest: jobOpenings[0].title,
-    message: '',
-  });
-  const [contactForm, setContactForm] = useState({
-    fullName: '',
-    email: '',
-    phone: '',
-    message: '',
-  });
+  const { vacancies, loading, error, retry } = usePublishedVacancies(LIST_QUERY);
+  const [activeVacancyId, setActiveVacancyId] = useState<string | null>(null);
+  const [applyOpen, setApplyOpen] = useState(false);
+  const [successOpen, setSuccessOpen] = useState(false);
+  const [successResponse, setSuccessResponse] = useState<ApplyJobVacancyResponse | null>(null);
 
-  const activeJob = useMemo(
-    () => jobOpenings.find((job) => job.id === activeJobId) ?? jobOpenings[0],
-    [activeJobId],
-  );
+  useEffect(() => {
+    if (vacancies.length > 0 && activeVacancyId === null) {
+      setActiveVacancyId(vacancies[0].id);
+    }
+  }, [vacancies, activeVacancyId]);
 
-  const handleSelectJob = (job: JobOpening) => {
-    setActiveJobId(job.id);
-    setApplicationForm((previous) => ({ ...previous, roleInterest: job.title }));
+  const activeListItem = useMemo<JobVacancyListItemResponse | null>(() => {
+    if (!activeVacancyId) return null;
+    return vacancies.find((vacancy) => vacancy.id === activeVacancyId) ?? null;
+  }, [vacancies, activeVacancyId]);
+
+  const {
+    vacancy: activeDetail,
+    loading: detailLoading,
+    error: detailError,
+    retry: retryDetail,
+  } = usePublicJobVacancy(activeVacancyId);
+
+  const closed = activeListItem ? isVacancyClosed(activeListItem.closingDate) : false;
+  const applyVacancyId = activeDetail?.id ?? activeListItem?.id ?? null;
+  const applyVacancyTitle = activeDetail?.title ?? activeListItem?.title ?? '';
+  const applyVacancy = applyVacancyId ? { id: applyVacancyId, title: applyVacancyTitle } : null;
+
+  const handleSelect = (vacancy: JobVacancyListItemResponse) => {
+    setActiveVacancyId(vacancy.id);
   };
 
-  const handleResumeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-
-    if (!file) {
-      setResumeName('');
-      return;
-    }
-
-    if (file.type !== 'application/pdf') {
-      event.target.value = '';
-      setResumeName('');
-      return;
-    }
-
-    setResumeName(file.name);
+  const handleApplySuccess = (response: ApplyJobVacancyResponse) => {
+    setApplyOpen(false);
+    setSuccessResponse(response);
+    setSuccessOpen(true);
   };
 
   return (
@@ -148,12 +78,12 @@ export default function JobsPage() {
           <div className="grid gap-8 lg:grid-cols-[1.3fr_0.7fr] lg:items-end">
             <div className="flex flex-col gap-4">
               <h1 className="max-w-3xl text-4xl font-semibold tracking-tight sm:text-5xl">
-                Postula a una vacante activa o envía tu perfil abierto al equipo de talento.
+                Postula a una vacante activa o envia tu perfil abierto al equipo de talento.
               </h1>
               <p className="max-w-2xl text-sm leading-relaxed text-muted-foreground sm:text-base">
-                La página está pensada para que primero revises la lista de roles disponibles, luego
-                completes tu postulación con datos de contacto y tu CV en PDF, y al final puedas
-                escribir al área de RRHH sin asociarlo a una vacante concreta.
+                Revisa la lista de roles disponibles, selecciona la vacante que te interese y envia
+                tu postulacion con tu CV en PDF. Tambien puedes escribir al area de RRHH sin
+                asociarlo a una vacante concreta.
               </p>
             </div>
 
@@ -165,33 +95,21 @@ export default function JobsPage() {
                 </CardDescription>
               </CardHeader>
               <CardContent className="flex flex-col gap-3">
-                <div className="flex items-center gap-3 rounded-xl border border-border bg-muted/30 p-3">
-                  <CheckCircle2 className="size-5 text-primary" />
-                  <div>
-                    <p className="text-sm font-medium">1. Elige la vacante</p>
-                    <p className="text-xs text-muted-foreground">
-                      Cada rol tiene su aplicación propia.
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3 rounded-xl border border-border bg-muted/30 p-3">
-                  <Upload className="size-5 text-primary" />
-                  <div>
-                    <p className="text-sm font-medium">2. Sube tu PDF</p>
-                    <p className="text-xs text-muted-foreground">
-                      El CV es obligatorio para aplicar.
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3 rounded-xl border border-border bg-muted/30 p-3">
-                  <Send className="size-5 text-primary" />
-                  <div>
-                    <p className="text-sm font-medium">3. Envío final</p>
-                    <p className="text-xs text-muted-foreground">
-                      Tus datos quedan listos para el reclutador.
-                    </p>
-                  </div>
-                </div>
+                <ProcessStep
+                  icon={CheckCircle2}
+                  title="1. Elige la vacante"
+                  description="Cada rol tiene su aplicacion propia."
+                />
+                <ProcessStep
+                  icon={Upload}
+                  title="2. Sube tu PDF"
+                  description="El CV es obligatorio para aplicar."
+                />
+                <ProcessStep
+                  icon={Send}
+                  title="3. Envio final"
+                  description="Tus datos quedan listos para el reclutador."
+                />
               </CardContent>
             </Card>
           </div>
@@ -206,233 +124,42 @@ export default function JobsPage() {
               <div>
                 <h2 className="text-2xl font-semibold tracking-tight">Ofertas disponibles</h2>
                 <p className="text-sm text-muted-foreground">
-                  Selecciona una vacante para cargar su formulario.
+                  Selecciona una vacante para ver los detalles y postularte.
                 </p>
               </div>
             </div>
 
-            <div className="flex flex-col gap-4">
-              {jobOpenings.map((job) => {
-                const isActive = job.id === activeJobId;
+            {loading && <VacanciesSkeleton />}
 
-                return (
-                  <button
-                    key={job.id}
-                    type="button"
-                    onClick={() => handleSelectJob(job)}
-                    className={cn(
-                      'rounded-2xl border p-5 text-left transition-colors',
-                      isActive
-                        ? 'border-primary bg-primary/5 shadow-sm'
-                        : 'border-border bg-card hover:border-primary/30 hover:bg-muted/30',
-                    )}
-                  >
-                    <div className="flex flex-col gap-4">
-                      <div className="flex flex-wrap items-center gap-2">
-                        <Badge variant={isActive ? 'default' : 'secondary'}>{job.seniority}</Badge>
-                        <Badge variant="outline">{job.department}</Badge>
-                        <Badge variant="outline">{job.type}</Badge>
-                      </div>
+            {!loading && error && (
+              <ErrorState message={error.message} code={error.code} onRetry={retry} />
+            )}
 
-                      <div className="flex flex-col gap-2">
-                        <h3 className="text-lg font-semibold tracking-tight">{job.title}</h3>
-                        <p className="text-sm leading-relaxed text-muted-foreground">
-                          {job.summary}
-                        </p>
-                      </div>
+            {!loading && !error && vacancies.length === 0 && <VacanciesEmpty />}
 
-                      <div className="flex flex-wrap items-center gap-3 text-xs uppercase tracking-widest text-muted-foreground">
-                        <span className="inline-flex items-center gap-1.5">
-                          <Building2 className="size-3.5" />
-                          {job.department}
-                        </span>
-                        <span className="inline-flex items-center gap-1.5">
-                          <MapPin className="size-3.5" />
-                          {job.location}
-                        </span>
-                      </div>
-
-                      <div className="flex flex-wrap gap-2">
-                        {job.highlights.map((highlight) => (
-                          <Badge key={highlight} variant="secondary" className="rounded-full">
-                            {highlight}
-                          </Badge>
-                        ))}
-                      </div>
-
-                      <div className="flex items-center justify-between border-t border-border pt-4">
-                        <span className="text-sm text-muted-foreground">
-                          Aplicación directa disponible
-                        </span>
-                        <span className="inline-flex items-center gap-1 text-sm font-medium text-primary">
-                          Aplicar ahora
-                          <ArrowRight className="size-4" />
-                        </span>
-                      </div>
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
+            {!loading && !error && vacancies.length > 0 && (
+              <div className="flex flex-col gap-4">
+                {vacancies.map((vacancy) => (
+                  <VacancyCard
+                    key={vacancy.id}
+                    vacancy={vacancy}
+                    active={vacancy.id === activeVacancyId}
+                    closed={isVacancyClosed(vacancy.closingDate)}
+                    onSelect={() => handleSelect(vacancy)}
+                  />
+                ))}
+              </div>
+            )}
           </div>
 
-          <Card className="border-border bg-card shadow-sm">
-            <CardHeader className="gap-3 border-b border-border pb-6">
-              <div className="flex flex-wrap items-center gap-2">
-                <Badge>{activeJob.seniority}</Badge>
-                <Badge variant="secondary">{activeJob.department}</Badge>
-                <Badge variant="outline">{activeJob.type}</Badge>
-              </div>
-              <CardTitle className="text-2xl font-semibold tracking-tight">
-                {activeJob.title}
-              </CardTitle>
-              <CardDescription className="max-w-2xl leading-relaxed">
-                {activeJob.summary}
-              </CardDescription>
-            </CardHeader>
-
-            <CardContent className="flex flex-col gap-8 p-6">
-              <section className="flex flex-col gap-4 rounded-2xl border border-border bg-muted/20 p-5">
-                <div className="flex items-center gap-3">
-                  <FileText className="size-5 text-primary" />
-                  <h3 className="text-base font-semibold">Datos de la postulación</h3>
-                </div>
-
-                <FieldGroup>
-                  <Field>
-                    <FieldLabel htmlFor="role-interest">Vacante seleccionada</FieldLabel>
-                    <Input
-                      id="role-interest"
-                      value={applicationForm.roleInterest}
-                      onChange={(event) =>
-                        setApplicationForm((previous) => ({
-                          ...previous,
-                          roleInterest: event.target.value,
-                        }))
-                      }
-                    />
-                    <FieldDescription>
-                      Puedes cambiar el texto si deseas ajustar tu interés antes de enviar.
-                    </FieldDescription>
-                  </Field>
-
-                  <Field>
-                    <FieldLabel htmlFor="applicant-name">Nombre completo</FieldLabel>
-                    <Input
-                      id="applicant-name"
-                      value={applicationForm.fullName}
-                      onChange={(event) =>
-                        setApplicationForm((previous) => ({
-                          ...previous,
-                          fullName: event.target.value,
-                        }))
-                      }
-                      placeholder="Tu nombre"
-                    />
-                  </Field>
-
-                  <Field>
-                    <FieldLabel htmlFor="applicant-email">Correo electrónico</FieldLabel>
-                    <Input
-                      id="applicant-email"
-                      type="email"
-                      value={applicationForm.email}
-                      onChange={(event) =>
-                        setApplicationForm((previous) => ({
-                          ...previous,
-                          email: event.target.value,
-                        }))
-                      }
-                      placeholder="tu@email.com"
-                    />
-                  </Field>
-
-                  <Field>
-                    <FieldLabel htmlFor="applicant-phone">Número de contacto</FieldLabel>
-                    <Input
-                      id="applicant-phone"
-                      type="tel"
-                      value={applicationForm.phone}
-                      onChange={(event) =>
-                        setApplicationForm((previous) => ({
-                          ...previous,
-                          phone: event.target.value,
-                        }))
-                      }
-                      placeholder="+593 ..."
-                    />
-                  </Field>
-
-                  <Field>
-                    <FieldLabel htmlFor="resume">Subir CV en PDF</FieldLabel>
-                    <Input
-                      id="resume"
-                      type="file"
-                      accept="application/pdf"
-                      onChange={handleResumeChange}
-                    />
-                    <FieldDescription>
-                      El archivo debe estar en formato PDF.{' '}
-                      {resumeName
-                        ? `Archivo cargado: ${formatFileName(resumeName)}`
-                        : 'Aún no has cargado un archivo.'}
-                    </FieldDescription>
-                  </Field>
-
-                  <Field>
-                    <FieldLabel htmlFor="applicant-message">Mensaje breve</FieldLabel>
-                    <Textarea
-                      id="applicant-message"
-                      rows={4}
-                      value={applicationForm.message}
-                      onChange={(event) =>
-                        setApplicationForm((previous) => ({
-                          ...previous,
-                          message: event.target.value,
-                        }))
-                      }
-                      placeholder="Cuéntanos por qué te interesa este rol"
-                    />
-                  </Field>
-                </FieldGroup>
-
-                <div className="flex flex-wrap gap-3">
-                  <Button type="button">
-                    <Upload data-icon="inline-start" />
-                    Enviar aplicación
-                  </Button>
-                  <Button type="button" variant="outline">
-                    <CircleAlert data-icon="inline-start" />
-                    Revisar requisitos
-                  </Button>
-                </div>
-              </section>
-
-              <section className="grid gap-4 sm:grid-cols-3">
-                {contactChannels.map((channel) => {
-                  const Icon = channel.icon;
-
-                  return (
-                    <div
-                      key={channel.label}
-                      className="rounded-2xl border border-border bg-muted/20 p-4"
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className="flex size-10 items-center justify-center rounded-full bg-primary/10 text-primary">
-                          <Icon className="size-4" />
-                        </div>
-                        <div>
-                          <p className="text-sm font-semibold">{channel.label}</p>
-                          <p className="text-sm text-foreground">{channel.value}</p>
-                        </div>
-                      </div>
-                      <p className="mt-3 text-sm text-muted-foreground">{channel.note}</p>
-                    </div>
-                  );
-                })}
-              </section>
-            </CardContent>
-          </Card>
+          <VacancyDetailPanel
+            vacancy={activeDetail}
+            loading={detailLoading}
+            error={detailError}
+            onRetry={retryDetail}
+            onApply={() => setApplyOpen(true)}
+            closed={closed}
+          />
         </div>
       </section>
 
@@ -451,85 +178,118 @@ export default function JobsPage() {
 
           <Card className="border-border bg-card shadow-sm">
             <CardContent className="p-6">
-              <FieldGroup>
-                <Field>
-                  <FieldLabel htmlFor="contact-name">Nombre completo</FieldLabel>
-                  <Input
-                    id="contact-name"
-                    value={contactForm.fullName}
-                    onChange={(event) =>
-                      setContactForm((previous) => ({
-                        ...previous,
-                        fullName: event.target.value,
-                      }))
-                    }
-                    placeholder="Tu nombre"
-                  />
-                </Field>
-
-                <Field>
-                  <FieldLabel htmlFor="contact-email">Correo electrónico</FieldLabel>
-                  <Input
-                    id="contact-email"
-                    type="email"
-                    value={contactForm.email}
-                    onChange={(event) =>
-                      setContactForm((previous) => ({
-                        ...previous,
-                        email: event.target.value,
-                      }))
-                    }
-                    placeholder="tu@email.com"
-                  />
-                </Field>
-
-                <Field>
-                  <FieldLabel htmlFor="contact-phone">Número de contacto</FieldLabel>
-                  <Input
-                    id="contact-phone"
-                    type="tel"
-                    value={contactForm.phone}
-                    onChange={(event) =>
-                      setContactForm((previous) => ({
-                        ...previous,
-                        phone: event.target.value,
-                      }))
-                    }
-                    placeholder="+593 ..."
-                  />
-                </Field>
-
-                <Field>
-                  <FieldLabel htmlFor="contact-message">Mensaje</FieldLabel>
-                  <Textarea
-                    id="contact-message"
-                    rows={5}
-                    value={contactForm.message}
-                    onChange={(event) =>
-                      setContactForm((previous) => ({
-                        ...previous,
-                        message: event.target.value,
-                      }))
-                    }
-                    placeholder="Escribe tu consulta para RRHH"
-                  />
-                </Field>
-              </FieldGroup>
-
-              <div className="mt-6 flex flex-wrap gap-3">
-                <Button type="button">
-                  <Send data-icon="inline-start" />
-                  Enviar mensaje
-                </Button>
-                <Button type="button" variant="outline">
-                  <Mail data-icon="inline-start" />
-                  Escribir a RRHH
-                </Button>
-              </div>
+              <ContactForm />
             </CardContent>
           </Card>
         </div>
       </section>
+
+      <ApplyDialog
+        open={applyOpen}
+        onOpenChange={setApplyOpen}
+        vacancy={applyVacancy}
+        onSuccess={handleApplySuccess}
+      />
+      {successResponse && (
+        <ApplySuccessDialog
+          open={successOpen}
+          onOpenChange={setSuccessOpen}
+          response={successResponse}
+        />
+      )}
     </div>
+  );
+}
+
+function ProcessStep({
+  icon: Icon,
+  title,
+  description,
+}: {
+  icon: typeof CheckCircle2;
+  title: string;
+  description: string;
+}) {
+  return (
+    <div className="flex items-center gap-3 rounded-xl border border-border bg-muted/30 p-3">
+      <Icon className="size-5 text-primary" />
+      <div>
+        <p className="text-sm font-medium">{title}</p>
+        <p className="text-xs text-muted-foreground">{description}</p>
+      </div>
+    </div>
+  );
+}
+
+function ContactForm() {
+  const [values, setValues] = useState({ fullName: '', email: '', phone: '', message: '' });
+
+  return (
+    <>
+      <FieldGroup>
+        <Field>
+          <FieldLabel htmlFor="contact-name">Nombre completo</FieldLabel>
+          <Input
+            id="contact-name"
+            value={values.fullName}
+            onChange={(event) =>
+              setValues((current) => ({ ...current, fullName: event.target.value }))
+            }
+            placeholder="Tu nombre"
+          />
+        </Field>
+
+        <Field>
+          <FieldLabel htmlFor="contact-email">Correo electronico</FieldLabel>
+          <Input
+            id="contact-email"
+            type="email"
+            value={values.email}
+            onChange={(event) =>
+              setValues((current) => ({ ...current, email: event.target.value }))
+            }
+            placeholder="tu@email.com"
+          />
+        </Field>
+
+        <Field>
+          <FieldLabel htmlFor="contact-phone">Numero de contacto</FieldLabel>
+          <Input
+            id="contact-phone"
+            type="tel"
+            value={values.phone}
+            onChange={(event) =>
+              setValues((current) => ({ ...current, phone: event.target.value }))
+            }
+            placeholder="+593 ..."
+          />
+        </Field>
+
+        <Field>
+          <FieldLabel htmlFor="contact-message">Mensaje</FieldLabel>
+          <Textarea
+            id="contact-message"
+            rows={5}
+            value={values.message}
+            onChange={(event) =>
+              setValues((current) => ({ ...current, message: event.target.value }))
+            }
+            placeholder="Escribe tu consulta para RRHH"
+          />
+          <FieldDescription>Te responderemos por correo electronico.</FieldDescription>
+        </Field>
+      </FieldGroup>
+
+      <div className="mt-6 flex flex-wrap gap-3">
+        <Button type="button">
+          <Send data-icon="inline-start" />
+          Enviar mensaje
+        </Button>
+        <Button type="button" variant="outline">
+          <ArrowRight data-icon="inline-end" />
+          Escribir a RRHH
+        </Button>
+      </div>
+    </>
   );
 }

@@ -80,5 +80,6 @@ Read `CLAUDE.md` and `DESIGN.md` for the full rules. Key constraints an agent of
 
 ## Misc
 
+- You Are a FRONTEND AGENT, do NOT make changes in backend unless explicitly asked. Focus on React, TypeScript, Vite, Tailwind, shadcn/ui, and frontend architecture.
 - UI copy is in **Spanish**.
 - `components.json` configures shadcn aliases (`@/components`, `@/lib/utils`, etc.).
