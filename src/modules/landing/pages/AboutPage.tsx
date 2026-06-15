@@ -25,7 +25,6 @@ const VALUE_DESCRIPTIONS_FALLBACK = [
   'Construimos relaciones transparentes y duraderas basadas en la seguridad de nuestra red y el respaldo técnico.',
   'Nos exigimos el más alto nivel de calidad en cada enlace, instalación y atención al cliente.',
 ];
-
 const VALUES = [
   { id: 'innovation', icon: Lightbulb, fallbackTitle: 'Innovación' },
   { id: 'trust', icon: ShieldCheck, fallbackTitle: 'Confianza' },

@@ -48,9 +48,26 @@ function getCmsContent(blocks: Blocks) {
 }
 
 function buildFeature(r: ReturnType<typeof resolveCms>, n: number) {
+  const features = [
+    {
+      title: 'Aliado Estratégico de Tigo',
+      desc: 'Somos distribuidores oficiales, ofreciendo conectividad confiable, telefonía y servicios digitales con respaldo directo.',
+    },
+    {
+      title: 'Cobertura a Nivel Nacional',
+      desc: 'Líderes en la Región Costa con capacidad operativa y soluciones integrales en la Sierra y Amazonía.',
+    },
+    {
+      title: '7 Años de Experiencia',
+      desc: 'Más de 300 clientes corporativos atendidos con un enfoque personalizado de alta calidad adaptado a tu negocio.',
+    },
+  ];
+
+  const feature = features[n - 1];
+
   return {
-    title: r(`about.feature_${n}_title`, ''),
-    desc: r(`about.feature_${n}_desc`, ''),
+    title: r(`about.feature_${n}_title`, feature.title),
+    desc: r(`about.feature_${n}_desc`, feature.desc),
   };
 }
 
@@ -73,10 +90,10 @@ function getHeroCms(r: ReturnType<typeof resolveCms>) {
 function getAboutCms(r: ReturnType<typeof resolveCms>) {
   return {
     eyebrow: r('about.eyebrow', 'Por qué Bopacorp'),
-    title: r('about.title', 'Más que un proveedor, un aliado tecnológico'),
+    title: r('about.title', 'Tu aliado estratégico en telecomunicaciones'),
     description: r(
       'about.description',
-      'Como Partner de una de las empresas de telecomunicaciones más grandes de Ecuador, en Bohorquez & Pauta Corp (Bopacorp S.A.) innovamos desde nuestra matriz en Guayaquil para brindar soluciones integradas de conectividad, equipos informáticos y tecnología celular a nivel nacional.',
+      'En BOPACORP S.A. somos distribuidores oficiales de Tigo y brindamos soluciones integrales de telecomunicaciones que potencian la productividad de las empresas ecuatorianas. Con 7 años de experiencia, innovamos desde nuestra matriz en Guayaquil para brindar soluciones de conectividad, equipos y servicios digitales a nivel nacional.',
     ),
     features: [buildFeature(r, 1), buildFeature(r, 2), buildFeature(r, 3)],
   };
@@ -254,27 +271,27 @@ export default function LandingPage() {
         <div className="w-full border-t border-white/10 bg-black/20 backdrop-blur-sm py-8 relative z-10">
           <div className="max-w-7xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-8">
             <div className="flex flex-col items-center text-center">
-              <span className="text-2xl md:text-3xl font-semibold text-white">+200</span>
+              <span className="text-2xl md:text-3xl font-semibold text-white">+300</span>
               <span className="text-xs md:text-sm text-white/60 mt-1 uppercase tracking-wider font-medium">
-                empresas conectadas
+                clientes corporativos
               </span>
             </div>
             <div className="flex flex-col items-center text-center border-l border-white/10 pl-6 max-md:border-l-0 max-md:pl-0">
-              <span className="text-2xl md:text-3xl font-semibold text-white">99.9%</span>
+              <span className="text-2xl md:text-3xl font-semibold text-white">7 años</span>
               <span className="text-xs md:text-sm text-white/60 mt-1 uppercase tracking-wider font-medium">
-                uptime garantizado
+                de experiencia
               </span>
             </div>
             <div className="flex flex-col items-center text-center border-l border-white/10 pl-6">
-              <span className="text-2xl md:text-3xl font-semibold text-white">7 años</span>
+              <span className="text-2xl md:text-3xl font-semibold text-white">Costa</span>
               <span className="text-xs md:text-sm text-white/60 mt-1 uppercase tracking-wider font-medium">
-                de trayectoria
+                líderes regionales
               </span>
             </div>
             <div className="flex flex-col items-center text-center border-l border-white/10 pl-6 max-md:border-l-0 max-md:pl-0">
-              <span className="text-2xl md:text-3xl font-semibold text-white">+36%</span>
+              <span className="text-2xl md:text-3xl font-semibold text-white">12</span>
               <span className="text-xs md:text-sm text-white/60 mt-1 uppercase tracking-wider font-medium">
-                crecimiento neto
+                colaboradores
               </span>
             </div>
           </div>
