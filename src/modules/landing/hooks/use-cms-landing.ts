@@ -1,11 +1,7 @@
+import type { ContentBlockResponse } from '@bopacorp/shared/catalog';
 import { useCallback, useEffect, useState } from 'react';
+import { withFallbackImageBlocks } from '@/modules/cms/cms-image-blocks.js';
 import { request } from '@/services/api.js';
-
-interface ContentBlockResponse {
-  id: string;
-  contentKey: string;
-  body: string;
-}
 
 interface CmsLandingResponse {
   blocks: Record<string, ContentBlockResponse>;
@@ -55,7 +51,7 @@ function applyData(
   setLoading: (loading: boolean) => void,
 ) {
   if (state.cancelled) return;
-  setBlocks(data.blocks);
+  setBlocks(withFallbackImageBlocks(data.blocks));
   setLoading(false);
 }
 

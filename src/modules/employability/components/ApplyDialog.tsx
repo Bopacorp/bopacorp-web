@@ -35,8 +35,18 @@ const EMPTY_VALUES: ApplyFormValues = {
 export function ApplyDialog({ open, onOpenChange, vacancy, onSuccess }: ApplyDialogProps) {
   const [values, setValues] = useState<ApplyFormValues>(EMPTY_VALUES);
   const [file, setFile] = useState<File | null>(null);
+  const [fileTouched, setFileTouched] = useState(false);
   const [fileName, setFileName] = useState('');
   const [errors, setErrors] = useState<ApplyFormErrors>({});
+  const [touched, setTouched] = useState<Record<keyof ApplyFormValues, boolean>>({
+    nationalId: false,
+    firstName: false,
+    lastName: false,
+    email: false,
+    phone: false,
+    address: false,
+    coverLetter: false,
+  });
   const [generalError, setGeneralError] = useState<string | null>(null);
   const { state, submit, reset } = useApplyJobVacancy();
 
@@ -44,8 +54,18 @@ export function ApplyDialog({ open, onOpenChange, vacancy, onSuccess }: ApplyDia
     if (!open) {
       setValues(EMPTY_VALUES);
       setFile(null);
+      setFileTouched(false);
       setFileName('');
       setErrors({});
+      setTouched({
+        nationalId: false,
+        firstName: false,
+        lastName: false,
+        email: false,
+        phone: false,
+        address: false,
+        coverLetter: false,
+      });
       setGeneralError(null);
       reset();
     }
@@ -68,14 +88,46 @@ export function ApplyDialog({ open, onOpenChange, vacancy, onSuccess }: ApplyDia
     (key: keyof ApplyFormValues) =>
     (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
       setValues((current) => ({ ...current, [key]: event.target.value }));
+      setTouched((current) => ({ ...current, [key]: true }));
     };
 
   const handleFile = (event: ChangeEvent<HTMLInputElement>) => {
     const next = event.target.files?.[0] ?? null;
     setFile(next);
+    setFileTouched(true);
     setFileName(next?.name ?? '');
     if (errors.file) setErrors((current) => ({ ...current, file: undefined }));
   };
+
+  const FIELD_ORDER: (keyof ApplyFormErrors)[] = [
+    'nationalId',
+    'firstName',
+    'lastName',
+    'email',
+    'phone',
+    'file',
+  ];
+
+  const FIELD_IDS: Record<keyof ApplyFormErrors, string> = {
+    nationalId: 'apply-national-id',
+    firstName: 'apply-first-name',
+    lastName: 'apply-last-name',
+    email: 'apply-email',
+    phone: 'apply-phone',
+    file: 'applicant-resume',
+  };
+
+  function focusFirstInvalidField(validation: ApplyFormErrors) {
+    const firstKey = FIELD_ORDER.find((key) => validation[key]);
+    if (!firstKey) return;
+    if (firstKey === 'file') {
+      setFileTouched(true);
+    } else {
+      setTouched((current) => ({ ...current, [firstKey]: true }));
+    }
+    const element = document.getElementById(FIELD_IDS[firstKey]);
+    element?.focus();
+  }
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -84,6 +136,7 @@ export function ApplyDialog({ open, onOpenChange, vacancy, onSuccess }: ApplyDia
     const validation = validateApplyForm(values, file);
     if (hasApplyErrors(validation)) {
       setErrors(validation);
+      focusFirstInvalidField(validation);
       return;
     }
     setErrors({});
@@ -131,12 +184,13 @@ export function ApplyDialog({ open, onOpenChange, vacancy, onSuccess }: ApplyDia
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-5" noValidate>
           <FieldGroup>
-            <Field data-invalid={Boolean(errors.nationalId) || undefined}>
+            <Field data-invalid={Boolean(errors.nationalId && touched.nationalId) || undefined}>
               <FieldLabel htmlFor="apply-national-id">Cedula o RUC</FieldLabel>
               <Input
                 id="apply-national-id"
+                inputMode="numeric"
                 value={values.nationalId}
                 onChange={handleField('nationalId')}
                 placeholder="1234567890"
@@ -144,11 +198,13 @@ export function ApplyDialog({ open, onOpenChange, vacancy, onSuccess }: ApplyDia
                 disabled={submitting}
                 required
               />
-              {errors.nationalId && <FieldError>{errors.nationalId}</FieldError>}
+              {errors.nationalId && touched.nationalId && (
+                <FieldError>{errors.nationalId}</FieldError>
+              )}
             </Field>
 
             <div className="grid gap-4 sm:grid-cols-2">
-              <Field data-invalid={Boolean(errors.firstName) || undefined}>
+              <Field data-invalid={Boolean(errors.firstName && touched.firstName) || undefined}>
                 <FieldLabel htmlFor="apply-first-name">Nombre</FieldLabel>
                 <Input
                   id="apply-first-name"
@@ -158,9 +214,11 @@ export function ApplyDialog({ open, onOpenChange, vacancy, onSuccess }: ApplyDia
                   disabled={submitting}
                   required
                 />
-                {errors.firstName && <FieldError>{errors.firstName}</FieldError>}
+                {errors.firstName && touched.firstName && (
+                  <FieldError>{errors.firstName}</FieldError>
+                )}
               </Field>
-              <Field data-invalid={Boolean(errors.lastName) || undefined}>
+              <Field data-invalid={Boolean(errors.lastName && touched.lastName) || undefined}>
                 <FieldLabel htmlFor="apply-last-name">Apellido</FieldLabel>
                 <Input
                   id="apply-last-name"
@@ -170,11 +228,11 @@ export function ApplyDialog({ open, onOpenChange, vacancy, onSuccess }: ApplyDia
                   disabled={submitting}
                   required
                 />
-                {errors.lastName && <FieldError>{errors.lastName}</FieldError>}
+                {errors.lastName && touched.lastName && <FieldError>{errors.lastName}</FieldError>}
               </Field>
             </div>
 
-            <Field data-invalid={Boolean(errors.email) || undefined}>
+            <Field data-invalid={Boolean(errors.email && touched.email) || undefined}>
               <FieldLabel htmlFor="apply-email">Correo electronico</FieldLabel>
               <Input
                 id="apply-email"
@@ -186,10 +244,10 @@ export function ApplyDialog({ open, onOpenChange, vacancy, onSuccess }: ApplyDia
                 disabled={submitting}
                 required
               />
-              {errors.email && <FieldError>{errors.email}</FieldError>}
+              {errors.email && touched.email && <FieldError>{errors.email}</FieldError>}
             </Field>
 
-            <Field data-invalid={Boolean(errors.phone) || undefined}>
+            <Field data-invalid={Boolean(errors.phone && touched.phone) || undefined}>
               <FieldLabel htmlFor="apply-phone">Telefono (opcional)</FieldLabel>
               <Input
                 id="apply-phone"
@@ -200,7 +258,7 @@ export function ApplyDialog({ open, onOpenChange, vacancy, onSuccess }: ApplyDia
                 maxLength={20}
                 disabled={submitting}
               />
-              {errors.phone && <FieldError>{errors.phone}</FieldError>}
+              {errors.phone && touched.phone && <FieldError>{errors.phone}</FieldError>}
             </Field>
 
             <Field>
@@ -225,7 +283,12 @@ export function ApplyDialog({ open, onOpenChange, vacancy, onSuccess }: ApplyDia
               />
             </Field>
 
-            <UploadResumeField fileName={fileName} error={errors.file} onChange={handleFile} />
+            <UploadResumeField
+              fileName={fileName}
+              error={errors.file}
+              touched={fileTouched}
+              onChange={handleFile}
+            />
           </FieldGroup>
 
           <div className="flex flex-wrap justify-end gap-2">

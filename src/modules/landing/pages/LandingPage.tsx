@@ -2,11 +2,10 @@ import { ArrowRight, Globe, MessageCircle, Smartphone, Wifi } from 'lucide-react
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
-import bannerImg from '@/assets/banner.jpg';
-import teamImg from '@/assets/team.jpg';
 import { Button } from '@/components/ui/button';
 import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
+import { CMS_IMAGE_KEYS } from '@/modules/cms/cms-image-blocks.js';
 import { useCmsLanding } from '../hooks/use-cms-landing.js';
 
 const SERVICES = [
@@ -30,7 +29,7 @@ const SERVICES = [
   },
 ];
 
-type Blocks = Record<string, { body: string }> | null;
+type Blocks = Record<string, { body: string | null }> | null;
 
 function resolveCms(blocks: Blocks) {
   return (key: string, fallback: string) => blocks?.[key]?.body ?? fallback;
@@ -42,9 +41,16 @@ function splitAtHighlight(text: string, highlight: string): [string, string] {
   return [text.slice(0, idx), text.slice(idx + highlight.length)];
 }
 
+function getImagesCms(r: ReturnType<typeof resolveCms>) {
+  return {
+    heroBackground: r(CMS_IMAGE_KEYS.heroBackground, ''),
+    aboutImage: r(CMS_IMAGE_KEYS.aboutImage, ''),
+  };
+}
+
 function getCmsContent(blocks: Blocks) {
   const r = resolveCms(blocks);
-  return { hero: getHeroCms(r), about: getAboutCms(r), cta: getCtaCms(r) };
+  return { hero: getHeroCms(r), about: getAboutCms(r), cta: getCtaCms(r), images: getImagesCms(r) };
 }
 
 function buildFeature(r: ReturnType<typeof resolveCms>, n: number) {
@@ -224,12 +230,12 @@ export default function LandingPage() {
   }, [error, retry]);
 
   if (loading && !blocks) return <LandingPageSkeleton />;
-  const { hero, about, cta } = getCmsContent(blocks);
+  const { hero, about, cta, images } = getCmsContent(blocks);
   return (
     <div className="w-full bg-background flex flex-col">
       <div className="w-full border-b border-border text-white relative overflow-hidden bg-hero">
         <img
-          src={bannerImg}
+          src={images.heroBackground}
           alt="Network Background"
           className="absolute inset-0 size-full object-cover opacity-25 pointer-events-none z-0"
         />
@@ -391,7 +397,7 @@ export default function LandingPage() {
           </div>
           <div className="lg:col-span-5 w-full flex flex-col items-center justify-center self-stretch overflow-hidden rounded-2xl shadow-md border border-border/30 bg-card transition-shadow hover:shadow-lg">
             <img
-              src={teamImg}
+              src={images.aboutImage}
               alt="Bopacorp Team"
               className="size-full object-cover aspect-[5/6]"
             />

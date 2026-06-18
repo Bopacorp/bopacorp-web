@@ -11,6 +11,7 @@ const MAX_PHONE = 20;
 const MAX_PDF_BYTES = 20 * 1024 * 1024;
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const NATIONAL_ID_RE = /^\d+$/;
 
 function validateString(value: string, min: number, max: number, required: boolean): string | null {
   const trimmed = value.trim();
@@ -22,7 +23,11 @@ function validateString(value: string, min: number, max: number, required: boole
 export function validateApplyForm(values: ApplyFormValues, file: File | null): ApplyFormErrors {
   const errors: ApplyFormErrors = {};
   const nationalId = validateString(values.nationalId, 1, MAX_NATIONAL_ID, true);
-  if (nationalId) errors.nationalId = nationalId;
+  if (nationalId) {
+    errors.nationalId = nationalId;
+  } else if (!NATIONAL_ID_RE.test(values.nationalId.trim())) {
+    errors.nationalId = 'Solo tiene que ser numerico.';
+  }
   const firstName = validateString(values.firstName, 1, MAX_NAME, true);
   if (firstName) errors.firstName = firstName;
   const lastName = validateString(values.lastName, 1, MAX_NAME, true);
