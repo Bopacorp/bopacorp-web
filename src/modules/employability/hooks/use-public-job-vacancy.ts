@@ -1,4 +1,4 @@
-import type { PublicJobVacancyResponse } from '@bopacorp/shared/employability';
+import type { JobVacancyResponse } from '@bopacorp/shared/employability';
 import { useCallback, useEffect, useState } from 'react';
 import { getPublicJobVacancy } from '../employability.service.js';
 import { getErrorMessage } from '../lib/validation.js';
@@ -8,14 +8,14 @@ interface CancelState {
 }
 
 interface UsePublicJobVacancyResult {
-  vacancy: PublicJobVacancyResponse | null;
+  vacancy: JobVacancyResponse | null;
   loading: boolean;
   error: { code: string; message: string } | null;
   retry: () => void;
 }
 
 export function usePublicJobVacancy(id: string | null | undefined): UsePublicJobVacancyResult {
-  const [vacancy, setVacancy] = useState<PublicJobVacancyResponse | null>(null);
+  const [vacancy, setVacancy] = useState<JobVacancyResponse | null>(null);
   const [loading, setLoading] = useState<boolean>(Boolean(id));
   const [error, setError] = useState<{ code: string; message: string } | null>(null);
   const [retryCount, setRetryCount] = useState(0);

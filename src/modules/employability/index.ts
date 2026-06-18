@@ -1,6 +1,6 @@
 export type {
   JobVacancyListItemResponse,
-  PublicJobVacancyResponse,
+  JobVacancyResponse,
 } from '@bopacorp/shared/employability';
 export { ApplyDialog } from './components/ApplyDialog.js';
 export { ApplySuccessDialog } from './components/ApplySuccessDialog.js';
