@@ -21,6 +21,12 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
+      - name: Debug dependency
+        run: |
+          cat package.json
+          npm pkg get dependencies.@bopacorp/shared
+          npm view @bopacorp/shared versions --json
+
       - name: Install dependencies
         run: npm ci
 
