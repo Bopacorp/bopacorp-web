@@ -16,14 +16,24 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: npm
           registry-url: https://npm.pkg.github.com
           scope: '@bopacorp'
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
+      - name: Debug dependency
+        run: |
+          cat package.json
+          npm pkg get dependencies.@bopacorp/shared
+          npm view @bopacorp/shared versions --json
+
       - name: Install dependencies
         run: npm ci
+
+      - name: Debug shared package
+        run: |
+          npm view @bopacorp/shared version
+          npm ls @bopacorp/shared
 
       - name: Lint, format & typecheck
         run: npm run check

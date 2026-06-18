@@ -26,6 +26,21 @@ function BodyPreview({ body }: { body: string | null }) {
   return <p className="text-sm leading-relaxed text-muted-foreground line-clamp-2">{preview}</p>;
 }
 
+function isVisualBlock(type: ContentBlockResponse['contentType']) {
+  return type?.code === 'IMAGE' || type?.code === 'BANNER';
+}
+
+function ImagePreview({ url }: { url: string | null }) {
+  if (!url) return <p className="text-sm text-muted-foreground italic">Sin URL de imagen.</p>;
+  return (
+    <img
+      src={url}
+      alt="Vista previa"
+      className="h-24 w-auto rounded-md border border-border object-cover"
+    />
+  );
+}
+
 function MetaItem({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex items-center gap-2">
@@ -61,7 +76,11 @@ export function CmsBlockRow({ block, index, onEdit }: CmsBlockRowProps) {
         <h3 className="font-display text-lg font-semibold tracking-tight text-foreground">
           {block.title ?? block.contentKey}
         </h3>
-        <BodyPreview body={block.body} />
+        {isVisualBlock(block.contentType) ? (
+          <ImagePreview url={block.body} />
+        ) : (
+          <BodyPreview body={block.body} />
+        )}
         <div className="flex items-center gap-1 pt-2">
           <Button variant="outline" size="sm" onClick={() => onEdit(block)}>
             <Pencil data-icon="inline-start" />

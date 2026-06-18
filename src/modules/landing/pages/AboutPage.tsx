@@ -31,7 +31,7 @@ const VALUES = [
   { id: 'excellence', icon: Award, fallbackTitle: 'Excelencia' },
 ];
 
-type Blocks = Record<string, { body: string }> | null;
+type Blocks = Record<string, { body: string | null }> | null;
 type Resolver = (key: string, fallback: string) => string;
 
 function resolveCms(blocks: Blocks) {

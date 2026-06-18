@@ -1,12 +1,8 @@
 import type { ListJobVacanciesQuery } from '@bopacorp/shared/employability';
-import { ArrowRight, BriefcaseBusiness, CheckCircle2, Send, Upload } from 'lucide-react';
+import { BriefcaseBusiness, CheckCircle2, Send, Upload } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Field, FieldDescription, FieldGroup, FieldLabel } from '@/components/ui/field';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import type { ApplyJobVacancyResponse, JobVacancyListItemResponse } from '@/modules/employability';
 import {
   ApplyDialog,
@@ -82,8 +78,7 @@ export default function JobsPage() {
               </h1>
               <p className="max-w-2xl text-sm leading-relaxed text-muted-foreground sm:text-base">
                 Revisa la lista de roles disponibles, selecciona la vacante que te interese y envia
-                tu postulacion con tu CV en PDF. Tambien puedes escribir al area de RRHH sin
-                asociarlo a una vacante concreta.
+                tu postulacion con tu CV en PDF.
               </p>
             </div>
 
@@ -163,27 +158,6 @@ export default function JobsPage() {
         </div>
       </section>
 
-      <section className="border-t border-border bg-muted/20 px-6 py-16">
-        <div className="mx-auto grid max-w-7xl gap-8 lg:grid-cols-[0.85fr_1.15fr]">
-          <div className="flex flex-col gap-4">
-            <Badge variant="secondary" className="w-fit">
-              Contacto general
-            </Badge>
-            <h2 className="text-2xl font-semibold tracking-tight">Formulario directo con RRHH</h2>
-            <p className="max-w-xl text-sm leading-relaxed text-muted-foreground">
-              Este formulario es independiente de las vacantes y sirve para consultas generales,
-              referencias, alianzas o preguntas del proceso de talento.
-            </p>
-          </div>
-
-          <Card className="border-border bg-card shadow-sm">
-            <CardContent className="p-6">
-              <ContactForm />
-            </CardContent>
-          </Card>
-        </div>
-      </section>
-
       <ApplyDialog
         open={applyOpen}
         onOpenChange={setApplyOpen}
@@ -218,78 +192,5 @@ function ProcessStep({
         <p className="text-xs text-muted-foreground">{description}</p>
       </div>
     </div>
-  );
-}
-
-function ContactForm() {
-  const [values, setValues] = useState({ fullName: '', email: '', phone: '', message: '' });
-
-  return (
-    <>
-      <FieldGroup>
-        <Field>
-          <FieldLabel htmlFor="contact-name">Nombre completo</FieldLabel>
-          <Input
-            id="contact-name"
-            value={values.fullName}
-            onChange={(event) =>
-              setValues((current) => ({ ...current, fullName: event.target.value }))
-            }
-            placeholder="Tu nombre"
-          />
-        </Field>
-
-        <Field>
-          <FieldLabel htmlFor="contact-email">Correo electronico</FieldLabel>
-          <Input
-            id="contact-email"
-            type="email"
-            value={values.email}
-            onChange={(event) =>
-              setValues((current) => ({ ...current, email: event.target.value }))
-            }
-            placeholder="tu@email.com"
-          />
-        </Field>
-
-        <Field>
-          <FieldLabel htmlFor="contact-phone">Numero de contacto</FieldLabel>
-          <Input
-            id="contact-phone"
-            type="tel"
-            value={values.phone}
-            onChange={(event) =>
-              setValues((current) => ({ ...current, phone: event.target.value }))
-            }
-            placeholder="+593 ..."
-          />
-        </Field>
-
-        <Field>
-          <FieldLabel htmlFor="contact-message">Mensaje</FieldLabel>
-          <Textarea
-            id="contact-message"
-            rows={5}
-            value={values.message}
-            onChange={(event) =>
-              setValues((current) => ({ ...current, message: event.target.value }))
-            }
-            placeholder="Escribe tu consulta para RRHH"
-          />
-          <FieldDescription>Te responderemos por correo electronico.</FieldDescription>
-        </Field>
-      </FieldGroup>
-
-      <div className="mt-6 flex flex-wrap gap-3">
-        <Button type="button">
-          <Send data-icon="inline-start" />
-          Enviar mensaje
-        </Button>
-        <Button type="button" variant="outline">
-          <ArrowRight data-icon="inline-end" />
-          Escribir a RRHH
-        </Button>
-      </div>
-    </>
   );
 }

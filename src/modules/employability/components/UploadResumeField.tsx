@@ -6,12 +6,13 @@ import { Input } from '@/components/ui/input';
 interface UploadResumeFieldProps {
   fileName: string;
   error?: string;
+  touched?: boolean;
   onChange: (event: ChangeEvent<HTMLInputElement>) => void;
 }
 
-export function UploadResumeField({ fileName, error, onChange }: UploadResumeFieldProps) {
+export function UploadResumeField({ fileName, error, touched, onChange }: UploadResumeFieldProps) {
   return (
-    <Field data-invalid={Boolean(error) || undefined}>
+    <Field data-invalid={Boolean(error && touched) || undefined}>
       <FieldLabel htmlFor="applicant-resume">CV en PDF</FieldLabel>
       <div className="flex items-center gap-3">
         <label
@@ -34,7 +35,7 @@ export function UploadResumeField({ fileName, error, onChange }: UploadResumeFie
         </span>
       </div>
       <FieldDescription>PDF, maximo 20 MB.</FieldDescription>
-      {error && <FieldError>{error}</FieldError>}
+      {error && touched && <FieldError>{error}</FieldError>}
     </Field>
   );
 }
