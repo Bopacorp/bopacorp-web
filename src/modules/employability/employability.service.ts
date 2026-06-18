@@ -1,9 +1,9 @@
 import type { PaginationMeta } from '@bopacorp/shared/common';
 import type {
   ApplyJobVacancyRequest,
+  JobVacancyResponse,
   JobVacancyListItemResponse,
   ListJobVacanciesQuery,
-  PublicJobVacancyResponse,
 } from '@bopacorp/shared/employability';
 import { request, requestPaginated } from '@/services/api.js';
 import type { ApplyJobVacancyResponse } from './employability.types.js';
@@ -17,7 +17,7 @@ export function listPublishedVacancies(query: ListJobVacanciesQuery) {
 }
 
 export function getPublicJobVacancy(id: string) {
-  return request<PublicJobVacancyResponse>({
+  return request<JobVacancyResponse>({
     method: 'GET',
     url: `/employability/vacancies/${id}/public`,
   });

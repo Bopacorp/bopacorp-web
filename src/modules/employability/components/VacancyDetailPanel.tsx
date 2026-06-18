@@ -1,4 +1,4 @@
-import type { PublicJobVacancyResponse } from '@bopacorp/shared/employability';
+import type { JobVacancyResponse } from '@bopacorp/shared/employability';
 import { Send } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -7,7 +7,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { VacancyDetailError } from './VacancyDetailError.js';
 
 type VacancySummary = Pick<
-  PublicJobVacancyResponse,
+  JobVacancyResponse,
   'id' | 'title' | 'description' | 'requirements' | 'publicationDate' | 'closingDate'
 >;
 
