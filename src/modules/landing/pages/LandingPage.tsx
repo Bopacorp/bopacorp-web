@@ -7,7 +7,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 import { CMS_IMAGE_KEYS } from '@/modules/cms/cms-image-blocks.js';
 import { useContactDialog } from '@/modules/contact/index.js';
-import { BlueprintGrid, ContourMotif, SignalDot } from '../components/decor.js';
+import { BlueprintGrid, ContourMotif } from '../components/decor.js';
 import { useCmsLanding } from '../hooks/use-cms-landing.js';
 
 const SERVICES = [
@@ -114,7 +114,7 @@ function getCtaCms(r: ReturnType<typeof resolveCms>) {
     title,
     highlight,
     titleParts: splitAtHighlight(title, highlight),
-    eyebrow: r('cta.eyebrow', '¿Listo para conectar tu empresa?'),
+    eyebrow: r('cta.eyebrow', 'Asesoría comercial sin costo'),
     description: r(
       'cta.description',
       'Habla con uno de nuestros asesores y encuentra el plan corporativo ideal para tu empresa. Sin compromisos.',
@@ -159,6 +159,7 @@ function HeroStat({ value, label, index }: { value: string; label: string; index
 }
 
 function HeroSection({ hero, images }: { hero: CmsContent['hero']; images: CmsContent['images'] }) {
+  const { openContactDialog } = useContactDialog();
   return (
     <div className="relative overflow-hidden bg-hero text-white">
       <img
@@ -174,7 +175,7 @@ function HeroSection({ hero, images }: { hero: CmsContent['hero']; images: CmsCo
       <BlueprintGrid className="text-white/5 mask-fade-center" />
       <ContourMotif className="contour-drift absolute -right-40 top-1/2 w-[44rem] -translate-y-1/2 text-white/10 z-0" />
 
-      <section className="relative z-10 mx-auto flex max-w-7xl flex-col items-start gap-10 px-6 pt-16 pb-20 md:pt-24 md:pb-28">
+      <section className="relative z-10 mx-auto flex max-w-7xl flex-col items-start gap-10 px-6 pt-14 pb-16 md:pt-20 md:pb-20">
         <div className="landing-rise flex max-w-3xl flex-col items-start gap-6">
           <h1 className="font-brand text-balance text-5xl font-semibold leading-[1.05] tracking-tight text-white sm:text-6xl md:text-7xl">
             {hero.titleParts[0]}
@@ -198,12 +199,13 @@ function HeroSection({ hero, images }: { hero: CmsContent['hero']; images: CmsCo
               </Link>
             </Button>
             <Button
-              asChild
               size="lg"
               variant="outline"
+              onClick={() => openContactDialog()}
               className="h-12 rounded-md border-white/30 bg-transparent px-7 text-sm font-medium text-white hover:bg-white/10 hover:text-white"
             >
-              <Link to="/about">{hero.ctaSecondaryLabel}</Link>
+              <MessageCircle className="mr-2 size-4" />
+              Hablar con un asesor
             </Button>
           </div>
         </div>
@@ -243,7 +245,7 @@ function ServiceRow({ item }: { item: (typeof SERVICES)[number] }) {
 
 function ServicesSection() {
   return (
-    <section className="relative bg-background px-6 py-24 md:py-32">
+    <section className="relative bg-background px-6 py-16 md:py-20">
       <BlueprintGrid className="text-foreground/5 mask-fade-top" />
       <div className="relative mx-auto grid max-w-7xl grid-cols-1 gap-12 lg:grid-cols-12">
         <header className="flex flex-col gap-4 self-start lg:sticky lg:top-28 lg:col-span-4">
@@ -290,7 +292,7 @@ function AboutSection({
   images: CmsContent['images'];
 }) {
   return (
-    <section className="relative border-y border-border bg-muted/30 px-6 py-24 md:py-32">
+    <section className="relative border-y border-border bg-muted/30 px-6 py-16 md:py-20">
       <div className="relative mx-auto grid max-w-7xl grid-cols-1 items-center gap-12 lg:grid-cols-12 lg:gap-16">
         <div className="flex flex-col items-start gap-7 lg:col-span-7">
           <div className="flex items-center gap-3">
@@ -339,7 +341,7 @@ function CtaSection({ cta }: { cta: CmsContent['cta'] }) {
   const { openContactDialog } = useContactDialog();
   const navigate = useNavigate();
   return (
-    <section className="relative overflow-hidden bg-hero px-6 py-28 text-white md:py-36">
+    <section className="relative overflow-hidden bg-hero px-6 py-20 text-white md:py-24">
       <div
         aria-hidden="true"
         className="absolute inset-0 bg-gradient-to-br from-hero via-hero-mid to-primary/80"
@@ -353,12 +355,9 @@ function CtaSection({ cta }: { cta: CmsContent['cta'] }) {
       <ContourMotif className="absolute -bottom-40 -right-40 w-[32rem] text-white/[0.06]" />
 
       <div className="relative z-10 mx-auto flex max-w-3xl flex-col items-center gap-8 text-center">
-        <div className="landing-rise inline-flex items-center gap-2.5 rounded-full border border-white/15 bg-white/5 py-1.5 pl-3 pr-4 backdrop-blur-sm">
-          <SignalDot />
-          <span className="text-[11px] font-medium uppercase tracking-[0.2em] text-white/80">
-            {cta.eyebrow}
-          </span>
-        </div>
+        <span className="landing-rise text-sm font-semibold uppercase tracking-[0.2em] text-primary">
+          {cta.eyebrow}
+        </span>
         <h2
           className="landing-rise font-brand text-balance text-4xl font-semibold leading-[1.08] tracking-tight text-white sm:text-5xl md:text-6xl"
           style={{ animationDelay: '100ms' }}
@@ -404,7 +403,7 @@ function LandingPageSkeleton() {
   return (
     <div className="flex w-full flex-col bg-background">
       <div className="relative w-full overflow-hidden bg-hero text-white">
-        <section className="relative z-10 mx-auto flex max-w-7xl flex-col items-start gap-10 px-6 pt-16 pb-20 md:pt-24 md:pb-28">
+        <section className="relative z-10 mx-auto flex max-w-7xl flex-col items-start gap-10 px-6 pt-14 pb-16 md:pt-20 md:pb-20">
           <div className="flex max-w-3xl flex-col items-start gap-6">
             <Skeleton className="h-14 w-3/4" />
             <Skeleton className="h-6 w-2/3" />
@@ -426,7 +425,7 @@ function LandingPageSkeleton() {
         </div>
       </div>
 
-      <section className="relative w-full bg-background px-6 py-24 md:py-32">
+      <section className="relative w-full bg-background px-6 py-16 md:py-20">
         <div className="mx-auto grid max-w-7xl grid-cols-1 gap-12 lg:grid-cols-12">
           <div className="flex flex-col gap-4 lg:col-span-4">
             <span aria-hidden="true" className="h-px w-10 bg-primary/40" />
@@ -447,7 +446,7 @@ function LandingPageSkeleton() {
         </div>
       </section>
 
-      <section className="relative w-full border-y border-border bg-muted/30 px-6 py-24 md:py-32">
+      <section className="relative w-full border-y border-border bg-muted/30 px-6 py-16 md:py-20">
         <div className="mx-auto grid max-w-7xl grid-cols-1 items-center gap-12 lg:grid-cols-12 lg:gap-16">
           <div className="flex flex-col items-start gap-6 lg:col-span-7">
             <Skeleton className="h-4 w-32" />
@@ -472,7 +471,7 @@ function LandingPageSkeleton() {
         </div>
       </section>
 
-      <section className="relative w-full overflow-hidden bg-hero px-6 py-28 text-white md:py-36">
+      <section className="relative w-full overflow-hidden bg-hero px-6 py-20 text-white md:py-24">
         <div className="mx-auto flex max-w-3xl flex-col items-center gap-8 text-center">
           <Skeleton className="h-7 w-56 rounded-full" />
           <Skeleton className="h-14 w-3/4" />
