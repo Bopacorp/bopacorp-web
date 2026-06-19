@@ -14,7 +14,7 @@ export function ApplySuccessDialog({ open, onOpenChange, response }: ApplySucces
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <div className="flex items-start justify-between gap-4">
-          <div className="flex size-12 items-center justify-center rounded-full bg-primary/10 text-primary">
+          <div className="flex size-12 items-center justify-center rounded-xl border border-primary/20 bg-primary/10 text-primary">
             <CheckCircle2 className="size-6" />
           </div>
           <Button
@@ -28,15 +28,17 @@ export function ApplySuccessDialog({ open, onOpenChange, response }: ApplySucces
           </Button>
         </div>
         <div className="flex flex-col gap-2">
-          <DialogTitle>Postulacion enviada</DialogTitle>
+          <DialogTitle className="font-brand text-lg font-semibold tracking-tight">
+            Postulacion enviada
+          </DialogTitle>
           <DialogDescription>
             Recibimos tu postulacion para la vacante. Te contactaremos por correo electronico.
           </DialogDescription>
         </div>
         <div className="flex flex-col gap-3 rounded-xl border border-border bg-muted/30 p-4">
           <div className="flex items-center gap-2 text-sm">
-            <Briefcase className="size-4 text-muted-foreground" />
-            <span className="font-medium">{response.vacancy.title}</span>
+            <Briefcase className="size-4 text-primary" />
+            <span className="font-semibold">{response.vacancy.title}</span>
           </div>
           <div className="flex flex-col gap-1 text-xs text-muted-foreground">
             <span>
@@ -54,8 +56,12 @@ export function ApplySuccessDialog({ open, onOpenChange, response }: ApplySucces
             </span>
           </div>
         </div>
-        <div className="flex flex-wrap gap-2">
-          <Button type="button" onClick={() => onOpenChange(false)}>
+        <div className="flex flex-wrap gap-3">
+          <Button
+            type="button"
+            onClick={() => onOpenChange(false)}
+            className="h-11 rounded-md px-6 text-sm font-medium"
+          >
             Entendido
           </Button>
         </div>

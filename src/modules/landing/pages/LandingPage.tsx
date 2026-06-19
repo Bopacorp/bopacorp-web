@@ -1,11 +1,12 @@
-import { ArrowRight, Globe, MessageCircle, Smartphone, Wifi } from 'lucide-react';
-import { useEffect } from 'react';
+import { ArrowRight, Check, Globe, MessageCircle, Smartphone, Wifi } from 'lucide-react';
+import { type ReactNode, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
-import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
+import { cn } from '@/lib/utils';
 import { CMS_IMAGE_KEYS } from '@/modules/cms/cms-image-blocks.js';
+import { BlueprintGrid, ContourMotif, SignalDot } from '../components/decor.js';
 import { useCmsLanding } from '../hooks/use-cms-landing.js';
 
 const SERVICES = [
@@ -122,66 +123,338 @@ function getCtaCms(r: ReturnType<typeof resolveCms>) {
   };
 }
 
+type CmsContent = ReturnType<typeof getCmsContent>;
+
+function Highlight({ children }: { children: ReactNode }) {
+  return (
+    <span className="relative font-brand text-primary">
+      {children}
+      <span
+        aria-hidden="true"
+        className="absolute -bottom-0.5 left-0 h-[3px] w-full rounded-full bg-primary/40"
+      />
+    </span>
+  );
+}
+
+function HeroStat({ value, label, index }: { value: string; label: string; index: number }) {
+  return (
+    <div
+      className={cn(
+        'flex flex-col gap-2 px-6 py-7 transition-colors group border-white/10',
+        index % 2 === 0 && 'border-l',
+        index >= 3 && 'border-t md:border-t-0',
+        index === 3 && 'md:border-l',
+      )}
+    >
+      <span className="font-brand text-3xl font-semibold tracking-tight text-white tabular-nums transition-colors group-hover:text-primary md:text-4xl">
+        {value}
+      </span>
+      <span className="text-[10px] font-medium uppercase tracking-[0.18em] text-white/50 md:text-xs">
+        {label}
+      </span>
+    </div>
+  );
+}
+
+function HeroSection({ hero, images }: { hero: CmsContent['hero']; images: CmsContent['images'] }) {
+  return (
+    <div className="relative overflow-hidden bg-hero text-white">
+      <img
+        src={images.heroBackground}
+        alt=""
+        aria-hidden="true"
+        className="absolute inset-0 size-full scale-105 object-cover opacity-20 pointer-events-none z-0"
+      />
+      <div
+        aria-hidden="true"
+        className="absolute -top-32 -right-24 size-[42rem] rounded-full bg-primary/25 blur-[140px] pointer-events-none z-0"
+      />
+      <BlueprintGrid className="text-white/5 mask-fade-center" />
+      <ContourMotif className="contour-drift absolute -right-40 top-1/2 w-[44rem] -translate-y-1/2 text-white/10 z-0" />
+
+      <section className="relative z-10 mx-auto flex max-w-7xl flex-col items-start gap-10 px-6 pt-16 pb-20 md:pt-24 md:pb-28">
+        <div className="landing-rise flex max-w-3xl flex-col items-start gap-6">
+          <h1 className="font-brand text-balance text-5xl font-semibold leading-[1.05] tracking-tight text-white sm:text-6xl md:text-7xl">
+            {hero.titleParts[0]}
+            <Highlight>{hero.highlight}</Highlight>
+            {hero.titleParts[1]}
+          </h1>
+          <p
+            className="landing-rise max-w-xl text-lg font-normal leading-relaxed text-white/70"
+            style={{ animationDelay: '120ms' }}
+          >
+            {hero.description}
+          </p>
+          <div
+            className="landing-rise flex flex-wrap gap-3 pt-2"
+            style={{ animationDelay: '220ms' }}
+          >
+            <Button asChild size="lg" className="h-12 rounded-md px-7 text-sm font-medium">
+              <Link to="/services">
+                {hero.ctaPrimaryLabel}
+                <ArrowRight className="ml-2 size-4" />
+              </Link>
+            </Button>
+            <Button
+              asChild
+              size="lg"
+              variant="outline"
+              className="h-12 rounded-md border-white/30 bg-transparent px-7 text-sm font-medium text-white hover:bg-white/10 hover:text-white"
+            >
+              <Link to="/about">{hero.ctaSecondaryLabel}</Link>
+            </Button>
+          </div>
+        </div>
+      </section>
+
+      <div className="relative z-10 w-full border-t border-white/10 bg-black/20 backdrop-blur-sm">
+        <div className="mx-auto grid max-w-7xl grid-cols-2 px-0 md:grid-cols-4">
+          <HeroStat index={1} value="+300" label="clientes corporativos" />
+          <HeroStat index={2} value="7 años" label="de experiencia" />
+          <HeroStat index={3} value="Costa" label="líderes regionales" />
+          <HeroStat index={4} value="12" label="colaboradores" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ServiceRow({ item }: { item: (typeof SERVICES)[number] }) {
+  const Icon = item.icon;
+  return (
+    <div className="group relative grid grid-cols-1 gap-5 border-b border-border py-7 px-1 transition-colors hover:bg-muted/40 sm:grid-cols-[auto_1fr] sm:items-center sm:gap-6">
+      <span className="absolute left-0 top-0 h-full w-px origin-top scale-y-0 bg-primary transition-transform duration-300 group-hover:scale-y-100" />
+      <span className="flex size-12 items-center justify-center rounded-xl border border-border text-foreground transition-colors group-hover:border-primary group-hover:text-primary">
+        <Icon className="size-5" />
+      </span>
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-5">
+        <div className="flex max-w-xl flex-col gap-1.5">
+          <h3 className="text-xl font-semibold tracking-tight text-foreground transition-colors group-hover:text-primary">
+            {item.title}
+          </h3>
+          <p className="text-sm font-normal leading-relaxed text-muted-foreground">{item.desc}</p>
+        </div>
+        <ArrowRight className="hidden size-5 shrink-0 text-muted-foreground/40 transition-all group-hover:translate-x-1 group-hover:text-primary sm:block" />
+      </div>
+    </div>
+  );
+}
+
+function ServicesSection() {
+  return (
+    <section className="relative bg-background px-6 py-24 md:py-32">
+      <BlueprintGrid className="text-foreground/5 mask-fade-top" />
+      <div className="relative mx-auto grid max-w-7xl grid-cols-1 gap-12 lg:grid-cols-12">
+        <header className="flex flex-col gap-4 self-start lg:sticky lg:top-28 lg:col-span-4">
+          <span aria-hidden="true" className="h-px w-10 bg-primary" />
+          <h2 className="font-brand text-balance text-3xl font-semibold leading-tight tracking-tight text-foreground sm:text-4xl">
+            Lo que hacemos por tu empresa
+          </h2>
+          <p className="max-w-sm text-base font-normal leading-relaxed text-muted-foreground">
+            Soluciones integradas de telecomunicaciones para empresas que necesitan fiabilidad,
+            velocidad y soporte 24/7.
+          </p>
+        </header>
+        <div className="flex flex-col border-t border-border lg:col-span-8">
+          {SERVICES.map((item) => (
+            <ServiceRow key={item.id} item={item} />
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function AboutFeatureRow({ feature }: { feature: { title: string; desc: string } }) {
+  return (
+    <div className="group flex items-start gap-4 border-b border-border py-5 transition-colors hover:bg-background/60">
+      <span className="mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
+        <Check className="size-3.5" />
+      </span>
+      <div className="flex flex-col gap-1">
+        <h4 className="text-base font-semibold text-foreground transition-colors group-hover:text-primary">
+          {feature.title}
+        </h4>
+        <p className="text-sm font-normal leading-relaxed text-muted-foreground">{feature.desc}</p>
+      </div>
+    </div>
+  );
+}
+
+function AboutSection({
+  about,
+  images,
+}: {
+  about: CmsContent['about'];
+  images: CmsContent['images'];
+}) {
+  return (
+    <section className="relative border-y border-border bg-muted/30 px-6 py-24 md:py-32">
+      <div className="relative mx-auto grid max-w-7xl grid-cols-1 items-center gap-12 lg:grid-cols-12 lg:gap-16">
+        <div className="flex flex-col items-start gap-7 lg:col-span-7">
+          <div className="flex items-center gap-3">
+            <span className="h-px w-10 bg-primary" />
+            <span className="text-xs font-semibold uppercase tracking-[0.2em] text-primary">
+              {about.eyebrow}
+            </span>
+          </div>
+          <h2 className="font-brand text-balance text-3xl font-semibold leading-[1.1] tracking-tight text-foreground sm:text-4xl md:text-5xl">
+            {about.title}
+          </h2>
+          <p className="max-w-xl text-base font-normal leading-relaxed text-muted-foreground">
+            {about.description}
+          </p>
+          <div className="mt-2 flex w-full flex-col border-t border-border">
+            {about.features.map((f) => (
+              <AboutFeatureRow key={f.title} feature={f} />
+            ))}
+          </div>
+        </div>
+
+        <div className="relative lg:col-span-5">
+          <div
+            aria-hidden="true"
+            className="absolute -inset-3 -z-10 rounded-3xl border border-primary/20"
+          />
+          <div className="relative aspect-[5/6] overflow-hidden rounded-2xl border border-border/50 shadow-sm">
+            <img src={images.aboutImage} alt="Bopacorp Team" className="size-full object-cover" />
+            <ContourMotif className="absolute -bottom-24 -right-24 w-72 text-white/25" />
+            <div
+              aria-hidden="true"
+              className="absolute inset-0 bg-gradient-to-t from-hero/40 to-transparent"
+            />
+          </div>
+          <span
+            aria-hidden="true"
+            className="absolute -top-3 -left-3 size-6 border-l-2 border-t-2 border-primary"
+          />
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function CtaSection({ cta }: { cta: CmsContent['cta'] }) {
+  return (
+    <section className="relative overflow-hidden bg-hero px-6 py-28 text-white md:py-36">
+      <div
+        aria-hidden="true"
+        className="absolute inset-0 bg-gradient-to-br from-hero via-hero-mid to-primary/80"
+      />
+      <div
+        aria-hidden="true"
+        className="absolute -bottom-40 -left-32 size-[40rem] rounded-full bg-primary/30 blur-[140px]"
+      />
+      <BlueprintGrid className="text-white/5 mask-fade-center" />
+      <ContourMotif className="contour-drift absolute -left-40 top-1/2 w-[40rem] -translate-y-1/2 text-white/10" />
+      <ContourMotif className="absolute -bottom-40 -right-40 w-[32rem] text-white/[0.06]" />
+
+      <div className="relative z-10 mx-auto flex max-w-3xl flex-col items-center gap-8 text-center">
+        <div className="landing-rise inline-flex items-center gap-2.5 rounded-full border border-white/15 bg-white/5 py-1.5 pl-3 pr-4 backdrop-blur-sm">
+          <SignalDot />
+          <span className="text-[11px] font-medium uppercase tracking-[0.2em] text-white/80">
+            {cta.eyebrow}
+          </span>
+        </div>
+        <h2
+          className="landing-rise font-brand text-balance text-4xl font-semibold leading-[1.08] tracking-tight text-white sm:text-5xl md:text-6xl"
+          style={{ animationDelay: '100ms' }}
+        >
+          {cta.titleParts[0]}
+          <br className="hidden sm:block" /> <Highlight>{cta.highlight}</Highlight>
+          {cta.titleParts[1]}
+        </h2>
+        <p
+          className="landing-rise max-w-xl text-lg font-normal leading-relaxed text-white/70"
+          style={{ animationDelay: '200ms' }}
+        >
+          {cta.description}
+        </p>
+        <div
+          className="landing-rise flex w-full flex-col items-center gap-3 pt-2 sm:w-auto sm:flex-row"
+          style={{ animationDelay: '300ms' }}
+        >
+          <Button
+            size="lg"
+            variant="secondary"
+            className="h-12 w-full rounded-md px-8 text-sm font-medium sm:w-auto"
+          >
+            <MessageCircle className="mr-2 size-4" />
+            {cta.primaryLabel}
+          </Button>
+          <Button
+            size="lg"
+            variant="outline"
+            className="h-12 w-full rounded-md border-white/30 bg-transparent px-8 text-sm font-medium text-white hover:bg-white/10 hover:text-white sm:w-auto"
+          >
+            {cta.secondaryLabel}
+          </Button>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function LandingPageSkeleton() {
   return (
-    <div className="w-full bg-background flex flex-col">
-      <div className="w-full border-b border-border text-white relative overflow-hidden bg-hero">
-        <section className="max-w-7xl mx-auto px-6 py-24 md:py-32 flex flex-col items-center text-center gap-10 relative z-10">
-          <div className="flex flex-col items-center gap-6 max-w-3xl mx-auto w-full">
-            <Skeleton className="h-12 w-3/4" />
+    <div className="flex w-full flex-col bg-background">
+      <div className="relative w-full overflow-hidden bg-hero text-white">
+        <section className="relative z-10 mx-auto flex max-w-7xl flex-col items-start gap-10 px-6 pt-16 pb-20 md:pt-24 md:pb-28">
+          <div className="flex max-w-3xl flex-col items-start gap-6">
+            <Skeleton className="h-14 w-3/4" />
             <Skeleton className="h-6 w-2/3" />
-            <div className="flex flex-wrap justify-center gap-4 pt-2">
-              <Skeleton className="h-12 w-40" />
+            <div className="flex flex-wrap gap-3 pt-2">
+              <Skeleton className="h-12 w-44" />
               <Skeleton className="h-12 w-40" />
             </div>
           </div>
         </section>
-        <div className="w-full border-t border-white/10 bg-black/20 backdrop-blur-sm py-8 relative z-10">
-          <div className="max-w-7xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-8">
-            {[0, 1, 2, 3].map((i) => (
-              <div key={i} className="flex flex-col items-center text-center gap-2">
-                <Skeleton className="h-8 w-20" />
-                <Skeleton className="h-4 w-28" />
+        <div className="relative z-10 w-full border-t border-white/10 bg-black/20 py-2">
+          <div className="mx-auto grid max-w-7xl grid-cols-2 md:grid-cols-4">
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="flex flex-col gap-2 px-6 py-7">
+                <Skeleton className="h-9 w-24" />
+                <Skeleton className="h-3 w-28" />
               </div>
             ))}
           </div>
         </div>
       </div>
 
-      <section className="w-full bg-muted/30 py-20 px-6 border-b border-border/50">
-        <div className="max-w-7xl mx-auto flex flex-col gap-12">
-          <div className="flex flex-col items-center text-center gap-4">
-            <Skeleton className="h-10 w-1/2 max-w-md" />
-            <Skeleton className="h-5 w-2/3 max-w-xl" />
+      <section className="relative w-full bg-background px-6 py-24 md:py-32">
+        <div className="mx-auto grid max-w-7xl grid-cols-1 gap-12 lg:grid-cols-12">
+          <div className="flex flex-col gap-4 lg:col-span-4">
+            <span aria-hidden="true" className="h-px w-10 bg-primary/40" />
+            <Skeleton className="h-10 w-3/4" />
+            <Skeleton className="h-5 w-2/3" />
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 w-full">
+          <div className="flex flex-col lg:col-span-8">
             {[0, 1, 2].map((i) => (
-              <div
-                key={i}
-                className="border border-border/60 rounded-xl bg-card p-6 flex flex-col gap-4"
-              >
+              <div key={i} className="flex items-center gap-5 border-b border-border py-7">
                 <Skeleton className="size-12 rounded-xl" />
-                <Skeleton className="h-6 w-3/4" />
-                <Skeleton className="h-4 w-full" />
-                <Skeleton className="h-4 w-5/6" />
+                <div className="flex flex-1 flex-col gap-2">
+                  <Skeleton className="h-5 w-1/2" />
+                  <Skeleton className="h-4 w-4/5" />
+                </div>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      <section className="w-full bg-accent/30 py-24 px-6 border-b border-border/50">
-        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-16 items-center justify-items-center">
-          <div className="lg:col-span-7 flex flex-col items-start text-left gap-6 w-full">
+      <section className="relative w-full border-y border-border bg-muted/30 px-6 py-24 md:py-32">
+        <div className="mx-auto grid max-w-7xl grid-cols-1 items-center gap-12 lg:grid-cols-12 lg:gap-16">
+          <div className="flex flex-col items-start gap-6 lg:col-span-7">
             <Skeleton className="h-4 w-32" />
-            <Skeleton className="h-10 w-3/4" />
+            <Skeleton className="h-12 w-3/4" />
             <Skeleton className="h-5 w-full" />
             <Skeleton className="h-5 w-5/6" />
-            <div className="flex flex-col gap-6 mt-4 w-full">
+            <div className="mt-2 flex w-full flex-col">
               {[0, 1, 2].map((i) => (
-                <div key={i} className="flex gap-4 items-start w-full">
-                  <Skeleton className="size-8 rounded-lg" />
-                  <div className="flex-1 flex flex-col gap-2">
+                <div key={i} className="flex gap-4 border-b border-border py-5">
+                  <Skeleton className="size-6 rounded-md" />
+                  <div className="flex flex-1 flex-col gap-2">
                     <Skeleton className="h-5 w-2/3" />
                     <Skeleton className="h-4 w-full" />
                   </div>
@@ -189,18 +462,18 @@ function LandingPageSkeleton() {
               ))}
             </div>
           </div>
-          <div className="lg:col-span-5 w-full">
+          <div className="lg:col-span-5">
             <Skeleton className="aspect-[5/6] w-full rounded-2xl" />
           </div>
         </div>
       </section>
 
-      <section className="w-full text-white relative overflow-hidden py-24 px-6 bg-gradient-to-r from-hero via-hero-mid to-primary">
-        <div className="max-w-4xl mx-auto flex flex-col items-center text-center gap-8 relative z-10">
-          <Skeleton className="h-7 w-64 rounded-full" />
+      <section className="relative w-full overflow-hidden bg-hero px-6 py-28 text-white md:py-36">
+        <div className="mx-auto flex max-w-3xl flex-col items-center gap-8 text-center">
+          <Skeleton className="h-7 w-56 rounded-full" />
           <Skeleton className="h-14 w-3/4" />
           <Skeleton className="h-6 w-2/3" />
-          <div className="flex flex-col sm:flex-row items-center gap-4 justify-center pt-2 w-full">
+          <div className="flex flex-col gap-3 pt-2 sm:flex-row">
             <Skeleton className="h-12 w-40" />
             <Skeleton className="h-12 w-40" />
           </div>
@@ -232,211 +505,11 @@ export default function LandingPage() {
   if (loading && !blocks) return <LandingPageSkeleton />;
   const { hero, about, cta, images } = getCmsContent(blocks);
   return (
-    <div className="w-full bg-background flex flex-col">
-      <div className="w-full border-b border-border text-white relative overflow-hidden bg-hero">
-        <img
-          src={images.heroBackground}
-          alt="Network Background"
-          className="absolute inset-0 size-full object-cover opacity-25 pointer-events-none z-0"
-        />
-
-        <section className="max-w-7xl mx-auto px-6 py-24 md:py-32 flex flex-col items-center text-center gap-10 relative z-10">
-          <div className="flex flex-col items-center gap-6 max-w-3xl mx-auto">
-            <h1 className="text-4xl font-semibold tracking-tight text-white sm:text-5xl md:text-6xl leading-[1.15]">
-              {hero.titleParts[0]}
-              <span className="text-primary">{hero.highlight}</span>
-              {hero.titleParts[1]}
-            </h1>
-            <p className="text-lg text-white/80 leading-relaxed max-w-2xl font-normal">
-              {hero.description}
-            </p>
-
-            <div className="flex flex-wrap justify-center gap-4 pt-2">
-              <Button
-                asChild
-                size="lg"
-                className="rounded-md font-medium transition-colors bg-primary text-primary-foreground hover:bg-primary/90 border-none cursor-pointer"
-              >
-                <Link to="/services">
-                  {hero.ctaPrimaryLabel}
-                  <ArrowRight className="ml-2 size-4" />
-                </Link>
-              </Button>
-              <Button
-                asChild
-                size="lg"
-                variant="outline"
-                className="bg-transparent border-white text-white hover:bg-white/10 rounded-md transition-colors font-medium cursor-pointer"
-              >
-                <Link to="/about">{hero.ctaSecondaryLabel}</Link>
-              </Button>
-            </div>
-          </div>
-        </section>
-
-        <div className="w-full border-t border-white/10 bg-black/20 backdrop-blur-sm py-8 relative z-10">
-          <div className="max-w-7xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-8">
-            <div className="flex flex-col items-center text-center">
-              <span className="text-2xl md:text-3xl font-semibold text-white">+300</span>
-              <span className="text-xs md:text-sm text-white/60 mt-1 uppercase tracking-wider font-medium">
-                clientes corporativos
-              </span>
-            </div>
-            <div className="flex flex-col items-center text-center border-l border-white/10 pl-6 max-md:border-l-0 max-md:pl-0">
-              <span className="text-2xl md:text-3xl font-semibold text-white">7 años</span>
-              <span className="text-xs md:text-sm text-white/60 mt-1 uppercase tracking-wider font-medium">
-                de experiencia
-              </span>
-            </div>
-            <div className="flex flex-col items-center text-center border-l border-white/10 pl-6">
-              <span className="text-2xl md:text-3xl font-semibold text-white">Costa</span>
-              <span className="text-xs md:text-sm text-white/60 mt-1 uppercase tracking-wider font-medium">
-                líderes regionales
-              </span>
-            </div>
-            <div className="flex flex-col items-center text-center border-l border-white/10 pl-6 max-md:border-l-0 max-md:pl-0">
-              <span className="text-2xl md:text-3xl font-semibold text-white">12</span>
-              <span className="text-xs md:text-sm text-white/60 mt-1 uppercase tracking-wider font-medium">
-                colaboradores
-              </span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <section className="w-full bg-muted/30 py-20 px-6 border-b border-border/50">
-        <div className="max-w-7xl mx-auto flex flex-col gap-12">
-          <div className="flex flex-col items-center text-center gap-2">
-            <h2 className="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
-              Lo que hacemos por tu empresa
-            </h2>
-            <p className="text-base text-muted-foreground max-w-2xl font-normal">
-              Soluciones integradas de telecomunicaciones para empresas que necesitan fiabilidad,
-              velocidad y soporte 24/7.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 w-full">
-            {SERVICES.map((item) => (
-              <Card
-                key={item.id}
-                className="border border-border/60 rounded-xl bg-card shadow-sm hover:shadow-md transition-shadow p-6 flex flex-col items-start text-left w-full"
-              >
-                <CardHeader className="gap-3 p-0 flex flex-col items-start w-full">
-                  <div className="size-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary shrink-0">
-                    <item.icon className="size-6" />
-                  </div>
-                  <CardTitle className="text-xl font-semibold text-card-foreground tracking-tight w-full">
-                    {item.title}
-                  </CardTitle>
-                  <CardDescription className="text-sm leading-relaxed font-normal w-full">
-                    {item.desc}
-                  </CardDescription>
-                </CardHeader>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="w-full bg-accent/30 py-24 px-6 border-b border-border/50">
-        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-16 items-center justify-items-center">
-          <div className="lg:col-span-7 flex flex-col items-start text-left gap-6">
-            <div className="flex flex-col gap-2">
-              <span className="text-xs font-semibold text-primary tracking-widest uppercase">
-                {about.eyebrow}
-              </span>
-              <h2 className="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl leading-tight">
-                {about.title}
-              </h2>
-            </div>
-            <p className="text-base text-muted-foreground leading-relaxed font-normal">
-              {about.description}
-            </p>
-            <div className="flex flex-col gap-6 mt-4">
-              <div className="flex gap-4 items-start">
-                <span className="text-xl font-semibold text-primary/40 bg-primary/5 size-8 rounded-lg flex items-center justify-center shrink-0">
-                  01
-                </span>
-                <div>
-                  <h4 className="text-base font-semibold text-foreground">
-                    {about.features[0].title}
-                  </h4>
-                  <p className="text-sm text-muted-foreground mt-1 font-normal">
-                    {about.features[0].desc}
-                  </p>
-                </div>
-              </div>
-              <div className="flex gap-4 items-start">
-                <span className="text-xl font-semibold text-primary/40 bg-primary/5 size-8 rounded-lg flex items-center justify-center shrink-0">
-                  02
-                </span>
-                <div>
-                  <h4 className="text-base font-semibold text-foreground">
-                    {about.features[1].title}
-                  </h4>
-                  <p className="text-sm text-muted-foreground mt-1 font-normal">
-                    {about.features[1].desc}
-                  </p>
-                </div>
-              </div>
-              <div className="flex gap-4 items-start">
-                <span className="text-xl font-semibold text-primary/40 bg-primary/5 size-8 rounded-lg flex items-center justify-center shrink-0">
-                  03
-                </span>
-                <div>
-                  <h4 className="text-base font-semibold text-foreground">
-                    {about.features[2].title}
-                  </h4>
-                  <p className="text-sm text-muted-foreground mt-1 font-normal">
-                    {about.features[2].desc}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div className="lg:col-span-5 w-full flex flex-col items-center justify-center self-stretch overflow-hidden rounded-2xl shadow-md border border-border/30 bg-card transition-shadow hover:shadow-lg">
-            <img
-              src={images.aboutImage}
-              alt="Bopacorp Team"
-              className="size-full object-cover aspect-[5/6]"
-            />
-          </div>
-        </div>
-      </section>
-
-      <section className="w-full text-white relative overflow-hidden py-24 px-6 bg-gradient-to-r from-hero via-hero-mid to-primary">
-        <div className="max-w-4xl mx-auto flex flex-col items-center text-center gap-8 relative z-10">
-          <div className="inline-flex items-center gap-2 border border-white/10 bg-white/5 px-4 py-1.5 rounded-full text-xs font-normal text-white/90 tracking-wider uppercase">
-            {cta.eyebrow}
-          </div>
-          <h2 className="text-3xl font-semibold tracking-tight text-white sm:text-5xl md:text-6xl leading-tight">
-            {cta.titleParts[0]}
-            <br className="hidden sm:block" /> <span className="text-primary">{cta.highlight}</span>
-            {cta.titleParts[1]}
-          </h2>
-          <p className="text-lg text-white/80 leading-relaxed max-w-2xl mx-auto font-normal">
-            {cta.description}
-          </p>
-          <div className="flex flex-col sm:flex-row items-center gap-4 justify-center pt-2 w-full">
-            <Button
-              size="lg"
-              variant="secondary"
-              className="rounded-md font-medium px-8 w-full sm:w-auto"
-            >
-              <MessageCircle className="mr-2 size-4" />
-              {cta.primaryLabel}
-            </Button>
-            <Button
-              size="lg"
-              variant="outline"
-              className="bg-transparent border-white text-white hover:bg-white/10 rounded-md font-medium px-8 w-full sm:w-auto"
-            >
-              {cta.secondaryLabel}
-            </Button>
-          </div>
-        </div>
-      </section>
+    <div className="flex w-full flex-col bg-background">
+      <HeroSection hero={hero} images={images} />
+      <ServicesSection />
+      <AboutSection about={about} images={images} />
+      <CtaSection cta={cta} />
     </div>
   );
 }

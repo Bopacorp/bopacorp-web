@@ -160,7 +160,12 @@ export function ApplyDialog({ open, onOpenChange, vacancy, onSuccess }: ApplyDia
       <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-lg" showCloseButton={false}>
         <div className="flex items-start justify-between gap-4">
           <div className="flex flex-col gap-2">
-            <DialogTitle>Postular a {vacancy?.title ?? 'la vacante'}</DialogTitle>
+            <div className="flex items-center gap-2.5">
+              <span aria-hidden="true" className="h-5 w-px bg-primary" />
+              <DialogTitle className="font-brand text-lg font-semibold tracking-tight">
+                Postular a {vacancy?.title ?? 'la vacante'}
+              </DialogTitle>
+            </div>
             <DialogDescription>
               Completa tus datos y adjunta tu CV en PDF. Los campos marcados son obligatorios.
             </DialogDescription>
@@ -178,7 +183,7 @@ export function ApplyDialog({ open, onOpenChange, vacancy, onSuccess }: ApplyDia
         </div>
 
         {generalError && (
-          <div className="flex items-start gap-2 rounded-lg border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive">
+          <div className="flex items-start gap-2.5 rounded-lg border border-destructive/30 bg-destructive/10 p-3.5 text-sm text-destructive">
             <AlertCircle className="mt-0.5 size-4 shrink-0" />
             <span>{generalError}</span>
           </div>
@@ -291,16 +296,21 @@ export function ApplyDialog({ open, onOpenChange, vacancy, onSuccess }: ApplyDia
             />
           </FieldGroup>
 
-          <div className="flex flex-wrap justify-end gap-2">
+          <div className="flex flex-wrap justify-end gap-3 border-t border-border pt-5">
             <Button
               type="button"
               variant="outline"
               onClick={() => onOpenChange(false)}
               disabled={submitting}
+              className="h-11 rounded-md px-6 text-sm font-medium"
             >
               Cancelar
             </Button>
-            <Button type="submit" disabled={submitting}>
+            <Button
+              type="submit"
+              disabled={submitting}
+              className="h-11 rounded-md px-6 text-sm font-medium"
+            >
               <Send data-icon="inline-start" />
               {submitting ? 'Enviando...' : 'Enviar postulacion'}
             </Button>

@@ -15,6 +15,7 @@ import {
   VacancyCard,
   VacancyDetailPanel,
 } from '@/modules/employability';
+import { BlueprintGrid } from '@/modules/landing/components/decor.js';
 import { ErrorState } from '@/shared/ui';
 
 const LIST_QUERY: ListJobVacanciesQuery = {
@@ -66,30 +67,43 @@ export default function JobsPage() {
 
   return (
     <div className="w-full bg-background text-foreground">
-      <section className="border-b border-border bg-gradient-to-br from-background via-background to-muted/30 px-6 py-20">
-        <div className="mx-auto flex max-w-7xl flex-col gap-6">
-          <Badge variant="secondary" className="w-fit">
-            Trabaja con nosotros
-          </Badge>
-          <div className="grid gap-8 lg:grid-cols-[1.3fr_0.7fr] lg:items-end">
-            <div className="flex flex-col gap-4">
-              <h1 className="max-w-3xl text-4xl font-semibold tracking-tight sm:text-5xl">
+      <section className="relative overflow-hidden border-b border-border px-6 pt-16 pb-10 md:pt-20 md:pb-12">
+        <div
+          aria-hidden="true"
+          className="absolute -top-40 -right-32 size-[34rem] rounded-full bg-primary/10 blur-[140px] pointer-events-none"
+        />
+        <BlueprintGrid className="text-foreground/[0.04] mask-fade-top" />
+        <div className="relative mx-auto flex max-w-7xl flex-col gap-10">
+          <div className="flex items-center gap-3">
+            <span aria-hidden="true" className="h-px w-10 bg-primary" />
+            <Badge
+              variant="secondary"
+              className="rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-[0.15em]"
+            >
+              Trabaja con nosotros
+            </Badge>
+          </div>
+          <div className="grid gap-10 lg:grid-cols-[1.3fr_0.7fr] lg:items-start">
+            <div className="flex flex-col gap-5">
+              <h1 className="font-brand max-w-3xl text-balance text-4xl font-semibold leading-[1.1] tracking-tight sm:text-5xl">
                 Postula a una vacante activa o envia tu perfil abierto al equipo de talento.
               </h1>
-              <p className="max-w-2xl text-sm leading-relaxed text-muted-foreground sm:text-base">
+              <p className="max-w-2xl text-base leading-relaxed text-muted-foreground">
                 Revisa la lista de roles disponibles, selecciona la vacante que te interese y envia
                 tu postulacion con tu CV en PDF.
               </p>
             </div>
 
-            <Card className="border-border bg-card shadow-sm">
+            <Card className="border-border bg-card/60 backdrop-blur-sm">
               <CardHeader className="gap-2">
-                <CardTitle className="text-base font-semibold">Proceso simple</CardTitle>
+                <CardTitle className="font-brand text-base font-semibold tracking-tight">
+                  Proceso simple
+                </CardTitle>
                 <CardDescription>
                   Selecciona un rol, adjunta tu CV y completa tus datos antes de enviar.
                 </CardDescription>
               </CardHeader>
-              <CardContent className="flex flex-col gap-3">
+              <CardContent className="flex flex-col gap-2.5">
                 <ProcessStep
                   icon={CheckCircle2}
                   title="1. Elige la vacante"
@@ -111,17 +125,19 @@ export default function JobsPage() {
         </div>
       </section>
 
-      <section className="px-6 py-16">
-        <div className="mx-auto grid max-w-7xl gap-8 lg:grid-cols-[0.95fr_1.05fr]">
-          <div className="flex flex-col gap-4">
-            <div className="flex items-center gap-3">
-              <BriefcaseBusiness className="size-5 text-primary" />
-              <div>
-                <h2 className="text-2xl font-semibold tracking-tight">Ofertas disponibles</h2>
-                <p className="text-sm text-muted-foreground">
-                  Selecciona una vacante para ver los detalles y postularte.
-                </p>
+      <section className="px-6 py-10 md:py-12">
+        <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[0.95fr_1.05fr]">
+          <div className="flex flex-col gap-6">
+            <div className="flex flex-col gap-1.5">
+              <div className="flex items-center gap-3">
+                <BriefcaseBusiness className="size-5 text-primary" />
+                <h2 className="font-brand text-2xl font-semibold tracking-tight">
+                  Ofertas disponibles
+                </h2>
               </div>
+              <p className="text-sm text-muted-foreground">
+                Selecciona una vacante para ver los detalles y postularte.
+              </p>
             </div>
 
             {loading && <VacanciesSkeleton />}
@@ -133,7 +149,7 @@ export default function JobsPage() {
             {!loading && !error && vacancies.length === 0 && <VacanciesEmpty />}
 
             {!loading && !error && vacancies.length > 0 && (
-              <div className="flex flex-col gap-4">
+              <div className="flex flex-col gap-3">
                 {vacancies.map((vacancy) => (
                   <VacancyCard
                     key={vacancy.id}
@@ -147,14 +163,16 @@ export default function JobsPage() {
             )}
           </div>
 
-          <VacancyDetailPanel
-            vacancy={activeDetail}
-            loading={detailLoading}
-            error={detailError}
-            onRetry={retryDetail}
-            onApply={() => setApplyOpen(true)}
-            closed={closed}
-          />
+          <div className="lg:sticky lg:top-28 lg:self-start">
+            <VacancyDetailPanel
+              vacancy={activeDetail}
+              loading={detailLoading}
+              error={detailError}
+              onRetry={retryDetail}
+              onApply={() => setApplyOpen(true)}
+              closed={closed}
+            />
+          </div>
         </div>
       </section>
 
@@ -185,10 +203,12 @@ function ProcessStep({
   description: string;
 }) {
   return (
-    <div className="flex items-center gap-3 rounded-xl border border-border bg-muted/30 p-3">
-      <Icon className="size-5 text-primary" />
-      <div>
-        <p className="text-sm font-medium">{title}</p>
+    <div className="group flex items-center gap-3 rounded-xl border border-border bg-background/60 p-3 transition-colors hover:border-primary/40">
+      <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
+        <Icon className="size-4" />
+      </span>
+      <div className="flex flex-col gap-0.5">
+        <p className="text-sm font-semibold">{title}</p>
         <p className="text-xs text-muted-foreground">{description}</p>
       </div>
     </div>

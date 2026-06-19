@@ -1,5 +1,5 @@
 import type { JobVacancyListItemResponse } from '@bopacorp/shared/employability';
-import { Calendar } from 'lucide-react';
+import { ArrowRight, Calendar } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 
@@ -19,24 +19,37 @@ export function VacancyCard({ vacancy, active, closed, onSelect }: VacancyCardPr
       }}
       disabled={closed}
       className={cn(
-        'rounded-2xl border p-5 text-left transition-colors',
+        'group relative overflow-hidden rounded-xl border p-5 text-left transition-all',
         closed && 'cursor-not-allowed opacity-60',
         !closed && active && 'border-primary bg-primary/5 shadow-sm',
-        !closed && !active && 'border-border bg-card hover:border-primary/30 hover:bg-muted/30',
+        !closed && !active && 'border-border bg-card hover:border-primary/40 hover:shadow-sm',
       )}
     >
+      {!closed && active && (
+        <span aria-hidden="true" className="absolute left-0 top-0 h-full w-1 bg-primary" />
+      )}
       <div className="flex flex-col gap-4">
         <div className="flex flex-wrap items-center gap-2">
           {closed ? (
-            <Badge variant="secondary">Cerrada</Badge>
+            <Badge variant="secondary" className="rounded-full">
+              Cerrada
+            </Badge>
           ) : (
-            <Badge variant={active ? 'default' : 'secondary'}>Publicada</Badge>
+            <Badge variant={active ? 'default' : 'secondary'} className="rounded-full">
+              Publicada
+            </Badge>
           )}
-          {vacancy.closingDate && !closed && <Badge variant="outline">Con cierre</Badge>}
+          {vacancy.closingDate && !closed && (
+            <Badge variant="outline" className="rounded-full">
+              Con cierre
+            </Badge>
+          )}
         </div>
 
         <div className="flex flex-col gap-2">
-          <h3 className="text-lg font-semibold tracking-tight">{vacancy.title}</h3>
+          <h3 className="font-brand text-lg font-semibold tracking-tight transition-colors group-hover:text-primary">
+            {vacancy.title}
+          </h3>
         </div>
 
         <div className="flex flex-wrap items-center gap-3 text-xs uppercase tracking-widest text-muted-foreground">
@@ -50,7 +63,12 @@ export function VacancyCard({ vacancy, active, closed, onSelect }: VacancyCardPr
           <span className="text-sm text-muted-foreground">
             {closed ? 'Postulaciones cerradas' : 'Postula en linea'}
           </span>
-          {!closed && <span className="text-sm font-medium text-primary">Ver detalle</span>}
+          {!closed && (
+            <span className="inline-flex items-center gap-1 text-sm font-semibold text-primary">
+              Ver detalle
+              <ArrowRight className="size-3.5 transition-transform group-hover:translate-x-0.5" />
+            </span>
+          )}
         </div>
       </div>
     </button>

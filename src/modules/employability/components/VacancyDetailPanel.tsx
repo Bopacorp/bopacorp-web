@@ -1,5 +1,5 @@
 import type { PublicJobVacancyResponse } from '@bopacorp/shared/employability';
-import { Send } from 'lucide-react';
+import { ArrowRight, Send } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -32,12 +32,20 @@ export function VacancyDetailPanel({
     <Card className="border-border bg-card shadow-sm">
       <CardHeader className="gap-3 border-b border-border pb-6">
         <div className="flex flex-wrap items-center gap-2">
-          {closed ? <Badge variant="secondary">Cerrada</Badge> : <Badge>Publicada</Badge>}
+          {closed ? (
+            <Badge variant="secondary" className="rounded-full">
+              Cerrada
+            </Badge>
+          ) : (
+            <Badge className="rounded-full">Publicada</Badge>
+          )}
           {vacancy?.closingDate && !closed && (
-            <Badge variant="outline">Cierra {formatShortDate(vacancy.closingDate)}</Badge>
+            <Badge variant="outline" className="rounded-full">
+              Cierra {formatShortDate(vacancy.closingDate)}
+            </Badge>
           )}
         </div>
-        <CardTitle className="text-2xl font-semibold tracking-tight">
+        <CardTitle className="font-brand text-2xl font-semibold tracking-tight">
           {loading ? (
             <Skeleton className="h-7 w-2/3" />
           ) : (
@@ -66,10 +74,17 @@ export function VacancyDetailPanel({
               loading={loading}
             />
             <DetailSection title="Requisitos" body={vacancy.requirements} loading={loading} />
-            <div className="flex flex-wrap gap-3 border-t border-border pt-4">
-              <Button type="button" onClick={onApply} disabled={closed || loading}>
+            <div className="flex flex-wrap gap-3 border-t border-border pt-5">
+              <Button
+                type="button"
+                onClick={onApply}
+                disabled={closed || loading}
+                size="lg"
+                className="h-11 rounded-md px-6 text-sm font-medium"
+              >
                 <Send data-icon="inline-start" />
                 {closed ? 'Postulaciones cerradas' : 'Postular a esta vacante'}
+                {!closed && !loading && <ArrowRight className="ml-1 size-4" />}
               </Button>
             </div>
           </>
@@ -90,7 +105,10 @@ function DetailSection({
 }) {
   return (
     <section className="flex flex-col gap-2">
-      <h3 className="text-sm font-semibold tracking-tight">{title}</h3>
+      <h3 className="flex items-center gap-2 text-sm font-semibold tracking-tight">
+        <span aria-hidden="true" className="h-3 w-px bg-primary" />
+        {title}
+      </h3>
       {loading ? (
         <div className="flex flex-col gap-2">
           <Skeleton className="h-4 w-full" />
