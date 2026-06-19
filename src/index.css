@@ -45,6 +45,11 @@
   --color-hero: var(--hero);
   --color-hero-mid: var(--hero-mid);
   --color-hero-foreground: var(--hero-foreground);
+  --color-plan-1: var(--plan-1);
+  --color-plan-2: var(--plan-2);
+  --color-plan-3: var(--plan-3);
+  --color-plan-4: var(--plan-4);
+  --color-plan-5: var(--plan-5);
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
@@ -80,6 +85,11 @@
   --hero: oklch(0.18 0.04 250);
   --hero-mid: oklch(0.22 0.06 250);
   --hero-foreground: oklch(1 0 0);
+  --plan-1: oklch(0.32 0.09 255);
+  --plan-2: oklch(0.4 0.13 310);
+  --plan-3: oklch(0.42 0.12 150);
+  --plan-4: oklch(0.42 0.15 12);
+  --plan-5: oklch(0.6 0.16 55);
   --radius: 0.625rem;
   --font-display:
     ui-rounded, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Inter Variable",
@@ -122,6 +132,11 @@
   --hero: oklch(0.18 0.04 250);
   --hero-mid: oklch(0.22 0.06 250);
   --hero-foreground: oklch(1 0 0);
+  --plan-1: oklch(0.4 0.1 255);
+  --plan-2: oklch(0.48 0.14 310);
+  --plan-3: oklch(0.5 0.13 150);
+  --plan-4: oklch(0.5 0.16 12);
+  --plan-5: oklch(0.68 0.17 55);
   --font-display:
     ui-rounded, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Inter Variable",
     sans-serif;
