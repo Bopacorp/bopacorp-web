@@ -1,9 +1,11 @@
 import { Navigate, Route, Routes } from 'react-router-dom';
+import AdminLayout from '@/app/AdminLayout.js';
 import MainLayout from '@/app/MainLayout.js';
 import { ScrollToTop } from '@/components/ScrollToTop.js';
-import AdminApp from '@/modules/admin/AdminApp.js';
+import { PermissionRoute } from '@/modules/admin/components/PermissionRoute.js';
 import RequireAuth from '@/modules/auth/components/RequireAuth.js';
 import LoginPage from '@/modules/auth/pages/LoginPage.js';
+import { CmsPage } from '@/modules/cms/CmsAdminPage.js';
 import AboutPage from '@/modules/landing/pages/AboutPage';
 import JobDetailPage from '@/modules/landing/pages/JobDetailPage';
 import JobsPage from '@/modules/landing/pages/JobsPage';
@@ -26,13 +28,24 @@ export default function App() {
         <Route path="/login" element={<LoginPage />} />
 
         <Route
-          path="/admin/*"
+          path="/admin"
           element={
             <RequireAuth>
-              <AdminApp />
+              <AdminLayout />
             </RequireAuth>
           }
-        />
+        >
+          <Route index element={<Navigate to="cms" replace />} />
+          <Route
+            path="cms"
+            element={
+              <PermissionRoute permission="content_blocks.read">
+                <CmsPage />
+              </PermissionRoute>
+            }
+          />
+          <Route path="*" element={<div className="p-8">Sección no encontrada</div>} />
+        </Route>
 
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
