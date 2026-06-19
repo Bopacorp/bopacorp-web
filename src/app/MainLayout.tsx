@@ -2,17 +2,27 @@ import { Mail, MapPin, Phone } from 'lucide-react';
 import { NavLink, Outlet } from 'react-router-dom';
 import logoFallback from '@/assets/logo.png';
 import { CMS_IMAGE_KEYS } from '@/modules/cms/cms-image-blocks.js';
+import { ContactDialogProvider, useContactDialog } from '@/modules/contact/index.js';
 import { useCmsLanding } from '@/modules/landing/hooks/use-cms-landing.js';
 
 export default function MainLayout() {
+  return (
+    <ContactDialogProvider>
+      <MainLayoutInner />
+    </ContactDialogProvider>
+  );
+}
+
+function MainLayoutInner() {
   const { blocks } = useCmsLanding();
   const logoUrl = blocks?.[CMS_IMAGE_KEYS.logo]?.body ?? logoFallback;
+  const { openContactDialog } = useContactDialog();
 
   return (
     <div className="min-h-screen w-full bg-background flex flex-col font-sans overflow-x-hidden">
       <header className="w-full bg-background border-b border-border fixed top-0 left-0 z-50">
         <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-          <div className="flex items-center gap-3 cursor-pointer">
+          <NavLink to="/" className="flex items-center gap-3">
             <img src={logoUrl} alt="Logo Bopacorp" className="size-10 object-contain rounded-lg" />
             <div className="flex flex-col">
               <span className="font-extrabold text-foreground tracking-tight leading-none text-lg">
@@ -22,7 +32,7 @@ export default function MainLayout() {
                 Distribuidor Tigo
               </span>
             </div>
-          </div>
+          </NavLink>
           <div className="flex items-center gap-8">
             <nav className="hidden md:flex items-center gap-8 text-sm font-semibold">
               <NavLink
@@ -69,6 +79,7 @@ export default function MainLayout() {
             <div className="flex items-center gap-3">
               <button
                 type="button"
+                onClick={() => openContactDialog()}
                 className="border border-input bg-background hover:bg-accent hover:text-accent-foreground text-xs font-bold px-4 py-2 rounded-lg transition-colors"
               >
                 Cotizar Servicios

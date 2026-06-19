@@ -207,5 +207,6 @@ function isPublicPath(url: string | undefined): boolean {
   if (url.includes('/employability/vacancies/published')) return true;
   if (url.includes('/employability/apply')) return true;
   if (/\/employability\/vacancies\/[^/?]+/.test(url)) return true;
+  if (url.includes('/contact-requests')) return true;
   return false;
 }

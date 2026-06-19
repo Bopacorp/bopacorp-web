@@ -1,6 +1,7 @@
 import { ArrowRight, Globe, Smartphone, Wifi } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useContactDialog } from '@/modules/contact/index.js';
 
 const SERVICES = [
   {
@@ -42,6 +43,7 @@ const SERVICES = [
 ];
 
 export default function ServicesPage() {
+  const { openContactDialog } = useContactDialog();
   return (
     <div className="w-full flex flex-col font-sans">
       <section className="w-full relative py-24 px-6 border-b border-border/50 bg-hero overflow-hidden min-h-[350px] flex items-center">
@@ -76,6 +78,7 @@ export default function ServicesPage() {
                   <p className="text-sm text-muted-foreground leading-relaxed">{service.desc}</p>
                   <Button
                     variant="outline"
+                    onClick={() => openContactDialog()}
                     className="w-full gap-2 group-hover:bg-primary group-hover:text-primary-foreground transition-colors"
                   >
                     Más información <ArrowRight className="size-4" />
