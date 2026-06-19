@@ -15,10 +15,10 @@ import { ApiError } from '@/services/api.js';
 import { ErrorState, PageLoader } from '@/shared/ui';
 import { updateContentBlock } from './cms.service.js';
 import { CmsArchiveEmpty } from './components/CmsArchiveEmpty.js';
-import { CmsBlockRow } from './components/CmsBlockRow.js';
 import { CmsEditDialog } from './components/CmsEditDialog.js';
 import { CmsMasthead } from './components/CmsMasthead.js';
 import { CmsSearchBar } from './components/CmsSearchBar.js';
+import { CmsSection } from './components/CmsSection.js';
 import { useContentBlocks } from './useContentBlocks.js';
 
 function getErrorMessage(err: unknown) {
@@ -42,6 +42,8 @@ async function persistEdit(
   toast.success('Bloque actualizado');
   onDone();
 }
+
+const SECTION_ORDER = ['hero', 'about', 'cta', 'site'];
 
 function computeLastUpdatedAt(blocks: ContentBlockResponse[] | undefined): Date | null {
   if (!blocks?.length) return null;
@@ -85,6 +87,23 @@ export function CmsPage() {
     if (!rawSearchQuery.trim()) return contentBlocks;
     return contentBlocks;
   }, [contentBlocks, rawSearchQuery]);
+
+  const groupedSections = useMemo(() => {
+    const groups: Record<string, typeof filteredBlocks> = {};
+    for (const block of filteredBlocks) {
+      const prefix = block.contentKey.split('.')[0];
+      if (!groups[prefix]) groups[prefix] = [];
+      groups[prefix].push(block);
+    }
+    const ordered = SECTION_ORDER.filter((p) => groups[p]);
+    const extra = Object.keys(groups)
+      .filter((p) => !SECTION_ORDER.includes(p))
+      .sort();
+    return [...ordered, ...extra].map((prefix) => ({
+      prefix,
+      blocks: groups[prefix],
+    }));
+  }, [filteredBlocks]);
 
   const totalPages = meta?.totalPages ?? 1;
   const pageNumbers = useMemo(() => getPageNumbers(page, totalPages), [page, totalPages]);
@@ -133,14 +152,17 @@ export function CmsPage() {
         total={contentBlocks.length}
       />
 
-      {contentBlocks.length === 0 ? (
-        <CmsArchiveEmpty searchQuery={rawSearchQuery} />
-      ) : filteredBlocks.length === 0 ? (
+      {contentBlocks.length === 0 || filteredBlocks.length === 0 ? (
         <CmsArchiveEmpty searchQuery={rawSearchQuery} />
       ) : (
-        <div className="flex flex-col gap-4">
-          {filteredBlocks.map((block, index) => (
-            <CmsBlockRow key={block.id} block={block} index={index} onEdit={openEdit} />
+        <div className="flex flex-col gap-6">
+          {groupedSections.map((section) => (
+            <CmsSection
+              key={section.prefix}
+              prefix={section.prefix}
+              blocks={section.blocks}
+              onEdit={openEdit}
+            />
           ))}
         </div>
       )}
