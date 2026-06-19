@@ -1,15 +1,113 @@
-import { AlertCircle, RefreshCw } from 'lucide-react';
+import {
+  AlertCircle,
+  Gift,
+  MessageCircle,
+  Phone,
+  Plane,
+  RefreshCw,
+  Share2,
+  Smartphone,
+} from 'lucide-react';
+import type { ComponentType } from 'react';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { PlanCard } from '@/modules/catalog/components/PlanCard.js';
 import { usePublicCatalogItems } from '@/modules/catalog/hooks/use-public-catalog-items.js';
+import { useContactDialog } from '@/modules/contact/index.js';
+import { ContourMotif } from '../components/decor.js';
+
+interface Benefit {
+  icon: ComponentType<{ className?: string }>;
+  title: string;
+  desc: string;
+}
+
+const BENEFITS: Benefit[] = [
+  {
+    icon: Smartphone,
+    title: 'Gigas para navegar',
+    desc: 'Datos estructurales y bonos adicionales incluidos para que tu equipo trabaje sin interrupciones.',
+  },
+  {
+    icon: Phone,
+    title: 'Minutos y SMS',
+    desc: 'Minutos a todo destino, SMS libres y minutos al extranjero para comunicarte con tus clientes.',
+  },
+  {
+    icon: Share2,
+    title: 'Redes sociales ilimitadas',
+    desc: 'Navegación sin límite en tus redes sociales favoritas para gestionar la presencia digital de tu negocio.',
+  },
+  {
+    icon: MessageCircle,
+    title: 'WhatsApp gratis',
+    desc: 'Mensajería ilimitada para coordinar con tu equipo y atender clientes en tiempo real.',
+  },
+  {
+    icon: Plane,
+    title: 'Roaming internacional',
+    desc: 'Conectividad en el extranjero con datos en zona CAN y pasaportes de roaming para viajes de negocio.',
+  },
+  {
+    icon: Gift,
+    title: 'Bonos de fidelización',
+    desc: 'Gigas adicionales como beneficio de lealtad para clientes con permanencia en su plan.',
+  },
+];
+
+function BenefitCard({ benefit }: { benefit: Benefit }) {
+  const Icon = benefit.icon;
+  return (
+    <div className="flex flex-col gap-4 rounded-xl border border-border bg-card p-6 transition-colors hover:border-primary/40">
+      <span className="flex size-11 items-center justify-center rounded-lg bg-primary/10 text-primary">
+        <Icon className="size-5" />
+      </span>
+      <h3 className="font-brand text-base font-semibold tracking-tight text-foreground">
+        {benefit.title}
+      </h3>
+      <p className="text-sm font-normal leading-relaxed text-muted-foreground">{benefit.desc}</p>
+    </div>
+  );
+}
+
+function SectionHeader({ title, desc }: { title: string; desc: string }) {
+  return (
+    <header className="flex flex-col gap-3 items-start">
+      <span aria-hidden="true" className="h-px w-10 bg-primary" />
+      <h2 className="font-brand text-2xl md:text-3xl font-semibold tracking-tight text-foreground">
+        {title}
+      </h2>
+      <p className="max-w-2xl text-sm md:text-base font-normal leading-relaxed text-muted-foreground">
+        {desc}
+      </p>
+    </header>
+  );
+}
+
+function BeneficiosSection() {
+  return (
+    <section className="w-full py-16 px-6 bg-background border-b border-border">
+      <div className="max-w-7xl mx-auto flex flex-col gap-10">
+        <SectionHeader
+          title="Beneficios incluidos"
+          desc="Todos nuestros planes corporativos incluyen una suite de beneficios diseñados para mantener tu empresa siempre conectada."
+        />
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {BENEFITS.map((benefit) => (
+            <BenefitCard key={benefit.title} benefit={benefit} />
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
 
 export default function ServicesPage() {
   const { items, loading, error, retry } = usePublicCatalogItems();
 
   return (
     <div className="w-full flex flex-col font-sans">
-      <section className="w-full relative py-24 px-6 border-b border-border/50 bg-hero overflow-hidden min-h-[350px] flex items-center">
+      <section className="w-full relative py-20 px-6 border-b border-border/50 bg-hero overflow-hidden min-h-[300px] flex items-center">
         <div className="max-w-4xl mx-auto text-center relative z-10 flex flex-col items-center gap-6">
           <h1 className="text-4xl md:text-6xl font-semibold tracking-tight text-white leading-tight">
             Cátalogo de <span className="text-primary">Servicios</span>
@@ -21,24 +119,103 @@ export default function ServicesPage() {
         </div>
       </section>
 
-      <section className="w-full py-24 px-6 bg-muted">
-        <div className="max-w-7xl mx-auto">
-          {loading ? (
-            <PlansSkeleton />
-          ) : error ? (
-            <PlansError onRetry={retry} />
-          ) : items.length === 0 ? (
-            <PlansEmpty />
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {items.map((item, index) => (
-                <PlanCard key={item.id} item={item} index={index} />
-              ))}
-            </div>
-          )}
-        </div>
-      </section>
+      <BeneficiosSection />
+
+      <PlansSection loading={loading} error={Boolean(error)} items={items} onRetry={retry} />
+
+      <CtaSection />
     </div>
+  );
+}
+
+function PlansSection({
+  loading,
+  error,
+  items,
+  onRetry,
+}: {
+  loading: boolean;
+  error: boolean;
+  items: ReturnType<typeof usePublicCatalogItems>['items'];
+  onRetry: () => void;
+}) {
+  return (
+    <section className="w-full py-16 px-6 bg-muted">
+      <div className="max-w-7xl mx-auto flex flex-col gap-10">
+        <SectionHeader
+          title="Nuestros planes corporativos"
+          desc="Elige el plan que mejor se adapte a las necesidades de tu empresa. Todos incluyen los beneficios anteriores."
+        />
+        {loading ? (
+          <PlansSkeleton />
+        ) : error ? (
+          <PlansError onRetry={onRetry} />
+        ) : items.length === 0 ? (
+          <PlansEmpty />
+        ) : (
+          <PlansGrid items={items} />
+        )}
+      </div>
+    </section>
+  );
+}
+
+function PlansGrid({ items }: { items: ReturnType<typeof usePublicCatalogItems>['items'] }) {
+  return (
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      {items.map((item, index) => (
+        <PlanCard key={item.id} item={item} index={index} />
+      ))}
+    </div>
+  );
+}
+
+function CtaSection() {
+  const { openContactDialog } = useContactDialog();
+  return (
+    <section className="relative overflow-hidden bg-hero px-6 py-24 text-white md:py-32">
+      <div
+        aria-hidden="true"
+        className="absolute inset-0 z-0"
+        style={{
+          background:
+            'repeating-linear-gradient(115deg, transparent 0px, transparent 80px, var(--color-plan-1) 80px, var(--color-plan-1) 82px, transparent 82px, transparent 160px, var(--color-plan-3) 160px, var(--color-plan-3) 162px, transparent 162px, transparent 240px, var(--color-plan-5) 240px, var(--color-plan-5) 242px)',
+          opacity: 0.12,
+        }}
+      />
+      <div
+        aria-hidden="true"
+        className="absolute inset-0 z-0 bg-gradient-to-r from-hero via-hero/95 to-hero/60"
+      />
+      <div
+        aria-hidden="true"
+        className="absolute -top-24 right-1/4 size-[32rem] rounded-full bg-primary/20 blur-[160px] pointer-events-none z-0"
+      />
+      <ContourMotif className="absolute -right-32 top-1/2 w-[40rem] -translate-y-1/2 text-white/[0.08] z-0" />
+
+      <div className="relative z-10 mx-auto flex max-w-7xl flex-col items-start gap-8">
+        <h2 className="landing-rise font-brand text-balance text-5xl font-bold leading-[0.95] tracking-tighter text-white sm:text-6xl md:text-7xl lg:text-8xl">
+          ¿No sabes cuál plan elegir?
+        </h2>
+        <p
+          className="landing-rise max-w-lg text-lg font-normal leading-relaxed text-white/70"
+          style={{ animationDelay: '100ms' }}
+        >
+          Habla con un asesor y encuentra el plan ideal. Nuestro equipo comercial te ayuda a elegir
+          la solución que mejor se adapta a tu empresa. Sin compromisos.
+        </p>
+        <Button
+          size="lg"
+          variant="secondary"
+          onClick={() => openContactDialog()}
+          className="landing-rise h-14 rounded-md px-10 text-base font-semibold"
+          style={{ animationDelay: '200ms' }}
+        >
+          <MessageCircle data-icon="inline-start" />
+          Contactar un asesor
+        </Button>
+      </div>
+    </section>
   );
 }
 
