@@ -143,9 +143,9 @@ function HeroStat({ value, label, index }: { value: string; label: string; index
     <div
       className={cn(
         'flex flex-col gap-2 px-6 py-7 transition-colors group border-white/10',
-        index % 2 === 0 && 'border-l',
-        index >= 3 && 'border-t md:border-t-0',
-        index === 3 && 'md:border-l',
+        index % 2 !== 0 && 'border-l',
+        index >= 2 && 'border-t md:border-t-0',
+        index === 2 && 'md:border-l',
       )}
     >
       <span className="font-brand text-3xl font-semibold tracking-tight text-white tabular-nums transition-colors group-hover:text-primary md:text-4xl">
@@ -211,10 +211,10 @@ function HeroSection({ hero, images }: { hero: CmsContent['hero']; images: CmsCo
 
       <div className="relative z-10 w-full border-t border-white/10 bg-black/20 backdrop-blur-sm">
         <div className="mx-auto grid max-w-7xl grid-cols-2 px-0 md:grid-cols-4">
-          <HeroStat index={1} value="+300" label="clientes corporativos" />
-          <HeroStat index={2} value="7 años" label="de experiencia" />
-          <HeroStat index={3} value="Costa" label="líderes regionales" />
-          <HeroStat index={4} value="12" label="colaboradores" />
+          <HeroStat index={0} value="+300" label="clientes corporativos" />
+          <HeroStat index={1} value="7 años" label="de experiencia" />
+          <HeroStat index={2} value="Costa" label="líderes regionales" />
+          <HeroStat index={3} value="12" label="colaboradores" />
         </div>
       </div>
     </div>
@@ -312,7 +312,7 @@ function AboutSection({
           </div>
         </div>
 
-        <div className="relative lg:col-span-5">
+        <div className="relative lg:col-span-5 px-3">
           <div
             aria-hidden="true"
             className="absolute -inset-3 -z-10 rounded-3xl border border-primary/20"

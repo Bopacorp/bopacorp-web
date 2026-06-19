@@ -1,10 +1,21 @@
-import { Mail, MapPin, Phone } from 'lucide-react';
+import { Mail, MapPin, Menu, MessageCircle, Phone } from 'lucide-react';
+import { useState } from 'react';
 import { NavLink, Outlet } from 'react-router-dom';
 import logoFallback from '@/assets/logo.png';
+import { Button } from '@/components/ui/button';
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
+import { cn } from '@/lib/utils';
 import { CMS_IMAGE_KEYS } from '@/modules/cms/cms-image-blocks.js';
 import { ContactDialogProvider, useContactDialog } from '@/modules/contact/index.js';
 import { useCmsLanding } from '@/modules/landing/hooks/use-cms-landing.js';
 import { ModeToggle } from '@/shared/ui/ModeToggle';
+
+const NAV_LINKS = [
+  { to: '/', label: 'Inicio' },
+  { to: '/services', label: 'Servicios' },
+  { to: '/about', label: 'Nosotros' },
+  { to: '/jobs', label: 'Trabaja con nosotros' },
+] as const;
 
 export default function MainLayout() {
   return (
@@ -18,6 +29,7 @@ function MainLayoutInner() {
   const { blocks } = useCmsLanding();
   const logoUrl = blocks?.[CMS_IMAGE_KEYS.logo]?.body ?? logoFallback;
   const { openContactDialog } = useContactDialog();
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
     <div className="min-h-screen w-full bg-background flex flex-col font-sans overflow-x-hidden">
@@ -36,60 +48,97 @@ function MainLayoutInner() {
           </NavLink>
           <div className="flex items-center gap-8">
             <nav className="hidden md:flex items-center gap-8 text-sm font-semibold">
-              <NavLink
-                to="/"
-                className={({ isActive }) =>
-                  isActive
-                    ? 'text-foreground border-b-2 border-primary py-2 px-1'
-                    : 'text-muted-foreground hover:text-foreground transition-colors py-2 px-1'
-                }
-              >
-                Inicio
-              </NavLink>
-              <NavLink
-                to="/services"
-                className={({ isActive }) =>
-                  isActive
-                    ? 'text-foreground border-b-2 border-primary py-2 px-1'
-                    : 'text-muted-foreground hover:text-foreground transition-colors py-2 px-1'
-                }
-              >
-                Servicios
-              </NavLink>
-              <NavLink
-                to="/about"
-                className={({ isActive }) =>
-                  isActive
-                    ? 'text-foreground border-b-2 border-primary py-2 px-1'
-                    : 'text-muted-foreground hover:text-foreground transition-colors py-2 px-1'
-                }
-              >
-                Nosotros
-              </NavLink>
-              <NavLink
-                to="/jobs"
-                className={({ isActive }) =>
-                  isActive
-                    ? 'text-foreground border-b-2 border-primary py-2 px-1'
-                    : 'text-muted-foreground hover:text-foreground transition-colors py-2 px-1'
-                }
-              >
-                Trabaja con nosotros
-              </NavLink>
+              {NAV_LINKS.map((link) => (
+                <NavLink
+                  key={link.to}
+                  to={link.to}
+                  className={({ isActive }) =>
+                    cn(
+                      'py-2 px-1 transition-colors',
+                      isActive
+                        ? 'text-foreground border-b-2 border-primary'
+                        : 'text-muted-foreground hover:text-foreground',
+                    )
+                  }
+                >
+                  {link.label}
+                </NavLink>
+              ))}
             </nav>
             <div className="flex items-center gap-3">
               <ModeToggle />
-              <button
-                type="button"
+              <Button
+                variant="outline"
+                size="sm"
                 onClick={() => openContactDialog()}
-                className="border border-input bg-background hover:bg-accent hover:text-accent-foreground text-xs font-bold px-4 py-2 rounded-lg transition-colors"
+                className="hidden sm:inline-flex"
               >
+                <MessageCircle data-icon="inline-start" />
                 Cotizar Servicios
-              </button>
+              </Button>
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => openContactDialog()}
+                className="sm:hidden"
+              >
+                <MessageCircle />
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setMobileOpen(true)}
+                className="md:hidden"
+              >
+                <Menu />
+                <span className="sr-only">Menú</span>
+              </Button>
             </div>
           </div>
         </div>
       </header>
+
+      <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
+        <SheetContent side="left" className="w-72 flex flex-col gap-6">
+          <SheetHeader>
+            <SheetTitle className="flex items-center gap-3">
+              <img src={logoUrl} alt="Logo Bopacorp" className="size-8 object-contain rounded-lg" />
+              BOPACORP
+            </SheetTitle>
+          </SheetHeader>
+          <nav className="flex flex-col gap-1">
+            {NAV_LINKS.map((link) => (
+              <NavLink
+                key={link.to}
+                to={link.to}
+                onClick={() => setMobileOpen(false)}
+                className={({ isActive }) =>
+                  cn(
+                    'text-base font-semibold py-3 px-4 rounded-lg transition-colors',
+                    isActive
+                      ? 'bg-accent text-foreground'
+                      : 'text-muted-foreground hover:text-foreground hover:bg-accent/50',
+                  )
+                }
+              >
+                {link.label}
+              </NavLink>
+            ))}
+          </nav>
+          <div className="mt-auto">
+            <Button
+              className="w-full"
+              onClick={() => {
+                setMobileOpen(false);
+                openContactDialog();
+              }}
+            >
+              <MessageCircle data-icon="inline-start" />
+              Cotizar Servicios
+            </Button>
+          </div>
+        </SheetContent>
+      </Sheet>
 
       <main className="flex-1 w-full overflow-hidden pt-20">
         <Outlet />
@@ -146,9 +195,12 @@ function MainLayoutInner() {
               <div className="flex items-center gap-2 text-sm text-muted-foreground font-normal w-full">
                 <Phone className="size-4 shrink-0 text-muted-foreground" /> 0991423895
               </div>
-              <div className="flex items-center gap-2 text-sm text-muted-foreground font-normal w-full">
-                <Mail className="size-4 shrink-0 text-muted-foreground" /> ch.pauta@bopacorp.com /
-                j.bohorquez@bopacorp.com
+              <div className="flex items-start gap-2 text-sm text-muted-foreground font-normal w-full">
+                <Mail className="size-4 shrink-0 text-muted-foreground mt-0.5" />
+                <div className="flex flex-col">
+                  <span>ch.pauta@bopacorp.com</span>
+                  <span>j.bohorquez@bopacorp.com</span>
+                </div>
               </div>
             </div>
           </div>
