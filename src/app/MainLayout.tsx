@@ -4,6 +4,7 @@ import logoFallback from '@/assets/logo.png';
 import { CMS_IMAGE_KEYS } from '@/modules/cms/cms-image-blocks.js';
 import { ContactDialogProvider, useContactDialog } from '@/modules/contact/index.js';
 import { useCmsLanding } from '@/modules/landing/hooks/use-cms-landing.js';
+import { ModeToggle } from '@/shared/ui/ModeToggle';
 
 export default function MainLayout() {
   return (
@@ -77,6 +78,7 @@ function MainLayoutInner() {
               </NavLink>
             </nav>
             <div className="flex items-center gap-3">
+              <ModeToggle />
               <button
                 type="button"
                 onClick={() => openContactDialog()}

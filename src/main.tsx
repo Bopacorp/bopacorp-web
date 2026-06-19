@@ -1,3 +1,4 @@
+import { ThemeProvider } from 'next-themes';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
@@ -14,13 +15,15 @@ if (!rootElement) {
 
 createRoot(rootElement).render(
   <StrictMode>
-    <TooltipProvider>
-      <BrowserRouter>
-        <AuthProvider>
-          <App />
-          <Toaster position="bottom-right" richColors closeButton />
-        </AuthProvider>
-      </BrowserRouter>
-    </TooltipProvider>
+    <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+      <TooltipProvider>
+        <BrowserRouter>
+          <AuthProvider>
+            <App />
+            <Toaster position="bottom-right" richColors closeButton />
+          </AuthProvider>
+        </BrowserRouter>
+      </TooltipProvider>
+    </ThemeProvider>
   </StrictMode>,
 );

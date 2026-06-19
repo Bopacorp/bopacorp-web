@@ -1,9 +1,12 @@
+import { Loader2 } from 'lucide-react';
 import { type FormEvent, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Field, FieldGroup, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { FormAlert } from '@/shared/ui/FormAlert';
+import { ModeToggle } from '@/shared/ui/ModeToggle';
 import { useAuth } from '../context/AuthContext.js';
 
 export default function LoginPage() {
@@ -15,65 +18,70 @@ export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setError(null);
-    setIsSubmitting(true);
+    setLoading(true);
 
     try {
       await login({ email: email.trim(), password });
       navigate(from, { replace: true });
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error al iniciar sesion');
+      setError(err instanceof Error ? err.message : 'Error al iniciar sesión');
     } finally {
-      setIsSubmitting(false);
+      setLoading(false);
     }
   };
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background p-4">
+      <div className="fixed top-4 right-4">
+        <ModeToggle />
+      </div>
       <Card className="w-full max-w-sm">
         <CardHeader className="text-center">
-          <CardTitle className="text-xl">BOPADIGITAL</CardTitle>
-          <CardDescription>Inicia sesion con tu cuenta corporativa</CardDescription>
+          <CardTitle className="text-2xl font-bold tracking-tight">BOPACORP</CardTitle>
+          <CardDescription>Iniciar sesión en BOPADIGITAL</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-            <div className="flex flex-col gap-2">
-              <Label htmlFor="email">Correo electronico</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="usuario@bopacorp.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                autoComplete="email"
-                aria-invalid={error ? 'true' : 'false'}
-              />
-            </div>
-            <div className="flex flex-col gap-2">
-              <Label htmlFor="password">Contrasena</Label>
-              <Input
-                id="password"
-                type="password"
-                placeholder="••••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                autoComplete="current-password"
-                aria-invalid={error ? 'true' : 'false'}
-              />
-            </div>
-            {error && (
-              <p className="text-sm text-destructive" role="alert">
-                {error}
-              </p>
-            )}
-            <Button type="submit" disabled={isSubmitting} className="w-full">
-              {isSubmitting ? 'Iniciando sesion...' : 'Iniciar sesion'}
+            {error && <FormAlert message={error} />}
+
+            <FieldGroup>
+              <Field>
+                <FieldLabel htmlFor="email">Correo electrónico</FieldLabel>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="usuario@bopacorp.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  autoComplete="email"
+                  disabled={loading}
+                />
+              </Field>
+
+              <Field>
+                <FieldLabel htmlFor="password">Contraseña</FieldLabel>
+                <Input
+                  id="password"
+                  type="password"
+                  placeholder="••••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  autoComplete="current-password"
+                  disabled={loading}
+                />
+              </Field>
+            </FieldGroup>
+
+            <Button type="submit" disabled={loading} className="w-full">
+              {loading && <Loader2 data-icon="inline-start" className="animate-spin" />}
+              Iniciar sesión
             </Button>
           </form>
           <p className="mt-4 text-center text-xs text-muted-foreground">
