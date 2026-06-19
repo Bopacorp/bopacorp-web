@@ -1,4 +1,4 @@
-import { LogOut, Plus } from 'lucide-react';
+import { LogOut } from 'lucide-react';
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/modules/auth/context/AuthContext.js';
@@ -24,10 +24,6 @@ export default function AdminApp() {
           <span className="text-sm text-muted-foreground hidden sm:inline">{user?.email}</span>
           <Button variant="ghost" size="icon" onClick={logout} aria-label="Cerrar sesion">
             <LogOut data-icon="inline-start" />
-          </Button>
-          <Button>
-            <Plus data-icon="inline-start" />
-            Nuevo cliente
           </Button>
         </div>
       </header>
