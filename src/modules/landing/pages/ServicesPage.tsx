@@ -1,49 +1,12 @@
-import { ArrowRight, Globe, Smartphone, Wifi } from 'lucide-react';
+import { AlertCircle, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { useContactDialog } from '@/modules/contact/index.js';
-
-const SERVICES = [
-  {
-    id: 'plan-1',
-    title: 'Plan 1',
-    icon: Wifi,
-    desc: '20GB para navegar, 300 Minutos a todo destino, 50 Minutos LDI mundo y Roaming WhatsApp Chat incluido.',
-  },
-  {
-    id: 'plan-2',
-    title: 'Plan 2',
-    icon: Smartphone,
-    desc: '22GB para navegar, 500 Minutos a todo destino, 150 Minutos LDI mundo y Redes Sociales ilimitadas.',
-  },
-  {
-    id: 'plan-3',
-    title: 'Plan 3',
-    icon: Globe,
-    desc: '30GB para navegar, Minutos Ilimitados a todo destino, 200 Minutos LDI mundo y Roaming incluido.',
-  },
-  {
-    id: 'plan-4',
-    title: 'Plan 4',
-    icon: Wifi,
-    desc: 'Plan empresarial con alta capacidad de datos y soporte técnico prioritario 24/7 para tu negocio.',
-  },
-  {
-    id: 'plan-5',
-    title: 'Plan 5',
-    icon: Smartphone,
-    desc: 'Soluciones de voz y datos escalables diseñadas para equipos comerciales y de campo.',
-  },
-  {
-    id: 'plan-6',
-    title: 'Plan 6',
-    icon: Globe,
-    desc: 'Estructura corporativa avanzada con gigas acumulables y servicios digitales de seguridad.',
-  },
-];
+import { Skeleton } from '@/components/ui/skeleton';
+import { PlanCard } from '@/modules/catalog/components/PlanCard.js';
+import { usePublicCatalogItems } from '@/modules/catalog/hooks/use-public-catalog-items.js';
 
 export default function ServicesPage() {
-  const { openContactDialog } = useContactDialog();
+  const { items, loading, error, retry } = usePublicCatalogItems();
+
   return (
     <div className="w-full flex flex-col font-sans">
       <section className="w-full relative py-24 px-6 border-b border-border/50 bg-hero overflow-hidden min-h-[350px] flex items-center">
@@ -58,37 +21,87 @@ export default function ServicesPage() {
         </div>
       </section>
 
-      <section className="w-full py-24 px-6 bg-muted min-h-screen">
+      <section className="w-full py-24 px-6 bg-muted">
         <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {SERVICES.map((service) => (
-              <Card
-                key={service.id}
-                className="group border-border shadow-sm hover:shadow-lg transition-all"
-              >
-                <div className="aspect-[16/9] bg-muted flex items-center justify-center">
-                  <service.icon className="size-12 text-primary/40" />
-                </div>
-                <CardHeader>
-                  <CardTitle className="text-xl font-semibold text-card-foreground">
-                    {service.title}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="flex flex-col gap-6">
-                  <p className="text-sm text-muted-foreground leading-relaxed">{service.desc}</p>
-                  <Button
-                    variant="outline"
-                    onClick={() => openContactDialog()}
-                    className="w-full gap-2 group-hover:bg-primary group-hover:text-primary-foreground transition-colors"
-                  >
-                    Más información <ArrowRight className="size-4" />
-                  </Button>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+          {loading ? (
+            <PlansSkeleton />
+          ) : error ? (
+            <PlansError onRetry={retry} />
+          ) : items.length === 0 ? (
+            <PlansEmpty />
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {items.map((item, index) => (
+                <PlanCard key={item.id} item={item} index={index} />
+              ))}
+            </div>
+          )}
         </div>
       </section>
+    </div>
+  );
+}
+
+const SKELETON_IDS = ['s1', 's2', 's3', 's4', 's5'];
+
+function PlansSkeleton() {
+  return (
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      {SKELETON_IDS.map((id) => (
+        <div
+          key={id}
+          className="flex flex-col overflow-hidden rounded-2xl border border-border bg-card"
+        >
+          <Skeleton className="h-28 rounded-none" />
+          <div className="flex flex-col gap-5 px-6 py-6">
+            <Skeleton className="h-16 w-full rounded-xl" />
+            <div className="flex flex-col gap-3.5">
+              <Skeleton className="h-4 w-4/5" />
+              <Skeleton className="h-4 w-3/4" />
+              <Skeleton className="h-4 w-2/3" />
+            </div>
+            <div className="flex flex-col gap-2.5 mt-2">
+              <Skeleton className="h-11 w-full rounded-md" />
+              <Skeleton className="h-11 w-full rounded-md" />
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function PlansError({ onRetry }: { onRetry: () => void }) {
+  return (
+    <div className="flex flex-col items-center gap-5 py-20 text-center">
+      <div className="flex size-14 items-center justify-center rounded-full bg-destructive/10 text-destructive">
+        <AlertCircle className="size-7" />
+      </div>
+      <div className="flex flex-col gap-1.5">
+        <h2 className="font-brand text-xl font-semibold text-foreground">
+          No se pudo cargar el catálogo
+        </h2>
+        <p className="text-sm text-muted-foreground max-w-md">
+          Ocurrió un error al obtener los servicios. Intenta de nuevo en unos momentos.
+        </p>
+      </div>
+      <Button variant="outline" onClick={onRetry} className="gap-2">
+        <RefreshCw className="size-4" />
+        Reintentar
+      </Button>
+    </div>
+  );
+}
+
+function PlansEmpty() {
+  return (
+    <div className="flex flex-col items-center gap-3 py-20 text-center">
+      <h2 className="font-brand text-xl font-semibold text-foreground">
+        No hay servicios disponibles
+      </h2>
+      <p className="text-sm text-muted-foreground max-w-md">
+        En este momento no hay planes publicados para mostrar. Vuelve pronto.
+      </p>
     </div>
   );
 }
