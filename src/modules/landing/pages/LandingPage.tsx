@@ -1,11 +1,12 @@
 import { ArrowRight, Check, Globe, MessageCircle, Smartphone, Wifi } from 'lucide-react';
 import { type ReactNode, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 import { CMS_IMAGE_KEYS } from '@/modules/cms/cms-image-blocks.js';
+import { useContactDialog } from '@/modules/contact/index.js';
 import { BlueprintGrid, ContourMotif, SignalDot } from '../components/decor.js';
 import { useCmsLanding } from '../hooks/use-cms-landing.js';
 
@@ -223,8 +224,7 @@ function HeroSection({ hero, images }: { hero: CmsContent['hero']; images: CmsCo
 function ServiceRow({ item }: { item: (typeof SERVICES)[number] }) {
   const Icon = item.icon;
   return (
-    <div className="group relative grid grid-cols-1 gap-5 border-b border-border py-7 px-1 transition-colors hover:bg-muted/40 sm:grid-cols-[auto_1fr] sm:items-center sm:gap-6">
-      <span className="absolute left-0 top-0 h-full w-px origin-top scale-y-0 bg-primary transition-transform duration-300 group-hover:scale-y-100" />
+    <div className="group relative grid grid-cols-1 gap-5 border-b border-border border-l-2 border-l-transparent py-7 px-4 transition-colors hover:border-l-primary hover:bg-muted/40 sm:grid-cols-[auto_1fr] sm:items-center sm:gap-6">
       <span className="flex size-12 items-center justify-center rounded-xl border border-border text-foreground transition-colors group-hover:border-primary group-hover:text-primary">
         <Icon className="size-5" />
       </span>
@@ -336,6 +336,8 @@ function AboutSection({
 }
 
 function CtaSection({ cta }: { cta: CmsContent['cta'] }) {
+  const { openContactDialog } = useContactDialog();
+  const navigate = useNavigate();
   return (
     <section className="relative overflow-hidden bg-hero px-6 py-28 text-white md:py-36">
       <div
@@ -378,6 +380,7 @@ function CtaSection({ cta }: { cta: CmsContent['cta'] }) {
           <Button
             size="lg"
             variant="secondary"
+            onClick={() => openContactDialog()}
             className="h-12 w-full rounded-md px-8 text-sm font-medium sm:w-auto"
           >
             <MessageCircle className="mr-2 size-4" />
@@ -386,6 +389,7 @@ function CtaSection({ cta }: { cta: CmsContent['cta'] }) {
           <Button
             size="lg"
             variant="outline"
+            onClick={() => navigate('/services')}
             className="h-12 w-full rounded-md border-white/30 bg-transparent px-8 text-sm font-medium text-white hover:bg-white/10 hover:text-white sm:w-auto"
           >
             {cta.secondaryLabel}
