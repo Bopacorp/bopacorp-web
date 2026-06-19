@@ -4,7 +4,7 @@ import { cn } from '@/lib/utils';
 import { useContactDialog } from '@/modules/contact/index.js';
 import type { PublicCatalogItem } from '../catalog.types.js';
 
-const WHATSAPP_NUMBER = '593991423895';
+const WHATSAPP_NUMBER = '59399999999';
 
 const HEADER_CLASSES = [
   'bg-plan-1 text-white',
@@ -75,7 +75,7 @@ export function PlanCard({ item, index }: PlanCardProps) {
               className="gap-2"
             >
               <MessageCircle className="size-4" />
-              Contáctanos por WS
+              Contáctanos por WhatsApp
             </a>
           </Button>
           <Button

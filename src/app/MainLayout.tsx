@@ -142,7 +142,7 @@ function MainLayoutInner() {
                 Of. 308, Guayaquil
               </div>
               <div className="flex items-center gap-2 text-sm text-muted-foreground font-normal w-full">
-                <Phone className="size-4 shrink-0 text-muted-foreground" /> 0991423895
+                <Phone className="size-4 shrink-0 text-muted-foreground" /> 0999999999
               </div>
               <div className="flex items-center gap-2 text-sm text-muted-foreground font-normal w-full">
                 <Mail className="size-4 shrink-0 text-muted-foreground" /> ch.pauta@bopacorp.com /
