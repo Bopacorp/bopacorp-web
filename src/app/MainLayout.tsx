@@ -125,18 +125,6 @@ function MainLayoutInner() {
               </NavLink>
             ))}
           </nav>
-          <div className="mt-auto">
-            <Button
-              className="w-full"
-              onClick={() => {
-                setMobileOpen(false);
-                openContactDialog();
-              }}
-            >
-              <MessageCircle data-icon="inline-start" />
-              Cotizar Servicios
-            </Button>
-          </div>
         </SheetContent>
       </Sheet>
 
