@@ -153,6 +153,7 @@ export function ContactRequestDialog({
                 type="tel"
                 placeholder="0991234567"
                 autoComplete="tel"
+                maxLength={10}
                 disabled={submitting}
                 {...form.register('clientPhone', {
                   setValueAs: (value) => (value === '' ? undefined : value),

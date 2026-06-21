@@ -204,7 +204,7 @@ export function ApplyDialog({ open, onOpenChange, vacancy, onSuccess }: ApplyDia
                 id="apply-phone"
                 type="tel"
                 placeholder="0991234567"
-                maxLength={12}
+                maxLength={10}
                 disabled={submitting}
                 {...form.register('phone', {
                   setValueAs: (value) => (value === '' ? undefined : value),
