@@ -203,7 +203,7 @@ export function ApplyDialog({ open, onOpenChange, vacancy, onSuccess }: ApplyDia
               <Input
                 id="apply-phone"
                 type="tel"
-                placeholder="+593 9..."
+                placeholder="0991234567"
                 maxLength={12}
                 disabled={submitting}
                 {...form.register('phone', {

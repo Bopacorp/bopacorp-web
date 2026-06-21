@@ -151,7 +151,7 @@ export function ContactRequestDialog({
               <Input
                 id="contact-phone"
                 type="tel"
-                placeholder="+593 9..."
+                placeholder="0991234567"
                 autoComplete="tel"
                 disabled={submitting}
                 {...form.register('clientPhone', {
