@@ -1,9 +1,10 @@
 import { LoginRequestSchema } from '@bopacorp/shared/auth';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Loader2 } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 import type { z } from 'zod';
 import { Button } from '@/components/ui/button.js';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card.js';
@@ -28,10 +29,21 @@ export default function LoginPage() {
     mode: 'onTouched',
   });
 
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (!form.formState.isDirty) return;
+      e.preventDefault();
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [form.formState.isDirty]);
+
   const onSubmit = async (values: LoginFormValues) => {
     setAuthError(null);
     try {
       await login({ email: values.email, password: values.password });
+      toast.success('Sesión iniciada');
       navigate(from, { replace: true });
     } catch (err) {
       setAuthError(err instanceof Error ? err.message : 'Error al iniciar sesión');
