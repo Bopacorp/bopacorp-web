@@ -66,8 +66,7 @@ export default function TermsPage() {
             <h2 className="text-xl font-semibold text-foreground">4. Propiedad Intelectual</h2>
             <p className="text-sm leading-relaxed text-muted-foreground">
               Todos los contenidos de este sitio, incluyendo de forma enunciativa pero no
-              limitativa: textos, gráficos, logotipos, marcas comerciales de BOPACORP y de{' '}
-              <strong>Tigo</strong>
+              limitativa: textos, gráficos, logotipos, marcas comerciales de BOPACORP y de Tigo
               (bajo licencia o derechos de distribución correspondientes), interfaces, códigos de
               programación e imágenes, son propiedad exclusiva de sus respectivos dueños y están
               protegidos por las leyes de propiedad intelectual vigentes en Ecuador y tratados

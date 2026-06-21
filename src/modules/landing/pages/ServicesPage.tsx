@@ -194,7 +194,7 @@ function CtaSection() {
       <ContourMotif className="absolute -right-32 top-1/2 w-[40rem] -translate-y-1/2 text-white/[0.08] z-0" />
 
       <div className="relative z-10 mx-auto flex max-w-7xl flex-col items-start gap-8">
-        <h2 className="landing-rise font-brand text-balance text-5xl font-bold leading-[0.95] tracking-tighter text-white sm:text-6xl md:text-7xl lg:text-8xl">
+        <h2 className="landing-rise font-brand text-balance text-5xl font-bold leading-[0.95] tracking-tighter text-white sm:text-6xl md:text-7xl lg:text-7xl">
           ¿No sabes cuál plan elegir?
         </h2>
         <p

@@ -132,41 +132,41 @@ function MainLayoutInner() {
         <Outlet />
       </main>
 
-      <footer className="w-full text-hero-foreground pt-16 pb-12 px-6 bg-background relative z-10 border-t border-hero -mt-px">
+      <footer className="w-full text-hero-foreground pt-16 pb-12 px-6 bg-hero relative z-10 border-t border-hero-mid -mt-px">
         <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-12 gap-12 w-full relative z-10">
           <div className="md:col-span-5 flex flex-col gap-6 w-full">
             <div className="flex flex-col gap-1 w-full">
-              <span className="text-2xl font-semibold text-foreground tracking-tight">
+              <span className="text-2xl font-semibold text-white tracking-tight">
                 BOHORQUEZ & PAUTA CORP.
               </span>
-              <span className="text-xs font-medium text-muted-foreground uppercase tracking-widest">
+              <span className="text-xs font-medium text-white/60 uppercase tracking-widest">
                 Distribuidor Oficial Tigo
               </span>
             </div>
-            <p className="text-sm text-muted-foreground leading-relaxed max-w-sm w-full font-normal">
+            <p className="text-sm text-white/70 leading-relaxed max-w-sm w-full font-normal">
               Conectando el futuro de tu empresa. Soluciones de telecomunicaciones corporativas
               integrales en Ecuador desde 2019.
             </p>
           </div>
           <div className="md:col-span-3 flex flex-col gap-4 w-full">
-            <h4 className="text-sm font-semibold text-foreground w-full">SERVICIOS</h4>
+            <h4 className="text-sm font-semibold text-white w-full">SERVICIOS</h4>
             <div className="flex flex-col gap-3 w-full">
               <div className="flex flex-col gap-3 w-full">
                 <Link
                   to="/services"
-                  className="text-sm text-muted-foreground hover:text-foreground transition-colors font-normal w-full"
+                  className="text-sm text-white/70 hover:text-white transition-colors font-normal w-full"
                 >
                   Conectividad Empresarial
                 </Link>
                 <Link
                   to="/services"
-                  className="text-sm text-muted-foreground hover:text-foreground transition-colors font-normal w-full"
+                  className="text-sm text-white/70 hover:text-white transition-colors font-normal w-full"
                 >
                   Planes Corporativos Tigo
                 </Link>
                 <Link
                   to="/services"
-                  className="text-sm text-muted-foreground hover:text-foreground transition-colors font-normal w-full"
+                  className="text-sm text-white/70 hover:text-white transition-colors font-normal w-full"
                 >
                   Equipos y Soluciones de Voz
                 </Link>
@@ -174,24 +174,24 @@ function MainLayoutInner() {
             </div>
           </div>
           <div className="md:col-span-4 flex flex-col gap-4 w-full">
-            <h4 className="text-sm font-semibold text-foreground w-full">CONTACTO</h4>
+            <h4 className="text-sm font-semibold text-white w-full">CONTACTO</h4>
             <div className="flex flex-col gap-3 w-full">
-              <div className="flex items-center gap-2 text-sm text-muted-foreground font-normal w-full">
-                <MapPin className="size-4 shrink-0 text-muted-foreground" /> Edificio Elite, Piso 3,
-                Of. 308, Guayaquil
+              <div className="flex items-center gap-2 text-sm text-white/70 font-normal w-full">
+                <MapPin className="size-4 shrink-0 text-white/60" /> Edificio Elite, Piso 3, Of.
+                308, Guayaquil
               </div>
-              <div className="flex items-center gap-2 text-sm text-muted-foreground font-normal w-full">
-                <Phone className="size-4 shrink-0 text-muted-foreground" />
-                <a href="tel:0912345678" className="hover:text-foreground transition-colors">
+              <div className="flex items-center gap-2 text-sm text-white/70 font-normal w-full">
+                <Phone className="size-4 shrink-0 text-white/60" />
+                <a href="tel:0912345678" className="hover:text-white transition-colors">
                   0912345678
                 </a>
               </div>
-              <div className="flex items-start gap-2 text-sm text-muted-foreground font-normal w-full">
-                <Mail className="size-4 shrink-0 text-muted-foreground mt-0.5" />
+              <div className="flex items-start gap-2 text-sm text-white/70 font-normal w-full">
+                <Mail className="size-4 shrink-0 text-white/60 mt-0.5" />
                 <div className="flex flex-col">
                   <a
                     href="mailto:contacto@bopacorp.com"
-                    className="hover:text-foreground transition-colors"
+                    className="hover:text-white transition-colors"
                   >
                     contacto@bopacorp.com
                   </a>
@@ -200,20 +200,20 @@ function MainLayoutInner() {
             </div>
           </div>
         </div>
-        <div className="max-w-7xl mx-auto w-full mt-16 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 relative z-10 border-t border-border">
-          <span className="text-xs text-muted-foreground font-normal">
+        <div className="max-w-7xl mx-auto w-full mt-16 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 relative z-10 border-t border-white/10">
+          <span className="text-xs text-white/50 font-normal">
             © 2026 BOPACORP S.A. Todos los derechos reservados.
           </span>
           <div className="flex items-center gap-6">
             <Link
               to="/terms"
-              className="text-xs text-muted-foreground hover:text-foreground transition-colors font-normal"
+              className="text-xs text-white/60 hover:text-white transition-colors font-normal"
             >
               Términos y Condiciones
             </Link>
             <Link
               to="/privacy"
-              className="text-xs text-muted-foreground hover:text-foreground transition-colors font-normal"
+              className="text-xs text-white/60 hover:text-white transition-colors font-normal"
             >
               Políticas de Privacidad
             </Link>
