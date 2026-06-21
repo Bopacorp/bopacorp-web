@@ -109,7 +109,7 @@ export default function ServicesPage() {
     <div className="w-full flex flex-col font-sans">
       <section className="w-full relative py-20 px-6 border-b border-border/50 bg-hero overflow-hidden min-h-[300px] flex items-center">
         <div className="max-w-4xl mx-auto text-center relative z-10 flex flex-col items-center gap-6">
-          <h1 className="text-4xl md:text-6xl font-semibold tracking-tight text-white leading-tight">
+          <h1 className="font-brand text-4xl md:text-6xl font-semibold tracking-tight text-white leading-tight">
             Cátalogo de <span className="text-primary">Servicios</span>
           </h1>
           <p className="text-lg text-white/80 max-w-2xl font-normal leading-relaxed">

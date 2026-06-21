@@ -45,7 +45,7 @@ export default function JobDetailPage() {
           <div className="flex items-center gap-3">
             <BriefcaseBusiness className="size-5 text-primary" />
             <div>
-              <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">
+              <h1 className="font-brand text-3xl font-semibold tracking-tight sm:text-4xl">
                 Detalle de la vacante
               </h1>
               <p className="text-sm text-muted-foreground">
