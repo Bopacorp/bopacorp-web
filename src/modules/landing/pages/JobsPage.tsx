@@ -166,7 +166,7 @@ export default function JobsPage() {
           <div className="lg:sticky lg:top-28 lg:self-start">
             <VacancyDetailPanel
               vacancy={activeDetail}
-              loading={detailLoading}
+              loading={loading || detailLoading}
               error={detailError}
               onRetry={retryDetail}
               onApply={() => setApplyOpen(true)}

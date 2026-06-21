@@ -32,17 +32,26 @@ export function VacancyDetailPanel({
     <Card className="border-border bg-card shadow-sm">
       <CardHeader className="gap-3 border-b border-border pb-6">
         <div className="flex flex-wrap items-center gap-2">
-          {closed ? (
-            <Badge variant="secondary" className="rounded-full">
-              Cerrada
-            </Badge>
+          {loading && !vacancy ? (
+            <>
+              <Skeleton className="h-5 w-16 rounded-full" />
+              <Skeleton className="h-5 w-24 rounded-full" />
+            </>
           ) : (
-            <Badge className="rounded-full">Publicada</Badge>
-          )}
-          {vacancy?.closingDate && !closed && (
-            <Badge variant="outline" className="rounded-full">
-              Cierra {formatShortDate(vacancy.closingDate)}
-            </Badge>
+            <>
+              {closed ? (
+                <Badge variant="secondary" className="rounded-full">
+                  Cerrada
+                </Badge>
+              ) : (
+                <Badge className="rounded-full">Publicada</Badge>
+              )}
+              {vacancy?.closingDate && !closed && (
+                <Badge variant="outline" className="rounded-full">
+                  Cierra {formatShortDate(vacancy.closingDate)}
+                </Badge>
+              )}
+            </>
           )}
         </div>
         <CardTitle className="font-brand text-2xl font-semibold tracking-tight">
@@ -66,8 +75,17 @@ export function VacancyDetailPanel({
         {error && !loading && (
           <VacancyDetailError message={error.message} code={error.code} onRetry={onRetry} />
         )}
-        {!error && vacancy && (
+        {!error && loading && !vacancy && (
           <>
+            <DetailSection title="Descripcion del rol" body="" loading={true} />
+            <DetailSection title="Requisitos" body="" loading={true} />
+            <div className="flex flex-wrap gap-3 border-t border-border pt-5">
+              <Skeleton className="h-11 w-48 rounded-md" />
+            </div>
+          </>
+        )}
+        {!error && vacancy && (
+          <div className="flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-2 duration-500">
             <DetailSection
               title="Descripcion del rol"
               body={vacancy.description}
@@ -87,7 +105,7 @@ export function VacancyDetailPanel({
                 {!closed && !loading && <ArrowRight className="ml-1 size-4" />}
               </Button>
             </div>
-          </>
+          </div>
         )}
       </CardContent>
     </Card>

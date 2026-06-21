@@ -59,7 +59,7 @@ export function UploadResumeField({ value, onChange, error, disabled }: UploadRe
           className="hidden"
         />
       </label>
-      <FieldDescription>PDF, maximo 20 MB.</FieldDescription>
+      <FieldDescription>PDF, máximo 20 MB.</FieldDescription>
       {error && <FieldError>{error}</FieldError>}
     </Field>
   );
