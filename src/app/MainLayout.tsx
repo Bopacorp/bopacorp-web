@@ -1,6 +1,6 @@
 import { Mail, MapPin, Menu, MessageCircle, Phone } from 'lucide-react';
 import { useState } from 'react';
-import { NavLink, Outlet } from 'react-router-dom';
+import { Link, NavLink, Outlet } from 'react-router-dom';
 import logoFallback from '@/assets/logo.png';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
@@ -152,24 +152,24 @@ function MainLayoutInner() {
             <h4 className="text-sm font-semibold text-foreground w-full">SERVICIOS</h4>
             <div className="flex flex-col gap-3 w-full">
               <div className="flex flex-col gap-3 w-full">
-                <a
-                  href="/services"
+                <Link
+                  to="/services"
                   className="text-sm text-muted-foreground hover:text-foreground transition-colors font-normal w-full"
                 >
                   Conectividad Empresarial
-                </a>
-                <a
-                  href="/services"
+                </Link>
+                <Link
+                  to="/services"
                   className="text-sm text-muted-foreground hover:text-foreground transition-colors font-normal w-full"
                 >
                   Planes Corporativos Tigo
-                </a>
-                <a
-                  href="/services"
+                </Link>
+                <Link
+                  to="/services"
                   className="text-sm text-muted-foreground hover:text-foreground transition-colors font-normal w-full"
                 >
                   Equipos y Soluciones de Voz
-                </a>
+                </Link>
               </div>
             </div>
           </div>
@@ -181,13 +181,20 @@ function MainLayoutInner() {
                 Of. 308, Guayaquil
               </div>
               <div className="flex items-center gap-2 text-sm text-muted-foreground font-normal w-full">
-                <Phone className="size-4 shrink-0 text-muted-foreground" /> 0999999999
+                <Phone className="size-4 shrink-0 text-muted-foreground" />
+                <a href="tel:0912345678" className="hover:text-foreground transition-colors">
+                  0912345678
+                </a>
               </div>
               <div className="flex items-start gap-2 text-sm text-muted-foreground font-normal w-full">
                 <Mail className="size-4 shrink-0 text-muted-foreground mt-0.5" />
                 <div className="flex flex-col">
-                  <span>ch.pauta@bopacorp.com</span>
-                  <span>j.bohorquez@bopacorp.com</span>
+                  <a
+                    href="mailto:contacto@bopacorp.com"
+                    className="hover:text-foreground transition-colors"
+                  >
+                    contacto@bopacorp.com
+                  </a>
                 </div>
               </div>
             </div>
@@ -198,18 +205,18 @@ function MainLayoutInner() {
             © 2026 BOPACORP S.A. Todos los derechos reservados.
           </span>
           <div className="flex items-center gap-6">
-            <a
-              href="/terms"
+            <Link
+              to="/terms"
               className="text-xs text-muted-foreground hover:text-foreground transition-colors font-normal"
             >
               Términos y Condiciones
-            </a>
-            <a
-              href="/privacy"
+            </Link>
+            <Link
+              to="/privacy"
               className="text-xs text-muted-foreground hover:text-foreground transition-colors font-normal"
             >
               Políticas de Privacidad
-            </a>
+            </Link>
           </div>
         </div>
       </footer>

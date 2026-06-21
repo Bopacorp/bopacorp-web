@@ -24,7 +24,7 @@ dist-ssr
 *.sln
 *.sw?
 
-# Shared packages 
+# Shared packages
 .npmrc
 
 # Environment variables
@@ -34,3 +34,4 @@ dist-ssr
 .opencode
 .claude
 .opencode/memory/
+.antigravitycli

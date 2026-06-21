@@ -10,7 +10,9 @@ import AboutPage from '@/modules/landing/pages/AboutPage';
 import JobDetailPage from '@/modules/landing/pages/JobDetailPage';
 import JobsPage from '@/modules/landing/pages/JobsPage';
 import LandingPage from '@/modules/landing/pages/LandingPage';
+import PrivacyPage from '@/modules/landing/pages/PrivacyPage.js';
 import ServicesPage from '@/modules/landing/pages/ServicesPage';
+import TermsPage from '@/modules/landing/pages/TermsPage.js';
 
 export default function App() {
   return (
@@ -23,6 +25,8 @@ export default function App() {
           <Route path="/about" element={<AboutPage />} />
           <Route path="/jobs" element={<JobsPage />} />
           <Route path="/jobs/:id" element={<JobDetailPage />} />
+          <Route path="/terms" element={<TermsPage />} />
+          <Route path="/privacy" element={<PrivacyPage />} />
         </Route>
 
         <Route path="/login" element={<LoginPage />} />

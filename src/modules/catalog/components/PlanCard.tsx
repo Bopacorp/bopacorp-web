@@ -4,7 +4,7 @@ import { cn } from '@/lib/utils';
 import { useContactDialog } from '@/modules/contact/index.js';
 import type { PublicCatalogItem } from '../catalog.types.js';
 
-const WHATSAPP_NUMBER = '59399999999';
+const WHATSAPP_NUMBER = '593912345678';
 
 const HEADER_CLASSES = [
   'bg-plan-1 text-white',
