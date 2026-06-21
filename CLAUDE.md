@@ -44,3 +44,8 @@ Preset `b0` owns all colors, fonts, radius. Read `DESIGN.md` for full rules. Key
 - **Items inside their Group** — `SelectItem` in `SelectGroup`, `DropdownMenuItem` in `DropdownMenuGroup`
 - **Search shadcn registries** before building custom components
 - Re-theme via `npx shadcn@latest apply b0`, never hard-code OKLCH values
+
+## Operational Rules
+
+- **Do not read `.env` files.** Ask the user if you need to know an environment variable.
+- **Do not start the dev server, build server, or any long-running service by yourself.** If you need a server running, ask the user first; it may already be running.

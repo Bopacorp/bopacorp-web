@@ -1,37 +1,40 @@
+import { LoginRequestSchema } from '@bopacorp/shared/auth';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { Loader2 } from 'lucide-react';
-import { type FormEvent, useState } from 'react';
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Field, FieldGroup, FieldLabel } from '@/components/ui/field';
-import { Input } from '@/components/ui/input';
-import { FormAlert } from '@/shared/ui/FormAlert';
-import { ModeToggle } from '@/shared/ui/ModeToggle';
+import type { z } from 'zod';
+import { Button } from '@/components/ui/button.js';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card.js';
+import { Field, FieldError, FieldGroup, FieldLabel } from '@/components/ui/field.js';
+import { Input } from '@/components/ui/input.js';
+import { FormAlert } from '@/shared/ui/FormAlert.js';
+import { ModeToggle } from '@/shared/ui/ModeToggle.js';
 import { useAuth } from '../context/AuthContext.js';
+
+type LoginFormValues = z.input<typeof LoginRequestSchema>;
 
 export default function LoginPage() {
   const { login } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const from = (location.state as { from?: string })?.from || '/admin';
+  const [authError, setAuthError] = useState<string | null>(null);
 
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
+  const form = useForm<LoginFormValues>({
+    resolver: zodResolver(LoginRequestSchema),
+    defaultValues: { email: '', password: '' },
+    mode: 'onTouched',
+  });
 
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
-    setError(null);
-    setLoading(true);
-
+  const onSubmit = async (values: LoginFormValues) => {
+    setAuthError(null);
     try {
-      await login({ email: email.trim(), password });
+      await login({ email: values.email, password: values.password });
       navigate(from, { replace: true });
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error al iniciar sesión');
-    } finally {
-      setLoading(false);
+      setAuthError(err instanceof Error ? err.message : 'Error al iniciar sesión');
     }
   };
 
@@ -46,41 +49,45 @@ export default function LoginPage() {
           <CardDescription>Iniciar sesión en BOPADIGITAL</CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-            {error && <FormAlert message={error} />}
+          <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-4" noValidate>
+            {authError && <FormAlert message={authError} />}
 
             <FieldGroup>
-              <Field>
+              <Field data-invalid={form.formState.errors.email ? true : undefined}>
                 <FieldLabel htmlFor="email">Correo electrónico</FieldLabel>
                 <Input
                   id="email"
                   type="email"
                   placeholder="usuario@bopacorp.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
                   autoComplete="email"
-                  disabled={loading}
+                  disabled={form.formState.isSubmitting}
+                  {...form.register('email')}
                 />
+                {form.formState.errors.email && (
+                  <FieldError>{form.formState.errors.email.message}</FieldError>
+                )}
               </Field>
 
-              <Field>
+              <Field data-invalid={form.formState.errors.password ? true : undefined}>
                 <FieldLabel htmlFor="password">Contraseña</FieldLabel>
                 <Input
                   id="password"
                   type="password"
                   placeholder="••••••••"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
                   autoComplete="current-password"
-                  disabled={loading}
+                  disabled={form.formState.isSubmitting}
+                  {...form.register('password')}
                 />
+                {form.formState.errors.password && (
+                  <FieldError>{form.formState.errors.password.message}</FieldError>
+                )}
               </Field>
             </FieldGroup>
 
-            <Button type="submit" disabled={loading} className="w-full">
-              {loading && <Loader2 data-icon="inline-start" className="animate-spin" />}
+            <Button type="submit" disabled={form.formState.isSubmitting} className="w-full">
+              {form.formState.isSubmitting && (
+                <Loader2 data-icon="inline-start" className="animate-spin" />
+              )}
               Iniciar sesión
             </Button>
           </form>

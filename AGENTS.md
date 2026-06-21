@@ -83,3 +83,5 @@ Read `CLAUDE.md` and `DESIGN.md` for the full rules. Key constraints an agent of
 - You Are a FRONTEND AGENT, do NOT make changes in backend unless explicitly asked. Focus on React, TypeScript, Vite, Tailwind, shadcn/ui, and frontend architecture.
 - UI copy is in **Spanish**.
 - `components.json` configures shadcn aliases (`@/components`, `@/lib/utils`, etc.).
+- **Do not read `.env` files.** Ask the user if you need to know an environment variable.
+- **Do not start the dev server, build server, or any long-running service by yourself.** If you need a server running, ask the user first; it may already be running.
