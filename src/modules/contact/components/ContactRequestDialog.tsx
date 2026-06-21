@@ -1,22 +1,18 @@
-import { AlertCircle, Send, X } from 'lucide-react';
-import type { ChangeEvent } from 'react';
-import { useEffect, useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog';
-import { Field, FieldError, FieldGroup, FieldLabel } from '@/components/ui/field';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import type {
-  ContactFormErrors,
-  ContactFormValues,
-  ContactRequestResponse,
-} from '../contact.types.js';
+import { CreateContactRequestSchema } from '@bopacorp/shared/catalog';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { AlertCircle, Loader2, Send, X } from 'lucide-react';
+import { useEffect } from 'react';
+import { useForm } from 'react-hook-form';
+import type { z } from 'zod';
+import { Button } from '@/components/ui/button.js';
+import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog.js';
+import { Field, FieldError, FieldGroup, FieldLabel } from '@/components/ui/field.js';
+import { Input } from '@/components/ui/input.js';
+import { Textarea } from '@/components/ui/textarea.js';
+import type { ContactRequestResponse } from '../contact.types.js';
 import { useContactRequest } from '../hooks/use-contact-request.js';
-import {
-  contactDetailsToErrors,
-  hasContactErrors,
-  validateContactForm,
-} from '../lib/validation.js';
+
+type ContactFormValues = z.input<typeof CreateContactRequestSchema>;
 
 interface ContactRequestDialogProps {
   open: boolean;
@@ -25,100 +21,65 @@ interface ContactRequestDialogProps {
   onSuccess?: (response: ContactRequestResponse) => void;
 }
 
-const EMPTY_VALUES: ContactFormValues = {
-  clientName: '',
-  clientEmail: '',
-  clientPhone: '',
-  message: '',
-};
-
 export function ContactRequestDialog({
   open,
   onOpenChange,
   itemId,
   onSuccess,
 }: ContactRequestDialogProps) {
-  const [values, setValues] = useState<ContactFormValues>(EMPTY_VALUES);
-  const [errors, setErrors] = useState<ContactFormErrors>({});
-  const [touched, setTouched] = useState<Record<keyof ContactFormValues, boolean>>({
-    clientName: false,
-    clientEmail: false,
-    clientPhone: false,
-    message: false,
-  });
-  const [generalError, setGeneralError] = useState<string | null>(null);
   const { state, submit, reset } = useContactRequest();
+
+  const form = useForm<ContactFormValues>({
+    resolver: zodResolver(CreateContactRequestSchema),
+    defaultValues: {
+      itemId: undefined,
+      clientName: '',
+      clientEmail: '',
+      clientPhone: '',
+      message: '',
+    },
+    mode: 'onTouched',
+  });
 
   useEffect(() => {
     if (!open) {
-      setValues(EMPTY_VALUES);
-      setErrors({});
-      setTouched({
-        clientName: false,
-        clientEmail: false,
-        clientPhone: false,
-        message: false,
-      });
-      setGeneralError(null);
+      form.reset();
       reset();
     }
-  }, [open, reset]);
+  }, [open, reset, form]);
 
   useEffect(() => {
     if (state.kind === 'success') {
       onSuccess?.(state.data);
     }
-    if (state.kind === 'error') {
-      const fieldErrors = contactDetailsToErrors(state.details);
-      setErrors(fieldErrors);
-      setGeneralError(fieldErrors && Object.keys(fieldErrors).length > 0 ? null : state.message);
-    }
   }, [state, onSuccess]);
 
-  const submitting = state.kind === 'submitting';
+  useEffect(() => {
+    if (state.kind !== 'error' || !state.details?.length) return;
 
-  const handleField =
-    (key: keyof ContactFormValues) =>
-    (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-      setValues((current) => ({ ...current, [key]: event.target.value }));
-      setTouched((current) => ({ ...current, [key]: true }));
-    };
+    form.clearErrors();
 
-  const FIELD_ORDER: (keyof ContactFormErrors)[] = ['clientName', 'clientEmail', 'clientPhone'];
-
-  const FIELD_IDS: Record<keyof ContactFormErrors, string> = {
-    clientName: 'contact-name',
-    clientEmail: 'contact-email',
-    clientPhone: 'contact-phone',
-    message: 'contact-message',
-  };
-
-  function focusFirstInvalidField(validation: ContactFormErrors) {
-    const firstKey = FIELD_ORDER.find((key) => validation[key]);
-    if (!firstKey) return;
-    setTouched((current) => ({ ...current, [firstKey]: true }));
-    const element = document.getElementById(FIELD_IDS[firstKey]);
-    element?.focus();
-  }
-
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    setGeneralError(null);
-    const validation = validateContactForm(values);
-    if (hasContactErrors(validation)) {
-      setErrors(validation);
-      focusFirstInvalidField(validation);
-      return;
+    for (const detail of state.details) {
+      const field = detail.field as keyof ContactFormValues;
+      if (field in form.getValues()) {
+        form.setError(field, { type: 'manual', message: detail.message });
+      }
     }
-    setErrors({});
-    submit({
+  }, [state, form]);
+
+  const onSubmit = async (values: ContactFormValues) => {
+    await submit({
+      ...values,
       clientName: values.clientName.trim(),
       clientEmail: values.clientEmail.trim(),
-      clientPhone: values.clientPhone.trim() || undefined,
-      message: values.message.trim() || undefined,
+      clientPhone: values.clientPhone?.trim() || undefined,
+      message: values.message?.trim() || undefined,
       itemId: itemId || undefined,
     });
   };
+
+  const submitting = state.kind === 'submitting' || form.formState.isSubmitting;
+  const generalError = state.kind === 'error' && !state.details?.length ? state.message : null;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -154,67 +115,66 @@ export function ContactRequestDialog({
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-5" noValidate>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-5" noValidate>
           <FieldGroup>
-            <Field data-invalid={Boolean(errors.clientName && touched.clientName) || undefined}>
+            <Field data-invalid={form.formState.errors.clientName ? true : undefined}>
               <FieldLabel htmlFor="contact-name">Nombre completo</FieldLabel>
               <Input
                 id="contact-name"
-                value={values.clientName}
-                onChange={handleField('clientName')}
                 placeholder="Juan Perez"
-                maxLength={200}
+                autoComplete="name"
                 disabled={submitting}
-                required
+                {...form.register('clientName')}
               />
-              {errors.clientName && touched.clientName && (
-                <FieldError>{errors.clientName}</FieldError>
+              {form.formState.errors.clientName && (
+                <FieldError>{form.formState.errors.clientName.message}</FieldError>
               )}
             </Field>
 
-            <Field data-invalid={Boolean(errors.clientEmail && touched.clientEmail) || undefined}>
+            <Field data-invalid={form.formState.errors.clientEmail ? true : undefined}>
               <FieldLabel htmlFor="contact-email">Correo electronico</FieldLabel>
               <Input
                 id="contact-email"
                 type="email"
-                value={values.clientEmail}
-                onChange={handleField('clientEmail')}
                 placeholder="tu@empresa.com"
-                maxLength={150}
+                autoComplete="email"
                 disabled={submitting}
-                required
+                {...form.register('clientEmail')}
               />
-              {errors.clientEmail && touched.clientEmail && (
-                <FieldError>{errors.clientEmail}</FieldError>
+              {form.formState.errors.clientEmail && (
+                <FieldError>{form.formState.errors.clientEmail.message}</FieldError>
               )}
             </Field>
 
-            <Field data-invalid={Boolean(errors.clientPhone && touched.clientPhone) || undefined}>
+            <Field data-invalid={form.formState.errors.clientPhone ? true : undefined}>
               <FieldLabel htmlFor="contact-phone">Telefono (opcional)</FieldLabel>
               <Input
                 id="contact-phone"
                 type="tel"
-                value={values.clientPhone}
-                onChange={handleField('clientPhone')}
                 placeholder="+593 9..."
-                maxLength={20}
+                autoComplete="tel"
                 disabled={submitting}
+                {...form.register('clientPhone', {
+                  setValueAs: (value) => (value === '' ? undefined : value),
+                })}
               />
-              {errors.clientPhone && touched.clientPhone && (
-                <FieldError>{errors.clientPhone}</FieldError>
+              {form.formState.errors.clientPhone && (
+                <FieldError>{form.formState.errors.clientPhone.message}</FieldError>
               )}
             </Field>
 
-            <Field>
+            <Field data-invalid={form.formState.errors.message ? true : undefined}>
               <FieldLabel htmlFor="contact-message">Mensaje (opcional)</FieldLabel>
               <Textarea
                 id="contact-message"
                 rows={4}
-                value={values.message}
-                onChange={handleField('message')}
                 placeholder="Cuentanos que necesitas para tu empresa"
                 disabled={submitting}
+                {...form.register('message')}
               />
+              {form.formState.errors.message && (
+                <FieldError>{form.formState.errors.message.message}</FieldError>
+              )}
             </Field>
           </FieldGroup>
 
@@ -233,7 +193,11 @@ export function ContactRequestDialog({
               disabled={submitting}
               className="h-10 rounded-md px-6 text-sm font-medium"
             >
-              <Send data-icon="inline-start" />
+              {submitting ? (
+                <Loader2 data-icon="inline-start" className="animate-spin" />
+              ) : (
+                <Send data-icon="inline-start" />
+              )}
               {submitting ? 'Enviando...' : 'Enviar solicitud'}
             </Button>
           </div>
