@@ -1,5 +1,5 @@
 import type { PublicJobVacancyResponse } from '@bopacorp/shared/employability';
-import { ArrowRight, Send } from 'lucide-react';
+import { ArrowRight, BriefcaseBusiness, Send } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -67,13 +67,24 @@ export function VacancyDetailPanel({
           ) : vacancy ? (
             'Revisa la descripcion y los requisitos para postularte.'
           ) : (
-            'Elige una vacante de la lista para ver los detalles.'
+            'Elige un rol de la lista para ver los detalles y postularte.'
           )}
         </CardDescription>
       </CardHeader>
       <CardContent className="flex flex-col gap-6 p-6">
         {error && !loading && (
           <VacancyDetailError message={error.message} code={error.code} onRetry={onRetry} />
+        )}
+        {!error && !loading && !vacancy && (
+          <div className="flex flex-col items-center justify-center gap-4 py-10 text-center">
+            <BriefcaseBusiness className="size-12 text-muted-foreground/50" />
+            <div className="flex flex-col gap-1">
+              <p className="font-medium">Ninguna vacante seleccionada</p>
+              <p className="text-sm text-muted-foreground">
+                Selecciona una oferta de la lista para ver los detalles.
+              </p>
+            </div>
+          </div>
         )}
         {!error && loading && !vacancy && (
           <>

@@ -1,6 +1,6 @@
 import type { ListJobVacanciesQuery } from '@bopacorp/shared/employability';
 import { BriefcaseBusiness, CheckCircle2, Send, Upload } from 'lucide-react';
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import type { ApplyJobVacancyResponse, JobVacancyListItemResponse } from '@/modules/employability';
@@ -31,12 +31,6 @@ export default function JobsPage() {
   const [applyOpen, setApplyOpen] = useState(false);
   const [successOpen, setSuccessOpen] = useState(false);
   const [successResponse, setSuccessResponse] = useState<ApplyJobVacancyResponse | null>(null);
-
-  useEffect(() => {
-    if (vacancies.length > 0 && activeVacancyId === null) {
-      setActiveVacancyId(vacancies[0].id);
-    }
-  }, [vacancies, activeVacancyId]);
 
   const activeListItem = useMemo<JobVacancyListItemResponse | null>(() => {
     if (!activeVacancyId) return null;
@@ -166,7 +160,7 @@ export default function JobsPage() {
           <div className="lg:sticky lg:top-28 lg:self-start">
             <VacancyDetailPanel
               vacancy={activeDetail}
-              loading={loading || detailLoading}
+              loading={detailLoading}
               error={detailError}
               onRetry={retryDetail}
               onApply={() => setApplyOpen(true)}
