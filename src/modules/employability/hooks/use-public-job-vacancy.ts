@@ -1,7 +1,7 @@
 import type { PublicJobVacancyResponse } from '@bopacorp/shared/employability';
 import { useCallback, useEffect, useState } from 'react';
 import { getPublicJobVacancy } from '../employability.service.js';
-import { getErrorMessage } from '../lib/validation.js';
+import { getErrorMessage } from '../lib/error-message.js';
 
 interface CancelState {
   cancelled: boolean;

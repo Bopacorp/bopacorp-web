@@ -1,24 +1,5 @@
 import type { ApplyJobVacancyRequest } from '@bopacorp/shared/employability';
 
-export interface ApplyFormValues {
-  nationalId: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  phone: string;
-  address: string;
-  coverLetter: string;
-}
-
-export interface ApplyFormErrors {
-  nationalId?: string;
-  firstName?: string;
-  lastName?: string;
-  email?: string;
-  phone?: string;
-  file?: string;
-}
-
 export type ApplyCandidatePayload = ApplyJobVacancyRequest['candidate'];
 
 export interface ApplyVacancyMeta {
@@ -34,11 +15,6 @@ export interface ApplyJobVacancyResponse {
   vacancy: { id: string; title: string };
 }
 
-export interface ApplyValidationDetail {
-  field: string;
-  message: string;
-}
-
 export type ApplyState =
   | { kind: 'idle' }
   | { kind: 'submitting' }
@@ -47,5 +23,5 @@ export type ApplyState =
       kind: 'error';
       code: string;
       message: string;
-      details?: ApplyValidationDetail[];
+      details?: Array<{ field: string; message: string }>;
     };

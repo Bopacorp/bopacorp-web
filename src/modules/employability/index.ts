@@ -14,11 +14,7 @@ export {
   getPublicJobVacancy,
   listPublishedVacancies,
 } from './employability.service.js';
-export type {
-  ApplyFormErrors,
-  ApplyFormValues,
-  ApplyJobVacancyResponse,
-} from './employability.types.js';
+export type { ApplyJobVacancyResponse } from './employability.types.js';
 export { useApplyJobVacancy } from './hooks/use-apply-job-vacancy.js';
 export { usePublicJobVacancy } from './hooks/use-public-job-vacancy.js';
 export { usePublishedVacancies } from './hooks/use-published-vacancies.js';

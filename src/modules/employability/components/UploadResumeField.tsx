@@ -1,20 +1,26 @@
 import { FileText, UploadCloud } from 'lucide-react';
 import type { ChangeEvent } from 'react';
-import { Field, FieldDescription, FieldError, FieldLabel } from '@/components/ui/field';
-import { Input } from '@/components/ui/input';
-import { cn } from '@/lib/utils';
+import { Field, FieldDescription, FieldError, FieldLabel } from '@/components/ui/field.js';
+import { Input } from '@/components/ui/input.js';
+import { cn } from '@/lib/utils.js';
 
 interface UploadResumeFieldProps {
-  fileName: string;
+  value?: File;
+  onChange: (file: File | undefined) => void;
   error?: string;
-  touched?: boolean;
-  onChange: (event: ChangeEvent<HTMLInputElement>) => void;
+  disabled?: boolean;
 }
 
-export function UploadResumeField({ fileName, error, touched, onChange }: UploadResumeFieldProps) {
-  const hasFile = Boolean(fileName);
+export function UploadResumeField({ value, onChange, error, disabled }: UploadResumeFieldProps) {
+  const hasFile = Boolean(value);
+
+  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    onChange(file);
+  };
+
   return (
-    <Field data-invalid={Boolean(error && touched) || undefined}>
+    <Field data-invalid={error ? true : undefined}>
       <FieldLabel htmlFor="applicant-resume">CV en PDF</FieldLabel>
       <label
         htmlFor="applicant-resume"
@@ -23,7 +29,7 @@ export function UploadResumeField({ fileName, error, touched, onChange }: Upload
           hasFile
             ? 'border-primary/50 bg-primary/5'
             : 'border-border bg-muted/20 hover:border-primary/40 hover:bg-muted/40',
-          error && touched && 'border-destructive/50 bg-destructive/5',
+          error && 'border-destructive/50 bg-destructive/5',
         )}
       >
         <span
@@ -38,7 +44,7 @@ export function UploadResumeField({ fileName, error, touched, onChange }: Upload
         </span>
         <span className="flex flex-col gap-0.5">
           <span className="text-sm font-medium text-foreground">
-            {hasFile ? formatFileName(fileName) : 'Haz clic para seleccionar tu CV'}
+            {hasFile ? formatFileName(value?.name ?? '') : 'Haz clic para seleccionar tu CV'}
           </span>
           <span className="text-xs text-muted-foreground">
             {hasFile ? 'Puedes cambiar el archivo' : 'Arrastra o selecciona un archivo PDF'}
@@ -48,12 +54,13 @@ export function UploadResumeField({ fileName, error, touched, onChange }: Upload
           id="applicant-resume"
           type="file"
           accept="application/pdf"
-          onChange={onChange}
+          onChange={handleChange}
+          disabled={disabled}
           className="hidden"
         />
       </label>
       <FieldDescription>PDF, maximo 20 MB.</FieldDescription>
-      {error && touched && <FieldError>{error}</FieldError>}
+      {error && <FieldError>{error}</FieldError>}
     </Field>
   );
 }

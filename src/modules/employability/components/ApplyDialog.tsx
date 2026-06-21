@@ -1,19 +1,28 @@
-import { AlertCircle, Send, X } from 'lucide-react';
-import type { ChangeEvent } from 'react';
-import { useEffect, useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog';
-import { Field, FieldError, FieldGroup, FieldLabel } from '@/components/ui/field';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import type {
-  ApplyFormErrors,
-  ApplyFormValues,
-  ApplyJobVacancyResponse,
-} from '../employability.types.js';
+import { ApplyJobVacancyFormSchema } from '@bopacorp/shared/employability';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { AlertCircle, Loader2, Send, X } from 'lucide-react';
+import { useEffect } from 'react';
+import { Controller, useForm } from 'react-hook-form';
+import { z } from 'zod';
+import { Button } from '@/components/ui/button.js';
+import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog.js';
+import { Field, FieldError, FieldGroup, FieldLabel } from '@/components/ui/field.js';
+import { Input } from '@/components/ui/input.js';
+import { Textarea } from '@/components/ui/textarea.js';
+import type { ApplyJobVacancyResponse } from '../employability.types.js';
 import { useApplyJobVacancy } from '../hooks/use-apply-job-vacancy.js';
-import { applyDetailsToErrors, hasApplyErrors, validateApplyForm } from '../lib/validation.js';
 import { UploadResumeField } from './UploadResumeField.js';
+
+const MAX_FILE_BYTES = 20 * 1024 * 1024;
+
+const ApplyFormSchema = ApplyJobVacancyFormSchema.extend({
+  file: z
+    .instanceof(File, { message: 'Adjunta tu CV en PDF' })
+    .refine((f) => f.type === 'application/pdf', 'Solo se aceptan archivos PDF')
+    .refine((f) => f.size <= MAX_FILE_BYTES, 'El archivo supera el tamaño máximo (20 MB)'),
+});
+
+type ApplyFormValues = z.input<typeof ApplyFormSchema>;
 
 interface ApplyDialogProps {
   open: boolean;
@@ -22,138 +31,80 @@ interface ApplyDialogProps {
   onSuccess?: (response: ApplyJobVacancyResponse) => void;
 }
 
-const EMPTY_VALUES: ApplyFormValues = {
-  nationalId: '',
-  firstName: '',
-  lastName: '',
-  email: '',
-  phone: '',
-  address: '',
-  coverLetter: '',
+const FIELD_MAP: Record<string, keyof ApplyFormValues> = {
+  'candidate.nationalId': 'nationalId',
+  'candidate.firstName': 'firstName',
+  'candidate.lastName': 'lastName',
+  'candidate.email': 'email',
+  'candidate.phone': 'phone',
+  'candidate.address': 'address',
+  file: 'file',
 };
 
 export function ApplyDialog({ open, onOpenChange, vacancy, onSuccess }: ApplyDialogProps) {
-  const [values, setValues] = useState<ApplyFormValues>(EMPTY_VALUES);
-  const [file, setFile] = useState<File | null>(null);
-  const [fileTouched, setFileTouched] = useState(false);
-  const [fileName, setFileName] = useState('');
-  const [errors, setErrors] = useState<ApplyFormErrors>({});
-  const [touched, setTouched] = useState<Record<keyof ApplyFormValues, boolean>>({
-    nationalId: false,
-    firstName: false,
-    lastName: false,
-    email: false,
-    phone: false,
-    address: false,
-    coverLetter: false,
-  });
-  const [generalError, setGeneralError] = useState<string | null>(null);
   const { state, submit, reset } = useApplyJobVacancy();
+
+  const form = useForm<ApplyFormValues>({
+    resolver: zodResolver(ApplyFormSchema),
+    defaultValues: {
+      nationalId: '',
+      firstName: '',
+      lastName: '',
+      email: '',
+      phone: '',
+      address: '',
+      coverLetter: '',
+      file: undefined,
+    },
+    mode: 'onTouched',
+  });
 
   useEffect(() => {
     if (!open) {
-      setValues(EMPTY_VALUES);
-      setFile(null);
-      setFileTouched(false);
-      setFileName('');
-      setErrors({});
-      setTouched({
-        nationalId: false,
-        firstName: false,
-        lastName: false,
-        email: false,
-        phone: false,
-        address: false,
-        coverLetter: false,
-      });
-      setGeneralError(null);
+      form.reset();
       reset();
     }
-  }, [open, reset]);
+  }, [open, reset, form]);
 
   useEffect(() => {
     if (state.kind === 'success') {
       onSuccess?.(state.data);
     }
-    if (state.kind === 'error') {
-      const fieldErrors = applyDetailsToErrors(state.details);
-      setErrors(fieldErrors);
-      setGeneralError(fieldErrors && Object.keys(fieldErrors).length > 0 ? null : state.message);
-    }
   }, [state, onSuccess]);
 
-  const submitting = state.kind === 'submitting';
+  useEffect(() => {
+    if (state.kind !== 'error' || !state.details?.length) return;
 
-  const handleField =
-    (key: keyof ApplyFormValues) =>
-    (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-      setValues((current) => ({ ...current, [key]: event.target.value }));
-      setTouched((current) => ({ ...current, [key]: true }));
-    };
+    form.clearErrors();
 
-  const handleFile = (event: ChangeEvent<HTMLInputElement>) => {
-    const next = event.target.files?.[0] ?? null;
-    setFile(next);
-    setFileTouched(true);
-    setFileName(next?.name ?? '');
-    if (errors.file) setErrors((current) => ({ ...current, file: undefined }));
-  };
-
-  const FIELD_ORDER: (keyof ApplyFormErrors)[] = [
-    'nationalId',
-    'firstName',
-    'lastName',
-    'email',
-    'phone',
-    'file',
-  ];
-
-  const FIELD_IDS: Record<keyof ApplyFormErrors, string> = {
-    nationalId: 'apply-national-id',
-    firstName: 'apply-first-name',
-    lastName: 'apply-last-name',
-    email: 'apply-email',
-    phone: 'apply-phone',
-    file: 'applicant-resume',
-  };
-
-  function focusFirstInvalidField(validation: ApplyFormErrors) {
-    const firstKey = FIELD_ORDER.find((key) => validation[key]);
-    if (!firstKey) return;
-    if (firstKey === 'file') {
-      setFileTouched(true);
-    } else {
-      setTouched((current) => ({ ...current, [firstKey]: true }));
+    for (const detail of state.details) {
+      const field = FIELD_MAP[detail.field];
+      if (field) {
+        form.setError(field, { type: 'manual', message: detail.message });
+      }
     }
-    const element = document.getElementById(FIELD_IDS[firstKey]);
-    element?.focus();
-  }
+  }, [state, form]);
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+  const onSubmit = async (values: ApplyFormValues) => {
     if (!vacancy) return;
-    setGeneralError(null);
-    const validation = validateApplyForm(values, file);
-    if (hasApplyErrors(validation)) {
-      setErrors(validation);
-      focusFirstInvalidField(validation);
-      return;
-    }
-    setErrors({});
-    submit({
+
+    await submit({
       vacancyId: vacancy.id,
       candidate: {
-        nationalId: values.nationalId.trim(),
+        nationalId: values.nationalId,
         firstName: values.firstName.trim(),
         lastName: values.lastName.trim(),
         email: values.email.trim(),
-        phone: values.phone.trim() || undefined,
-        address: values.address.trim() || undefined,
+        phone: values.phone?.trim() || undefined,
+        address: values.address?.trim() || undefined,
       },
-      coverLetter: values.coverLetter,
-      file: file as File,
+      coverLetter: values.coverLetter || '',
+      file: values.file,
     });
   };
+
+  const submitting = state.kind === 'submitting' || form.formState.isSubmitting;
+  const generalError = state.kind === 'error' && !state.details?.length ? state.message : null;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -189,110 +140,119 @@ export function ApplyDialog({ open, onOpenChange, vacancy, onSuccess }: ApplyDia
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-5" noValidate>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-5" noValidate>
           <FieldGroup>
-            <Field data-invalid={Boolean(errors.nationalId && touched.nationalId) || undefined}>
-              <FieldLabel htmlFor="apply-national-id">Cedula o RUC</FieldLabel>
+            <Field data-invalid={form.formState.errors.nationalId ? true : undefined}>
+              <FieldLabel htmlFor="apply-national-id">Cedula</FieldLabel>
               <Input
                 id="apply-national-id"
                 inputMode="numeric"
-                value={values.nationalId}
-                onChange={handleField('nationalId')}
                 placeholder="1234567890"
-                maxLength={20}
                 disabled={submitting}
-                required
+                {...form.register('nationalId')}
               />
-              {errors.nationalId && touched.nationalId && (
-                <FieldError>{errors.nationalId}</FieldError>
+              {form.formState.errors.nationalId && (
+                <FieldError>{form.formState.errors.nationalId.message}</FieldError>
               )}
             </Field>
 
             <div className="grid gap-4 sm:grid-cols-2">
-              <Field data-invalid={Boolean(errors.firstName && touched.firstName) || undefined}>
+              <Field data-invalid={form.formState.errors.firstName ? true : undefined}>
                 <FieldLabel htmlFor="apply-first-name">Nombre</FieldLabel>
                 <Input
                   id="apply-first-name"
-                  value={values.firstName}
-                  onChange={handleField('firstName')}
-                  maxLength={100}
+                  maxLength={50}
                   disabled={submitting}
-                  required
+                  {...form.register('firstName')}
                 />
-                {errors.firstName && touched.firstName && (
-                  <FieldError>{errors.firstName}</FieldError>
+                {form.formState.errors.firstName && (
+                  <FieldError>{form.formState.errors.firstName.message}</FieldError>
                 )}
               </Field>
-              <Field data-invalid={Boolean(errors.lastName && touched.lastName) || undefined}>
+              <Field data-invalid={form.formState.errors.lastName ? true : undefined}>
                 <FieldLabel htmlFor="apply-last-name">Apellido</FieldLabel>
                 <Input
                   id="apply-last-name"
-                  value={values.lastName}
-                  onChange={handleField('lastName')}
-                  maxLength={100}
+                  maxLength={50}
                   disabled={submitting}
-                  required
+                  {...form.register('lastName')}
                 />
-                {errors.lastName && touched.lastName && <FieldError>{errors.lastName}</FieldError>}
+                {form.formState.errors.lastName && (
+                  <FieldError>{form.formState.errors.lastName.message}</FieldError>
+                )}
               </Field>
             </div>
 
-            <Field data-invalid={Boolean(errors.email && touched.email) || undefined}>
+            <Field data-invalid={form.formState.errors.email ? true : undefined}>
               <FieldLabel htmlFor="apply-email">Correo electronico</FieldLabel>
               <Input
                 id="apply-email"
                 type="email"
-                value={values.email}
-                onChange={handleField('email')}
                 placeholder="tu@email.com"
                 maxLength={150}
                 disabled={submitting}
-                required
+                {...form.register('email')}
               />
-              {errors.email && touched.email && <FieldError>{errors.email}</FieldError>}
+              {form.formState.errors.email && (
+                <FieldError>{form.formState.errors.email.message}</FieldError>
+              )}
             </Field>
 
-            <Field data-invalid={Boolean(errors.phone && touched.phone) || undefined}>
+            <Field data-invalid={form.formState.errors.phone ? true : undefined}>
               <FieldLabel htmlFor="apply-phone">Telefono (opcional)</FieldLabel>
               <Input
                 id="apply-phone"
                 type="tel"
-                value={values.phone}
-                onChange={handleField('phone')}
                 placeholder="+593 9..."
-                maxLength={20}
+                maxLength={12}
                 disabled={submitting}
+                {...form.register('phone', {
+                  setValueAs: (value) => (value === '' ? undefined : value),
+                })}
               />
-              {errors.phone && touched.phone && <FieldError>{errors.phone}</FieldError>}
+              {form.formState.errors.phone && (
+                <FieldError>{form.formState.errors.phone.message}</FieldError>
+              )}
             </Field>
 
-            <Field>
+            <Field data-invalid={form.formState.errors.address ? true : undefined}>
               <FieldLabel htmlFor="apply-address">Direccion (opcional)</FieldLabel>
               <Input
                 id="apply-address"
-                value={values.address}
-                onChange={handleField('address')}
+                maxLength={255}
                 disabled={submitting}
+                {...form.register('address')}
               />
+              {form.formState.errors.address && (
+                <FieldError>{form.formState.errors.address.message}</FieldError>
+              )}
             </Field>
 
-            <Field>
+            <Field data-invalid={form.formState.errors.coverLetter ? true : undefined}>
               <FieldLabel htmlFor="apply-cover-letter">Carta de presentacion (opcional)</FieldLabel>
               <Textarea
                 id="apply-cover-letter"
                 rows={4}
-                value={values.coverLetter}
-                onChange={handleField('coverLetter')}
                 placeholder="Cuentanos por que te interesa este rol"
                 disabled={submitting}
+                {...form.register('coverLetter')}
               />
+              {form.formState.errors.coverLetter && (
+                <FieldError>{form.formState.errors.coverLetter.message}</FieldError>
+              )}
             </Field>
 
-            <UploadResumeField
-              fileName={fileName}
-              error={errors.file}
-              touched={fileTouched}
-              onChange={handleFile}
+            <Controller
+              name="file"
+              control={form.control}
+              render={({ field }) => (
+                <UploadResumeField
+                  value={field.value}
+                  onChange={field.onChange}
+                  error={form.formState.errors.file?.message}
+                  disabled={submitting}
+                />
+              )}
             />
           </FieldGroup>
 
@@ -311,7 +271,11 @@ export function ApplyDialog({ open, onOpenChange, vacancy, onSuccess }: ApplyDia
               disabled={submitting}
               className="h-11 rounded-md px-6 text-sm font-medium"
             >
-              <Send data-icon="inline-start" />
+              {submitting ? (
+                <Loader2 data-icon="inline-start" className="animate-spin" />
+              ) : (
+                <Send data-icon="inline-start" />
+              )}
               {submitting ? 'Enviando...' : 'Enviar postulacion'}
             </Button>
           </div>
