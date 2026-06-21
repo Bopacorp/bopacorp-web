@@ -158,7 +158,7 @@ export function ApplyDialog({ open, onOpenChange, vacancy, onSuccess }: ApplyDia
                 <Input
                   id="apply-national-id"
                   inputMode="numeric"
-                  placeholder="1234567890"
+                  placeholder="1712345678"
                   disabled={submitting}
                   {...form.register('nationalId')}
                 />
@@ -173,6 +173,7 @@ export function ApplyDialog({ open, onOpenChange, vacancy, onSuccess }: ApplyDia
                   <Input
                     id="apply-first-name"
                     maxLength={50}
+                    placeholder="Juan"
                     disabled={submitting}
                     {...form.register('firstName')}
                   />
@@ -185,6 +186,7 @@ export function ApplyDialog({ open, onOpenChange, vacancy, onSuccess }: ApplyDia
                   <Input
                     id="apply-last-name"
                     maxLength={50}
+                    placeholder="Perez"
                     disabled={submitting}
                     {...form.register('lastName')}
                   />
@@ -199,7 +201,7 @@ export function ApplyDialog({ open, onOpenChange, vacancy, onSuccess }: ApplyDia
                 <Input
                   id="apply-email"
                   type="email"
-                  placeholder="tu@email.com"
+                  placeholder="tu@correo.com.ec"
                   maxLength={150}
                   disabled={submitting}
                   {...form.register('email')}

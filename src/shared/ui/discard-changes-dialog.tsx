@@ -1,12 +1,12 @@
 import {
   AlertDialog,
-  AlertDialogAction,
   AlertDialogContent,
   AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog.js';
+import { Button } from '@/components/ui/button.js';
 
 interface DiscardChangesDialogProps {
   open: boolean;
@@ -15,20 +15,30 @@ interface DiscardChangesDialogProps {
 }
 
 export function DiscardChangesDialog({ open, onCancel, onDiscard }: DiscardChangesDialogProps) {
+  const handleCancel = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onCancel();
+  };
+
+  const handleDiscard = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onDiscard();
+  };
+
   return (
-    <AlertDialog open={open} onOpenChange={(v) => !v && onCancel()}>
-      <AlertDialogContent>
+    <AlertDialog open={open} onOpenChange={() => {}}>
+      <AlertDialogContent onEscapeKeyDown={onCancel}>
         <AlertDialogHeader>
           <AlertDialogTitle>¿Descartar cambios?</AlertDialogTitle>
           <AlertDialogDescription>Los cambios no guardados se perderán.</AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogAction variant="outline" onClick={onCancel}>
+          <Button type="button" variant="outline" onClick={handleCancel}>
             Seguir editando
-          </AlertDialogAction>
-          <AlertDialogAction variant="destructive" onClick={onDiscard}>
+          </Button>
+          <Button type="button" variant="destructive" onClick={handleDiscard}>
             Descartar
-          </AlertDialogAction>
+          </Button>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

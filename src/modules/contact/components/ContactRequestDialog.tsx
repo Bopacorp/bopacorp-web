@@ -147,7 +147,7 @@ export function ContactRequestDialog({
                 <Input
                   id="contact-email"
                   type="email"
-                  placeholder="tu@empresa.com"
+                  placeholder="tu@empresa.com.ec"
                   autoComplete="email"
                   disabled={submitting}
                   {...form.register('clientEmail')}
