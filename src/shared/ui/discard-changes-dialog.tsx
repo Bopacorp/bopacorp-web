@@ -17,19 +17,14 @@ interface DiscardChangesDialogProps {
 
 export function DiscardChangesDialog({ open, onCancel, onDiscard }: DiscardChangesDialogProps) {
   return (
-    <AlertDialog
-      open={open}
-      onOpenChange={(v) => {
-        if (!v) onCancel();
-      }}
-    >
-      <AlertDialogContent>
+    <AlertDialog open={open} onOpenChange={() => {}}>
+      <AlertDialogContent onEscapeKeyDown={onCancel}>
         <AlertDialogHeader>
           <AlertDialogTitle>¿Descartar cambios?</AlertDialogTitle>
           <AlertDialogDescription>Los cambios no guardados se perderán.</AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>Seguir editando</AlertDialogCancel>
+          <AlertDialogCancel onClick={onCancel}>Seguir editando</AlertDialogCancel>
           <AlertDialogAction variant="destructive" onClick={onDiscard}>
             Descartar
           </AlertDialogAction>
