@@ -17,3 +17,20 @@ export function updateContentBlock(id: string, payload: UpdateContentBlockReques
     data: payload,
   });
 }
+
+interface UploadImageResponse {
+  url: string;
+  key: string;
+  contentKey: string;
+}
+
+export function uploadContentBlockImage(contentKey: string, image: File) {
+  const data = new FormData();
+  data.append('image', image);
+  return request<UploadImageResponse>({
+    method: 'POST',
+    url: '/uploads/images',
+    params: { contentKey },
+    data,
+  });
+}

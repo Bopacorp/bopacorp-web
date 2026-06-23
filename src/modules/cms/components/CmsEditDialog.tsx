@@ -10,14 +10,17 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog.js';
 import { Field, FieldGroup, FieldLabel } from '@/components/ui/field.js';
-import { Input } from '@/components/ui/input.js';
 import { Textarea } from '@/components/ui/textarea.js';
+import { CmsImageUploadField } from './CmsImageUploadField.js';
 
 interface CmsEditDialogProps {
   block: ContentBlockResponse | null;
   body: string;
+  file: File | null;
   saving: boolean;
+  imageError?: string;
   onBodyChange: (value: string) => void;
+  onFileChange: (file: File | null) => void;
   onSave: () => void;
   onCancel: () => void;
 }
@@ -44,29 +47,35 @@ function isVisualBlock(type: ContentBlockResponse['contentType'] | undefined) {
   return type?.code === 'IMAGE' || type?.code === 'BANNER';
 }
 
-function ImagePreview({ url }: { url: string }) {
-  return (
-    <img
-      src={url}
-      alt="Vista previa"
-      className="mt-3 h-40 w-auto rounded-md border border-border object-cover"
-    />
-  );
-}
-
 interface BodyFieldProps {
   block: ContentBlockResponse | null;
   body: string;
+  file: File | null;
+  imageError?: string;
   onBodyChange: (value: string) => void;
+  onFileChange: (file: File | null) => void;
+  disabled?: boolean;
 }
 
-function BodyField({ block, body, onBodyChange }: BodyFieldProps) {
+function BodyField({
+  block,
+  body,
+  file,
+  imageError,
+  onBodyChange,
+  onFileChange,
+  disabled,
+}: BodyFieldProps) {
   if (isVisualBlock(block?.contentType)) {
     return (
-      <>
-        <Input id="edit-body" value={body} onChange={(e) => onBodyChange(e.target.value)} />
-        {body && <ImagePreview url={body} />}
-      </>
+      <CmsImageUploadField
+        id="edit-image"
+        currentUrl={body || null}
+        file={file}
+        onChange={onFileChange}
+        disabled={disabled}
+        error={imageError}
+      />
     );
   }
 
@@ -84,11 +93,16 @@ function BodyField({ block, body, onBodyChange }: BodyFieldProps) {
 export function CmsEditDialog({
   block,
   body,
+  file,
   saving,
+  imageError,
   onBodyChange,
+  onFileChange,
   onSave,
   onCancel,
 }: CmsEditDialogProps) {
+  const visual = isVisualBlock(block?.contentType);
+
   return (
     <Dialog
       open={!!block}
@@ -110,19 +124,29 @@ export function CmsEditDialog({
             <FieldLabel htmlFor="edit-body" className="sr-only">
               Contenido
             </FieldLabel>
-            <BodyField block={block} body={body} onBodyChange={onBodyChange} />
+            <BodyField
+              block={block}
+              body={body}
+              file={file}
+              imageError={imageError}
+              onBodyChange={onBodyChange}
+              onFileChange={onFileChange}
+              disabled={saving}
+            />
           </Field>
         </FieldGroup>
 
-        <div className="flex items-center justify-between -mt-2 px-1">
-          <CharacterCount body={body} />
-        </div>
+        {!visual && (
+          <div className="flex items-center justify-between -mt-2 px-1">
+            <CharacterCount body={body} />
+          </div>
+        )}
 
         <DialogFooter>
           <Button variant="outline" onClick={onCancel} disabled={saving}>
             Cancelar
           </Button>
-          <Button onClick={onSave} disabled={saving}>
+          <Button onClick={onSave} disabled={saving || (visual && !file) || !!imageError}>
             {saving ? 'Guardando…' : 'Guardar cambios'}
             <ArrowRight data-icon="inline-end" />
           </Button>
