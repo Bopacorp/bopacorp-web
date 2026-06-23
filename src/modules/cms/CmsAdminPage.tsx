@@ -13,7 +13,7 @@ import {
 } from '@/components/ui/pagination.js';
 import { ApiError } from '@/services/api.js';
 import { ErrorState, PageLoader } from '@/shared/ui';
-import { updateContentBlock } from './cms.service.js';
+import { updateContentBlock, uploadContentBlockImage } from './cms.service.js';
 import { CmsArchiveEmpty } from './components/CmsArchiveEmpty.js';
 import { CmsEditDialog } from './components/CmsEditDialog.js';
 import { CmsMasthead } from './components/CmsMasthead.js';
@@ -31,6 +31,21 @@ function updateBlock(prev: ContentBlockResponse[], id: string, updated: ContentB
   return prev.map((block) => (block.id === id ? updated : block));
 }
 
+function isVisualBlock(type: ContentBlockResponse['contentType'] | undefined) {
+  return type?.code === 'IMAGE' || type?.code === 'BANNER';
+}
+
+function validateImageFile(file: File): string | null {
+  const allowed = ['image/png', 'image/jpeg', 'image/webp', 'image/avif'];
+  if (!allowed.includes(file.type)) {
+    return 'Formato no válido. Usa JPG, PNG, WebP o AVIF.';
+  }
+  if (file.size > 5 * 1024 * 1024) {
+    return 'La imagen debe pesar menos de 5 MB.';
+  }
+  return null;
+}
+
 async function persistEdit(
   block: ContentBlockResponse,
   body: string,
@@ -40,6 +55,18 @@ async function persistEdit(
   const updated = await updateContentBlock(block.id, { body });
   setBlocks((prev) => updateBlock(prev, block.id, updated));
   toast.success('Bloque actualizado');
+  onDone();
+}
+
+async function persistImageEdit(
+  block: ContentBlockResponse,
+  file: File,
+  refresh: () => Promise<void>,
+  onDone: () => void,
+) {
+  await uploadContentBlockImage(block.contentKey, file);
+  await refresh();
+  toast.success('Imagen actualizada');
   onDone();
 }
 
@@ -74,14 +101,14 @@ function getPageNumbers(current: number, total: number) {
 export function CmsPage() {
   const [editingBlock, setEditingBlock] = useState<ContentBlockResponse | null>(null);
   const [editBody, setEditBody] = useState('');
+  const [editFile, setEditFile] = useState<File | null>(null);
+  const [imageError, setImageError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [rawSearchQuery, setSearchQuery] = useState('');
   const [debouncedQuery] = useDebounce(rawSearchQuery, 300);
   const [page, setPage] = useState(1);
-  const { contentBlocks, meta, loading, error, retry, setContentBlocks } = useContentBlocks(
-    page,
-    debouncedQuery,
-  );
+  const { contentBlocks, meta, loading, error, retry, refresh, setContentBlocks } =
+    useContentBlocks(page, debouncedQuery);
 
   const filteredBlocks = useMemo(() => {
     if (!rawSearchQuery.trim()) return contentBlocks;
@@ -118,25 +145,51 @@ export function CmsPage() {
   const openEdit = useCallback((block: ContentBlockResponse) => {
     setEditingBlock(block);
     setEditBody(block.body ?? '');
+    setEditFile(null);
+    setImageError(null);
   }, []);
 
   const closeEdit = useCallback(() => {
     setEditingBlock(null);
     setEditBody('');
+    setEditFile(null);
+    setImageError(null);
     setSaving(false);
+  }, []);
+
+  const handleFileChange = useCallback((file: File | null) => {
+    if (!file) {
+      setEditFile(null);
+      setImageError(null);
+      return;
+    }
+
+    const error = validateImageFile(file);
+    if (error) {
+      setEditFile(null);
+      setImageError(error);
+      return;
+    }
+
+    setEditFile(file);
+    setImageError(null);
   }, []);
 
   const saveEdit = useCallback(async () => {
     if (!editingBlock) return;
     setSaving(true);
     try {
-      await persistEdit(editingBlock, editBody, setContentBlocks, closeEdit);
+      if (isVisualBlock(editingBlock.contentType) && editFile) {
+        await persistImageEdit(editingBlock, editFile, refresh, closeEdit);
+      } else {
+        await persistEdit(editingBlock, editBody, setContentBlocks, closeEdit);
+      }
     } catch (err) {
       toast.error(getErrorMessage(err));
     } finally {
       setSaving(false);
     }
-  }, [editingBlock, editBody, closeEdit, setContentBlocks]);
+  }, [editingBlock, editBody, editFile, refresh, closeEdit, setContentBlocks]);
 
   if (loading) return <PageLoader />;
   if (error) return <ErrorState message={error} onRetry={retry} />;
@@ -218,8 +271,11 @@ export function CmsPage() {
       <CmsEditDialog
         block={editingBlock}
         body={editBody}
+        file={editFile}
         saving={saving}
+        imageError={imageError ?? undefined}
         onBodyChange={setEditBody}
+        onFileChange={handleFileChange}
         onSave={saveEdit}
         onCancel={closeEdit}
       />

@@ -52,6 +52,17 @@ async function loadBlocks(
   }
 }
 
+async function refreshBlocks(
+  page: number,
+  query: string,
+  setContentBlocks: React.Dispatch<React.SetStateAction<ContentBlockResponse[]>>,
+  setMeta: React.Dispatch<React.SetStateAction<PaginationMeta | null>>,
+) {
+  const { data, meta } = await listContentBlocks(page, query);
+  setContentBlocks(data);
+  setMeta(meta);
+}
+
 export function useContentBlocks(page: number, query: string) {
   const [contentBlocks, setContentBlocks] = useState<ContentBlockResponse[]>([]);
   const [meta, setMeta] = useState<PaginationMeta | null>(null);
@@ -74,5 +85,9 @@ export function useContentBlocks(page: number, query: string) {
     setRetryCount((n) => n + 1);
   }, []);
 
-  return { contentBlocks, meta, loading, error, retry, setContentBlocks };
+  const refresh = useCallback(async () => {
+    await refreshBlocks(page, query, setContentBlocks, setMeta);
+  }, [page, query]);
+
+  return { contentBlocks, meta, loading, error, retry, refresh, setContentBlocks };
 }
