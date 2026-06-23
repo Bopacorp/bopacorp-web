@@ -99,9 +99,6 @@ export function CmsImageUploadField({
                 ? 'Haz clic para cambiar la imagen'
                 : 'Haz clic para seleccionar una imagen'}
           </span>
-          <span className="text-xs text-muted-foreground">
-            {file ? 'Se subirá al guardar' : 'Arrastra o selecciona un archivo'}
-          </span>
         </span>
 
         <Input
