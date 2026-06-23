@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button.js';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card.js';
 import { Field, FieldError, FieldGroup, FieldLabel } from '@/components/ui/field.js';
 import { Input } from '@/components/ui/input.js';
+import { hasAnyAdminRole } from '@/modules/auth/constants.js';
 import { FormAlert } from '@/shared/ui/FormAlert.js';
 import { ModeToggle } from '@/shared/ui/ModeToggle.js';
 import { useAuth } from '../context/AuthContext.js';
@@ -17,7 +18,7 @@ import { useAuth } from '../context/AuthContext.js';
 type LoginFormValues = z.input<typeof LoginRequestSchema>;
 
 export default function LoginPage() {
-  const { login } = useAuth();
+  const { login, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const from = (location.state as { from?: string })?.from || '/admin';
@@ -42,7 +43,12 @@ export default function LoginPage() {
   const onSubmit = async (values: LoginFormValues) => {
     setAuthError(null);
     try {
-      await login({ email: values.email, password: values.password });
+      const user = await login({ email: values.email, password: values.password });
+      if (!hasAnyAdminRole(user.roles)) {
+        await logout();
+        setAuthError('No tienes permisos para acceder al panel de administración.');
+        return;
+      }
       toast.success('Sesión iniciada');
       navigate(from, { replace: true });
     } catch (err) {
