@@ -3,6 +3,7 @@ import AdminLayout from '@/app/AdminLayout.js';
 import MainLayout from '@/app/MainLayout.js';
 import { ScrollToTop } from '@/components/ScrollToTop.js';
 import { PermissionRoute } from '@/modules/admin/components/PermissionRoute.js';
+import RequireAdminRole from '@/modules/auth/components/RequireAdminRole.js';
 import RequireAuth from '@/modules/auth/components/RequireAuth.js';
 import LoginPage from '@/modules/auth/pages/LoginPage.js';
 import { CmsPage } from '@/modules/cms/CmsAdminPage.js';
@@ -35,7 +36,9 @@ export default function App() {
           path="/admin"
           element={
             <RequireAuth>
-              <AdminLayout />
+              <RequireAdminRole>
+                <AdminLayout />
+              </RequireAdminRole>
             </RequireAuth>
           }
         >

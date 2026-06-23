@@ -14,9 +14,10 @@ import {
 interface AuthState {
   user: AuthUser | null;
   isLoading: boolean;
-  login: (data: { email: string; password: string }) => Promise<void>;
+  login: (data: { email: string; password: string }) => Promise<AuthUser>;
   logout: () => Promise<void>;
   hasPermission: (permission: string) => boolean;
+  hasRole: (role: string) => boolean;
 }
 
 const AuthContext = createContext<AuthState | null>(null);
@@ -87,6 +88,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     saveTokens(response.tokens);
     saveUser(response.user);
     setUser(response.user);
+    return response.user;
   }, []);
 
   const logout = useCallback(async () => {
@@ -107,8 +109,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     [user],
   );
 
+  const hasRole = useCallback((role: string) => user?.roles.includes(role) ?? false, [user]);
+
   return (
-    <AuthContext.Provider value={{ user, isLoading, login, logout, hasPermission }}>
+    <AuthContext.Provider value={{ user, isLoading, login, logout, hasPermission, hasRole }}>
       {children}
     </AuthContext.Provider>
   );
