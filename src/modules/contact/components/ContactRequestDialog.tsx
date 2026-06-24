@@ -134,6 +134,7 @@ export function ContactRequestDialog({
                   id="contact-name"
                   placeholder="Juan Perez"
                   autoComplete="name"
+                  maxLength={50}
                   disabled={submitting}
                   {...form.register('clientName')}
                 />
@@ -149,6 +150,7 @@ export function ContactRequestDialog({
                   type="email"
                   placeholder="tu@empresa.com.ec"
                   autoComplete="email"
+                  maxLength={150}
                   disabled={submitting}
                   {...form.register('clientEmail')}
                 />
@@ -180,6 +182,7 @@ export function ContactRequestDialog({
                 <Textarea
                   id="contact-message"
                   rows={4}
+                  maxLength={1000}
                   placeholder="Cuentanos que necesitas para tu empresa"
                   disabled={submitting}
                   {...form.register('message')}

@@ -83,6 +83,7 @@ function BodyField({
     <Textarea
       id="edit-body"
       className="min-h-72"
+      maxLength={10000}
       value={body}
       onChange={(e) => onBodyChange(e.target.value)}
       rows={12}

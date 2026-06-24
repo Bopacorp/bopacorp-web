@@ -78,6 +78,7 @@ export default function LoginPage() {
                   type="email"
                   placeholder="usuario@bopacorp.com"
                   autoComplete="email"
+                  maxLength={150}
                   disabled={form.formState.isSubmitting}
                   {...form.register('email')}
                 />

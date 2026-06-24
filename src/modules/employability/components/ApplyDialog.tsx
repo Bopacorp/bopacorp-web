@@ -159,6 +159,7 @@ export function ApplyDialog({ open, onOpenChange, vacancy, onSuccess }: ApplyDia
                   id="apply-national-id"
                   inputMode="numeric"
                   placeholder="1712345678"
+                  maxLength={10}
                   disabled={submitting}
                   {...form.register('nationalId')}
                 />
@@ -248,6 +249,7 @@ export function ApplyDialog({ open, onOpenChange, vacancy, onSuccess }: ApplyDia
                 <Textarea
                   id="apply-cover-letter"
                   rows={4}
+                  maxLength={2000}
                   placeholder="Cuentanos por que te interesa este rol"
                   disabled={submitting}
                   {...form.register('coverLetter')}
