@@ -12,9 +12,9 @@ import { ModeToggle } from '@/shared/ui/ModeToggle';
 
 const NAV_LINKS = [
   { to: '/', label: 'Inicio' },
-  { to: '/services', label: 'Servicios' },
-  { to: '/about', label: 'Nosotros' },
-  { to: '/jobs', label: 'Trabaja con nosotros' },
+  { to: '/servicios', label: 'Servicios' },
+  { to: '/nosotros', label: 'Nosotros' },
+  { to: '/empleos', label: 'Trabaja con nosotros' },
 ] as const;
 
 export default function MainLayout() {
@@ -32,7 +32,7 @@ function MainLayoutInner() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const location = useLocation();
 
-  const isDarkFooter = !['/', '/services'].includes(location.pathname);
+  const isDarkFooter = !['/', '/servicios'].includes(location.pathname);
 
   const textHeading = isDarkFooter ? 'text-white' : 'text-foreground';
   const textMuted = isDarkFooter ? 'text-white/60' : 'text-muted-foreground';
@@ -177,22 +177,22 @@ function MainLayoutInner() {
             <div className="flex flex-col gap-3 w-full">
               <div className="flex flex-col gap-3 w-full">
                 <Link
-                  to="/services"
+                  to="/servicios?categoria=conectividad"
                   className={cn('text-sm transition-colors font-normal w-full', textLink)}
                 >
                   Conectividad Empresarial
                 </Link>
                 <Link
-                  to="/services"
+                  to="/servicios?categoria=voz"
                   className={cn('text-sm transition-colors font-normal w-full', textLink)}
                 >
                   Planes Corporativos Tigo
                 </Link>
                 <Link
-                  to="/services"
+                  to="/servicios?categoria=servicios-digitales"
                   className={cn('text-sm transition-colors font-normal w-full', textLink)}
                 >
-                  Equipos y Soluciones de Voz
+                  Servicios Digitales
                 </Link>
               </div>
             </div>
@@ -235,13 +235,13 @@ function MainLayoutInner() {
           </span>
           <div className="flex items-center gap-6">
             <Link
-              to="/terms"
+              to="/terminos"
               className={cn('text-xs transition-colors font-normal', textBottomLink)}
             >
               Términos y Condiciones
             </Link>
             <Link
-              to="/privacy"
+              to="/privacidad"
               className={cn('text-xs transition-colors font-normal', textBottomLink)}
             >
               Políticas de Privacidad

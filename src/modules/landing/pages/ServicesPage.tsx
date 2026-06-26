@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import type { ComponentType } from 'react';
 import { useEffect, useMemo, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardAction, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -122,15 +123,19 @@ function BeneficiosSection() {
   );
 }
 
-const DEFAULT_CATEGORY_NAME = 'Voz';
+const DEFAULT_CATEGORY_SLUG = 'voz';
 
 export default function ServicesPage() {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const categoriaParam = searchParams.get('categoria');
+  const categorySlug = categoriaParam ?? DEFAULT_CATEGORY_SLUG;
+
   const { categories } = usePublicCategories();
   const { segments } = usePublicSegments();
 
-  const defaultCategoryId = useMemo(
-    () => categories.find((c) => c.name === DEFAULT_CATEGORY_NAME)?.id,
-    [categories],
+  const categoryIdFromSlug = useMemo(
+    () => categories.find((c) => c.slug === categorySlug)?.id,
+    [categories, categorySlug],
   );
 
   const [categoryId, setCategoryId] = useState<string>();
@@ -139,34 +144,50 @@ export default function ServicesPage() {
   const [maxPrice, setMaxPrice] = useState<string>('');
 
   useEffect(() => {
-    if (!categoryId && defaultCategoryId) {
-      setCategoryId(defaultCategoryId);
+    if (categoryIdFromSlug) {
+      setCategoryId(categoryIdFromSlug);
     }
-  }, [defaultCategoryId, categoryId]);
+  }, [categoryIdFromSlug]);
+
+  function handleCategoryChange(id: string | undefined) {
+    setCategoryId(id);
+    const slug = categories.find((c) => c.id === id)?.slug;
+    if (slug && slug !== DEFAULT_CATEGORY_SLUG) {
+      setSearchParams({ categoria: slug }, { replace: true });
+    } else {
+      setSearchParams({}, { replace: true });
+    }
+  }
 
   const debouncedMinPrice = useDebouncedValue(minPrice);
   const debouncedMaxPrice = useDebouncedValue(maxPrice);
 
   const filters = useMemo<ListPublicCatalogQuery | undefined>(() => {
-    if (!categoryId) return undefined;
-    const f: ListPublicCatalogQuery = { categoryId };
+    if (!categoryId && !categorySlug) return undefined;
+    const f: ListPublicCatalogQuery = {};
+    if (categoryId) {
+      f.categoryId = categoryId;
+    } else {
+      f.categorySlug = categorySlug;
+    }
     if (segmentId) f.segmentId = segmentId;
     if (debouncedMinPrice) f.minPrice = Number(debouncedMinPrice);
     if (debouncedMaxPrice) f.maxPrice = Number(debouncedMaxPrice);
     return f;
-  }, [categoryId, segmentId, debouncedMinPrice, debouncedMaxPrice]);
+  }, [categoryId, categorySlug, segmentId, debouncedMinPrice, debouncedMaxPrice]);
 
   const { items, loading, reloading, error, retry } = usePublicCatalogItems(filters);
 
   const hasFilters = Boolean(
-    (categoryId && categoryId !== defaultCategoryId) || segmentId || minPrice || maxPrice,
+    (categoryId && categoryId !== categoryIdFromSlug) || segmentId || minPrice || maxPrice,
   );
 
   function clearFilters() {
-    setCategoryId(defaultCategoryId);
+    setCategoryId(categoryIdFromSlug);
     setSegmentId(undefined);
     setMinPrice('');
     setMaxPrice('');
+    setSearchParams({}, { replace: true });
   }
 
   return (
@@ -193,7 +214,7 @@ export default function ServicesPage() {
         onRetry={retry}
         categories={categories}
         categoryId={categoryId}
-        onCategoryChange={setCategoryId}
+        onCategoryChange={handleCategoryChange}
         segments={segments}
         segmentId={segmentId}
         onSegmentChange={setSegmentId}
@@ -234,7 +255,7 @@ function PlansSection({
   error: boolean;
   items: ReturnType<typeof usePublicCatalogItems>['items'];
   onRetry: () => void;
-  categories: { id: string; name: string }[];
+  categories: { id: string; name: string; slug: string }[];
   categoryId: string | undefined;
   onCategoryChange: (v: string | undefined) => void;
   segments: { id: string; code: string; name: string }[];

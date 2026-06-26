@@ -193,7 +193,7 @@ function HeroSection({ hero, images }: { hero: CmsContent['hero']; images: CmsCo
             style={{ animationDelay: '220ms' }}
           >
             <Button asChild size="lg" className="h-12 rounded-md px-7 text-sm font-medium">
-              <Link to="/services">
+              <Link to="/servicios">
                 {hero.ctaPrimaryLabel}
                 <ArrowRight className="ml-2 size-4" />
               </Link>

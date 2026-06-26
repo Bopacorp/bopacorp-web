@@ -18,7 +18,7 @@ import { useAuth } from '../context/AuthContext.js';
 type LoginFormValues = z.input<typeof LoginRequestSchema>;
 
 export default function LoginPage() {
-  const { login, logout } = useAuth();
+  const { login } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const from = (location.state as { from?: string })?.from || '/admin';
@@ -43,12 +43,10 @@ export default function LoginPage() {
   const onSubmit = async (values: LoginFormValues) => {
     setAuthError(null);
     try {
-      const user = await login({ email: values.email, password: values.password });
-      if (!hasAnyAdminRole(user.roles)) {
-        await logout();
-        setAuthError('No tienes permisos para acceder al panel de administración.');
-        return;
-      }
+      await login(
+        { email: values.email, password: values.password },
+        { validate: (u) => hasAnyAdminRole(u.roles) },
+      );
       toast.success('Sesión iniciada');
       navigate(from, { replace: true });
     } catch (err) {

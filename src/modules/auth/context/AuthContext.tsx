@@ -14,7 +14,10 @@ import {
 interface AuthState {
   user: AuthUser | null;
   isLoading: boolean;
-  login: (data: { email: string; password: string }) => Promise<AuthUser>;
+  login: (
+    data: { email: string; password: string },
+    opts?: { validate?: (user: AuthUser) => boolean },
+  ) => Promise<AuthUser>;
   logout: () => Promise<void>;
   hasPermission: (permission: string) => boolean;
   hasRole: (role: string) => boolean;
@@ -83,13 +86,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => window.removeEventListener('bopacorp:token-refreshed', handleTokenRefresh);
   }, []);
 
-  const login = useCallback(async (data: { email: string; password: string }) => {
-    const response = await authService.login(data);
-    saveTokens(response.tokens);
-    saveUser(response.user);
-    setUser(response.user);
-    return response.user;
-  }, []);
+  const login = useCallback(
+    async (
+      data: { email: string; password: string },
+      opts?: { validate?: (user: AuthUser) => boolean },
+    ) => {
+      const response = await authService.login(data);
+      if (opts?.validate && !opts.validate(response.user)) {
+        throw new Error('No tienes permisos para acceder al panel de administración.');
+      }
+      saveTokens(response.tokens);
+      saveUser(response.user);
+      setUser(response.user);
+      return response.user;
+    },
+    [],
+  );
 
   const logout = useCallback(async () => {
     const refreshToken = getRefreshToken();
