@@ -51,15 +51,18 @@ export function usePublicCatalogItems(
     [categoryId, segmentId, minPrice, maxPrice],
   );
 
+  const enabled = filters !== undefined;
+
   // biome-ignore lint/correctness/useExhaustiveDependencies: retryCount is the intentional trigger for refetch
   useEffect(() => {
+    if (!enabled) return;
     setLoading(true);
     const state: CancelState = { cancelled: false };
     loadData(state);
     return () => {
       state.cancelled = true;
     };
-  }, [retryCount, loadData]);
+  }, [enabled, retryCount, loadData]);
 
   const retry = useCallback(() => {
     setLoading(true);
