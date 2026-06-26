@@ -1,18 +1,34 @@
+import type { ListPublicCatalogQuery } from '@bopacorp/shared';
 import {
   AlertCircle,
   Gift,
+  ListFilter,
   MessageCircle,
   Phone,
   Plane,
   RefreshCw,
   Share2,
   Smartphone,
+  X,
 } from 'lucide-react';
 import type { ComponentType } from 'react';
+import { useMemo, useState } from 'react';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
 import { PlanCard } from '@/modules/catalog/components/PlanCard.js';
 import { usePublicCatalogItems } from '@/modules/catalog/hooks/use-public-catalog-items.js';
+import { usePublicCategories } from '@/modules/catalog/hooks/use-public-categories.js';
+import { usePublicSegments } from '@/modules/catalog/hooks/use-public-segments.js';
 import { useContactDialog } from '@/modules/contact/index.js';
 import { ContourMotif } from '../components/decor.js';
 
@@ -103,7 +119,32 @@ function BeneficiosSection() {
 }
 
 export default function ServicesPage() {
-  const { items, loading, error, retry } = usePublicCatalogItems();
+  const [categoryId, setCategoryId] = useState<string>();
+  const [segmentId, setSegmentId] = useState<string>();
+  const [minPrice, setMinPrice] = useState<string>('');
+  const [maxPrice, setMaxPrice] = useState<string>('');
+
+  const filters = useMemo<ListPublicCatalogQuery>(() => {
+    const f: ListPublicCatalogQuery = {};
+    if (categoryId) f.categoryId = categoryId;
+    if (segmentId) f.segmentId = segmentId;
+    if (minPrice) f.minPrice = Number(minPrice);
+    if (maxPrice) f.maxPrice = Number(maxPrice);
+    return f;
+  }, [categoryId, segmentId, minPrice, maxPrice]);
+
+  const { items, loading, error, retry } = usePublicCatalogItems(filters);
+  const { categories } = usePublicCategories();
+  const { segments } = usePublicSegments();
+
+  const hasFilters = Boolean(categoryId || segmentId || minPrice || maxPrice);
+
+  function clearFilters() {
+    setCategoryId(undefined);
+    setSegmentId(undefined);
+    setMinPrice('');
+    setMaxPrice('');
+  }
 
   return (
     <div className="w-full flex flex-col font-sans">
@@ -121,10 +162,164 @@ export default function ServicesPage() {
 
       <BeneficiosSection />
 
+      <CatalogFilters
+        categories={categories}
+        categoryId={categoryId}
+        onCategoryChange={setCategoryId}
+        segments={segments}
+        segmentId={segmentId}
+        onSegmentChange={setSegmentId}
+        minPrice={minPrice}
+        onMinPriceChange={setMinPrice}
+        maxPrice={maxPrice}
+        onMaxPriceChange={setMaxPrice}
+        hasFilters={hasFilters}
+        onClear={clearFilters}
+        resultCount={items.length}
+        loading={loading}
+      />
+
       <PlansSection loading={loading} error={Boolean(error)} items={items} onRetry={retry} />
 
       <CtaSection />
     </div>
+  );
+}
+
+function CatalogFilters({
+  categories,
+  categoryId,
+  onCategoryChange,
+  segments,
+  segmentId,
+  onSegmentChange,
+  minPrice,
+  onMinPriceChange,
+  maxPrice,
+  onMaxPriceChange,
+  hasFilters,
+  onClear,
+  resultCount,
+  loading,
+}: {
+  categories: { id: string; name: string }[];
+  categoryId: string | undefined;
+  onCategoryChange: (v: string | undefined) => void;
+  segments: { id: string; code: string; name: string }[];
+  segmentId: string | undefined;
+  onSegmentChange: (v: string | undefined) => void;
+  minPrice: string;
+  onMinPriceChange: (v: string) => void;
+  maxPrice: string;
+  onMaxPriceChange: (v: string) => void;
+  hasFilters: boolean;
+  onClear: () => void;
+  resultCount: number;
+  loading: boolean;
+}) {
+  return (
+    <section className="w-full border-b border-border bg-background px-6 py-6">
+      <div className="mx-auto flex max-w-7xl flex-col gap-4">
+        <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+          <ListFilter className="size-4" />
+          <span>Filtrar servicios</span>
+          {hasFilters && !loading && (
+            <Badge variant="secondary" className="ml-1 tabular-nums">
+              {resultCount} {resultCount === 1 ? 'resultado' : 'resultados'}
+            </Badge>
+          )}
+        </div>
+
+        <div className="flex flex-wrap items-end gap-3">
+          <div className="flex w-full flex-col gap-1.5 sm:w-56">
+            <label htmlFor="filter-category" className="text-xs font-medium text-muted-foreground">
+              Categoría
+            </label>
+            <Select
+              value={categoryId ?? 'all'}
+              onValueChange={(v) => onCategoryChange(v === 'all' ? undefined : v)}
+            >
+              <SelectTrigger id="filter-category" className="h-10">
+                <SelectValue placeholder="Todas las categorías" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  <SelectItem value="all">Todas las categorías</SelectItem>
+                  {categories.map((c) => (
+                    <SelectItem key={c.id} value={c.id}>
+                      {c.name}
+                    </SelectItem>
+                  ))}
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="flex w-full flex-col gap-1.5 sm:w-56">
+            <label htmlFor="filter-segment" className="text-xs font-medium text-muted-foreground">
+              Segmento
+            </label>
+            <Select
+              value={segmentId ?? 'all'}
+              onValueChange={(v) => onSegmentChange(v === 'all' ? undefined : v)}
+            >
+              <SelectTrigger id="filter-segment" className="h-10">
+                <SelectValue placeholder="Todos los segmentos" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  <SelectItem value="all">Todos los segmentos</SelectItem>
+                  {segments.map((s) => (
+                    <SelectItem key={s.id} value={s.id}>
+                      {s.name}
+                    </SelectItem>
+                  ))}
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="flex w-full flex-col gap-1.5 sm:w-36">
+            <label htmlFor="filter-min" className="text-xs font-medium text-muted-foreground">
+              Precio mín. ($)
+            </label>
+            <Input
+              id="filter-min"
+              type="number"
+              min={0}
+              step="0.01"
+              placeholder="0.00"
+              value={minPrice}
+              onChange={(e) => onMinPriceChange(e.target.value)}
+              className="h-10 tabular-nums"
+            />
+          </div>
+
+          <div className="flex w-full flex-col gap-1.5 sm:w-36">
+            <label htmlFor="filter-max" className="text-xs font-medium text-muted-foreground">
+              Precio máx. ($)
+            </label>
+            <Input
+              id="filter-max"
+              type="number"
+              min={0}
+              step="0.01"
+              placeholder="999.99"
+              value={maxPrice}
+              onChange={(e) => onMaxPriceChange(e.target.value)}
+              className="h-10 tabular-nums"
+            />
+          </div>
+
+          {hasFilters && (
+            <Button variant="ghost" size="sm" onClick={onClear} className="h-10 gap-1.5">
+              <X className="size-3.5" />
+              Limpiar
+            </Button>
+          )}
+        </div>
+      </div>
+    </section>
   );
 }
 

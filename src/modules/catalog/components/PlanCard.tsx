@@ -1,8 +1,8 @@
+import type { PublicCatalogItemResponse } from '@bopacorp/shared';
 import { Globe, MessageCircle, Phone, Plane, Share2, Smartphone } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { useContactDialog } from '@/modules/contact/index.js';
-import type { PublicCatalogItem } from '../catalog.types.js';
 
 const WHATSAPP_NUMBER = '593912345678';
 
@@ -15,7 +15,7 @@ const HEADER_CLASSES = [
 ];
 
 interface PlanCardProps {
-  item: PublicCatalogItem;
+  item: PublicCatalogItemResponse;
   index: number;
 }
 
@@ -97,7 +97,7 @@ interface BenefitEntry {
   icon: typeof Globe;
 }
 
-function buildBenefits(item: PublicCatalogItem): BenefitEntry[] {
+function buildBenefits(item: PublicCatalogItemResponse): BenefitEntry[] {
   const voice = item.voiceDetails;
   if (!voice) return [];
   const entries: BenefitEntry[] = [];
@@ -155,7 +155,7 @@ function formatPrice(price: number): string {
   return price.toFixed(2);
 }
 
-function buildWhatsappUrl(item: PublicCatalogItem): string {
+function buildWhatsappUrl(item: PublicCatalogItemResponse): string {
   const message = `Hola, estoy interesado en el plan ${item.name} ($${formatPrice(item.price)}/mes). Quisiera más información.`;
   return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
 }
