@@ -10,7 +10,10 @@ import { Button } from '@/components/ui/button.js';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card.js';
 import { Field, FieldError, FieldGroup, FieldLabel } from '@/components/ui/field.js';
 import { Input } from '@/components/ui/input.js';
+import { PasswordInput } from '@/components/ui/password-input.js';
 import { hasAnyAdminRole } from '@/modules/auth/constants.js';
+import { LOGIN_ERRORS } from '@/shared/errors/auth.js';
+import { getErrorMessage } from '@/shared/errors/index.js';
 import { FormAlert } from '@/shared/ui/FormAlert.js';
 import { ModeToggle } from '@/shared/ui/ModeToggle.js';
 import { useAuth } from '../context/AuthContext.js';
@@ -50,7 +53,7 @@ export default function LoginPage() {
       toast.success('Sesión iniciada');
       navigate(from, { replace: true });
     } catch (err) {
-      setAuthError(err instanceof Error ? err.message : 'Error al iniciar sesión');
+      setAuthError(getErrorMessage(err, LOGIN_ERRORS));
     }
   };
 
@@ -62,7 +65,7 @@ export default function LoginPage() {
       <Card className="w-full max-w-sm">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl font-bold tracking-tight">BOPACORP</CardTitle>
-          <CardDescription>Iniciar sesión en BOPADIGITAL</CardDescription>
+          <CardDescription>Iniciar sesión</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-4" noValidate>
@@ -87,9 +90,8 @@ export default function LoginPage() {
 
               <Field data-invalid={form.formState.errors.password ? true : undefined}>
                 <FieldLabel htmlFor="password">Contraseña</FieldLabel>
-                <Input
+                <PasswordInput
                   id="password"
-                  type="password"
                   placeholder="••••••••"
                   autoComplete="current-password"
                   disabled={form.formState.isSubmitting}
@@ -101,16 +103,20 @@ export default function LoginPage() {
               </Field>
             </FieldGroup>
 
-            <Button type="submit" disabled={form.formState.isSubmitting} className="w-full">
+            <Button
+              type="submit"
+              disabled={
+                form.formState.isSubmitting ||
+                (form.formState.isSubmitted && !form.formState.isValid)
+              }
+              className="w-full"
+            >
               {form.formState.isSubmitting && (
                 <Loader2 data-icon="inline-start" className="animate-spin" />
               )}
               Iniciar sesión
             </Button>
           </form>
-          <p className="mt-4 text-center text-xs text-muted-foreground">
-            Si no tienes cuenta, contacta al administrador del sistema.
-          </p>
         </CardContent>
       </Card>
     </div>

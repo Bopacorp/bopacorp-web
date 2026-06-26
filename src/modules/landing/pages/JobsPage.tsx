@@ -1,7 +1,8 @@
 import type { ListJobVacanciesQuery } from '@bopacorp/shared/employability';
-import { BriefcaseBusiness, CheckCircle2, Send, Upload } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import { BriefcaseBusiness, CheckCircle2, Loader2, Send, Upload } from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import type { ApplyJobVacancyResponse, JobVacancyListItemResponse } from '@/modules/employability';
 import {
@@ -18,24 +19,40 @@ import {
 import { BlueprintGrid } from '@/modules/landing/components/decor.js';
 import { ErrorState } from '@/shared/ui';
 
-const LIST_QUERY: ListJobVacanciesQuery = {
-  page: 1,
-  limit: 20,
+const BASE_QUERY: Omit<ListJobVacanciesQuery, 'page'> = {
+  limit: 10,
   sortBy: 'createdAt',
   sortOrder: 'desc',
 };
 
 export default function JobsPage() {
-  const { vacancies, loading, error, retry } = usePublishedVacancies(LIST_QUERY);
+  const [page, setPage] = useState(1);
+  const query = useMemo<ListJobVacanciesQuery>(() => ({ ...BASE_QUERY, page }), [page]);
+  const { vacancies, meta, loading, error, retry } = usePublishedVacancies(query);
+  const [accumulated, setAccumulated] = useState<JobVacancyListItemResponse[]>([]);
   const [activeVacancyId, setActiveVacancyId] = useState<string | null>(null);
   const [applyOpen, setApplyOpen] = useState(false);
   const [successOpen, setSuccessOpen] = useState(false);
   const [successResponse, setSuccessResponse] = useState<ApplyJobVacancyResponse | null>(null);
 
+  useEffect(() => {
+    if (loading || vacancies.length === 0) return;
+    setAccumulated((prev) => {
+      if (page === 1) return vacancies;
+      const existingIds = new Set(prev.map((v) => v.id));
+      const fresh = vacancies.filter((v) => !existingIds.has(v.id));
+      return [...prev, ...fresh];
+    });
+  }, [vacancies, page, loading]);
+
+  const initialLoading = loading && accumulated.length === 0;
+  const loadingMore = loading && accumulated.length > 0;
+  const hasMore = meta ? page < meta.totalPages : false;
+
   const activeListItem = useMemo<JobVacancyListItemResponse | null>(() => {
     if (!activeVacancyId) return null;
-    return vacancies.find((vacancy) => vacancy.id === activeVacancyId) ?? null;
-  }, [vacancies, activeVacancyId]);
+    return accumulated.find((vacancy) => vacancy.id === activeVacancyId) ?? null;
+  }, [accumulated, activeVacancyId]);
 
   const {
     vacancy: activeDetail,
@@ -132,19 +149,24 @@ export default function JobsPage() {
               <p className="text-sm text-muted-foreground">
                 Selecciona una vacante para ver los detalles y postularte.
               </p>
+              {meta && meta.totalItems > 0 && (
+                <p className="text-xs text-muted-foreground">
+                  Mostrando {accumulated.length} de {meta.totalItems}
+                </p>
+              )}
             </div>
 
-            {loading && <VacanciesSkeleton />}
+            {initialLoading && <VacanciesSkeleton />}
 
             {!loading && error && (
               <ErrorState message={error.message} code={error.code} onRetry={retry} />
             )}
 
-            {!loading && !error && vacancies.length === 0 && <VacanciesEmpty />}
+            {!initialLoading && !error && accumulated.length === 0 && <VacanciesEmpty />}
 
-            {!loading && !error && vacancies.length > 0 && (
+            {accumulated.length > 0 && (
               <div className="flex flex-col gap-3">
-                {vacancies.map((vacancy) => (
+                {accumulated.map((vacancy) => (
                   <VacancyCard
                     key={vacancy.id}
                     vacancy={vacancy}
@@ -153,6 +175,19 @@ export default function JobsPage() {
                     onSelect={() => handleSelect(vacancy)}
                   />
                 ))}
+                {hasMore && (
+                  <Button
+                    variant="outline"
+                    onClick={() => setPage((p) => p + 1)}
+                    disabled={loadingMore}
+                    className="w-full"
+                  >
+                    {loadingMore ? (
+                      <Loader2 className="animate-spin" data-icon="inline-start" />
+                    ) : null}
+                    {loadingMore ? 'Cargando...' : 'Cargar más vacantes'}
+                  </Button>
+                )}
               </div>
             )}
           </div>

@@ -1,14 +1,8 @@
 import type { ContentBlockResponse } from '@bopacorp/shared/catalog';
 import type { PaginationMeta } from '@bopacorp/shared/common';
 import { useCallback, useEffect, useState } from 'react';
-import { ApiError } from '@/services/api.js';
+import { getErrorMessage } from '@/shared/errors/index.js';
 import { listContentBlocks } from './cms.service.js';
-
-function getErrorMessage(err: unknown) {
-  if (err instanceof ApiError) return err.message;
-  if (err instanceof Error) return err.message;
-  return 'Error desconocido';
-}
 
 function saveBlocks(
   data: ContentBlockResponse[],

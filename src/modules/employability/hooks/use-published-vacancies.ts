@@ -4,8 +4,8 @@ import type {
   ListJobVacanciesQuery,
 } from '@bopacorp/shared/employability';
 import { useCallback, useEffect, useState } from 'react';
+import { getErrorMessage } from '@/shared/errors/index.js';
 import { listPublishedVacancies } from '../employability.service.js';
-import { getErrorMessage } from '../lib/error-message.js';
 
 interface CancelState {
   cancelled: boolean;

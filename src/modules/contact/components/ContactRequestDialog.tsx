@@ -205,7 +205,7 @@ export function ContactRequestDialog({
               </Button>
               <Button
                 type="submit"
-                disabled={submitting}
+                disabled={submitting || (form.formState.isSubmitted && !form.formState.isValid)}
                 className="h-10 rounded-md px-6 text-sm font-medium"
               >
                 {submitting ? (

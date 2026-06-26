@@ -114,10 +114,20 @@ function injectAuthHeader(config: InternalAxiosRequestConfig) {
 
 type RetryConfig = InternalAxiosRequestConfig & { _retry?: boolean };
 
+function toApiError(error: AxiosError): ApiError | AxiosError {
+  const body = error.response?.data as
+    | { error?: { code: string; message: string; details?: unknown } }
+    | undefined;
+  if (body?.error) {
+    return new ApiError(body.error.code, body.error.message, normalizeDetails(body.error.details));
+  }
+  return error;
+}
+
 function handleResponseError(error: AxiosError) {
   const originalRequest = error.config as RetryConfig;
   if (isPublicPath(originalRequest?.url)) {
-    return Promise.reject(error);
+    return Promise.reject(toApiError(error));
   }
   if (!shouldRefresh(error, originalRequest)) {
     return Promise.reject(error);
@@ -204,6 +214,7 @@ function redirectToLogin() {
 
 function isPublicPath(url: string | undefined): boolean {
   if (!url) return false;
+  if (url.includes('/auth/login')) return true;
   if (url.includes('/employability/vacancies/published')) return true;
   if (url.includes('/employability/apply')) return true;
   if (/\/employability\/vacancies\/[^/?]+/.test(url)) return true;

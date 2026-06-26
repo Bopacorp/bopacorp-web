@@ -11,8 +11,9 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from '@/components/ui/pagination.js';
-import { ApiError } from '@/services/api.js';
-import { ErrorState, PageLoader } from '@/shared/ui';
+import { Skeleton } from '@/components/ui/skeleton.js';
+import { getErrorMessage } from '@/shared/errors/index.js';
+import { ErrorState } from '@/shared/ui';
 import { updateContentBlock, uploadContentBlockImage } from './cms.service.js';
 import { CmsArchiveEmpty } from './components/CmsArchiveEmpty.js';
 import { CmsEditDialog } from './components/CmsEditDialog.js';
@@ -20,12 +21,6 @@ import { CmsMasthead } from './components/CmsMasthead.js';
 import { CmsSearchBar } from './components/CmsSearchBar.js';
 import { CmsSection } from './components/CmsSection.js';
 import { useContentBlocks } from './useContentBlocks.js';
-
-function getErrorMessage(err: unknown) {
-  if (err instanceof ApiError) return err.message;
-  if (err instanceof Error) return err.message;
-  return 'Error al guardar';
-}
 
 function updateBlock(prev: ContentBlockResponse[], id: string, updated: ContentBlockResponse) {
   return prev.map((block) => (block.id === id ? updated : block));
@@ -96,6 +91,57 @@ function getPageNumbers(current: number, total: number) {
     pages.push(total);
   }
   return pages;
+}
+
+function CmsCardSkeleton() {
+  return (
+    <div className="flex flex-col gap-3 rounded-xl border border-border p-4">
+      <div className="flex items-center justify-between gap-2">
+        <Skeleton className="h-3 w-20" />
+        <Skeleton className="h-4 w-12 rounded-full" />
+      </div>
+      <Skeleton className="h-4 w-3/4" />
+      <Skeleton className="h-3 w-full" />
+      <Skeleton className="h-3 w-5/6" />
+      <div className="flex items-center justify-between gap-2 pt-1 mt-auto">
+        <Skeleton className="h-3 w-24" />
+        <Skeleton className="h-7 w-16 rounded-md" />
+      </div>
+    </div>
+  );
+}
+
+function CmsSectionSkeleton({ cards }: { cards: number }) {
+  return (
+    <div className="flex flex-col gap-3">
+      <div className="flex items-center gap-3 py-2">
+        <Skeleton className="size-4" />
+        <Skeleton className="h-4 w-20" />
+        <Skeleton className="h-4 w-6 rounded-full" />
+      </div>
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {Array.from({ length: cards }, (_, i) => (
+          // biome-ignore lint/suspicious/noArrayIndexKey: skeleton placeholders never reorder
+          <CmsCardSkeleton key={i} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function CmsPageSkeleton() {
+  return (
+    <div className="flex flex-col gap-6 p-6 md:p-8">
+      <div className="flex flex-col gap-1">
+        <Skeleton className="h-7 w-48" />
+        <Skeleton className="h-4 w-72" />
+      </div>
+      <Skeleton className="h-8 w-full max-w-sm rounded-lg" />
+      <CmsSectionSkeleton cards={3} />
+      <CmsSectionSkeleton cards={2} />
+      <CmsSectionSkeleton cards={3} />
+    </div>
+  );
 }
 
 export function CmsPage() {
@@ -191,7 +237,7 @@ export function CmsPage() {
     }
   }, [editingBlock, editBody, editFile, refresh, closeEdit, setContentBlocks]);
 
-  if (loading) return <PageLoader />;
+  if (loading) return <CmsPageSkeleton />;
   if (error) return <ErrorState message={error} onRetry={retry} />;
 
   return (
