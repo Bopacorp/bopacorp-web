@@ -1,6 +1,9 @@
 import { BlueprintGrid } from '../components/decor.js';
+import { useCmsLanding } from '../hooks/use-cms-landing.js';
 
 export default function PrivacyPage() {
+  const { blocks } = useCmsLanding();
+  const email = blocks?.['site.contact.email']?.body ?? 'contacto@bopacorp.com';
   return (
     <div className="w-full flex flex-col font-sans bg-background min-h-screen">
       {/* Hero Header Section */}
@@ -33,8 +36,8 @@ export default function PrivacyPage() {
             <p className="text-sm leading-relaxed text-muted-foreground">
               Para cualquier consulta sobre la protección de sus datos personales, puede escribirnos
               al correo electrónico:{' '}
-              <a href="mailto:contacto@bopacorp.com" className="text-primary hover:underline">
-                contacto@bopacorp.com
+              <a href={`mailto:${email}`} className="text-primary hover:underline">
+                {email}
               </a>
               .
             </p>
@@ -158,8 +161,8 @@ export default function PrivacyPage() {
             <p className="text-sm leading-relaxed text-muted-foreground">
               Para ejercer cualquiera de estos derechos, puede remitir una solicitud escrita firmada
               adjuntando copia de su documento de identidad a{' '}
-              <a href="mailto:contacto@bopacorp.com" className="text-primary hover:underline">
-                contacto@bopacorp.com
+              <a href={`mailto:${email}`} className="text-primary hover:underline">
+                {email}
               </a>
               .
             </p>

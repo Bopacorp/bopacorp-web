@@ -15,8 +15,9 @@ import {
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { useContactDialog } from '@/modules/contact/index.js';
+import { useCmsLanding } from '@/modules/landing/hooks/use-cms-landing.js';
 
-const WHATSAPP_NUMBER = '593912345678';
+const WHATSAPP_FALLBACK = '593912345678';
 
 const HEADER_CLASSES = [
   'bg-plan-1 text-white',
@@ -33,6 +34,8 @@ interface PlanCardProps {
 
 export function PlanCard({ item, index }: PlanCardProps) {
   const { openContactDialog } = useContactDialog();
+  const { blocks } = useCmsLanding();
+  const whatsappNumber = blocks?.['site.contact.whatsapp']?.body ?? WHATSAPP_FALLBACK;
   const headerClass = HEADER_CLASSES[index % HEADER_CLASSES.length] ?? HEADER_CLASSES[0];
   const highlight = buildHighlight(item);
   const benefits = buildBenefits(item);
@@ -87,7 +90,7 @@ export function PlanCard({ item, index }: PlanCardProps) {
             className="h-11 w-full rounded-md px-5 text-sm font-semibold"
           >
             <a
-              href={buildWhatsappUrl(item)}
+              href={buildWhatsappUrl(item, whatsappNumber)}
               target="_blank"
               rel="noopener noreferrer"
               className="gap-2"
@@ -241,7 +244,7 @@ function formatPrice(price: number): string {
   return price.toFixed(2);
 }
 
-function buildWhatsappUrl(item: PublicCatalogItemResponse): string {
+function buildWhatsappUrl(item: PublicCatalogItemResponse, number: string): string {
   const message = `Hola, estoy interesado en el servicio ${item.name} ($${formatPrice(item.price)}/mes). Quisiera más información.`;
-  return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
+  return `https://wa.me/${number}?text=${encodeURIComponent(message)}`;
 }

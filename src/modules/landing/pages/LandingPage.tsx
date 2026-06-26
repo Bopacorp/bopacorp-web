@@ -388,7 +388,7 @@ function CtaSection({ cta }: { cta: CmsContent['cta'] }) {
           <Button
             size="lg"
             variant="outline"
-            onClick={() => navigate('/services')}
+            onClick={() => navigate('/servicios')}
             className="h-12 w-full rounded-md border-white/30 bg-transparent px-8 text-sm font-medium text-white hover:bg-white/10 hover:text-white sm:w-auto"
           >
             {cta.secondaryLabel}

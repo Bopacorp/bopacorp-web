@@ -28,6 +28,10 @@ export default function MainLayout() {
 function MainLayoutInner() {
   const { blocks } = useCmsLanding();
   const logoUrl = blocks?.[CMS_IMAGE_KEYS.logo]?.body ?? logoFallback;
+  const phone = blocks?.['site.contact.phone']?.body ?? '0912345678';
+  const email = blocks?.['site.contact.email']?.body ?? 'contacto@bopacorp.com';
+  const address =
+    blocks?.['site.contact.address']?.body ?? 'Edificio Elite, Piso 3, Of. 308, Guayaquil';
   const { openContactDialog } = useContactDialog();
   const [mobileOpen, setMobileOpen] = useState(false);
   const location = useLocation();
@@ -201,23 +205,19 @@ function MainLayoutInner() {
             <h4 className={cn('text-sm font-semibold w-full', textHeading)}>CONTACTO</h4>
             <div className="flex flex-col gap-3 w-full">
               <div className={cn('flex items-center gap-2 text-sm font-normal w-full', textBody)}>
-                <MapPin className={cn('size-4 shrink-0', iconColor)} /> Edificio Elite, Piso 3, Of.
-                308, Guayaquil
+                <MapPin className={cn('size-4 shrink-0', iconColor)} /> {address}
               </div>
               <div className={cn('flex items-center gap-2 text-sm font-normal w-full', textBody)}>
                 <Phone className={cn('size-4 shrink-0', iconColor)} />
-                <a href="tel:0912345678" className={cn('transition-colors', textAnchor)}>
-                  0912345678
+                <a href={`tel:${phone}`} className={cn('transition-colors', textAnchor)}>
+                  {phone}
                 </a>
               </div>
               <div className={cn('flex items-start gap-2 text-sm font-normal w-full', textBody)}>
                 <Mail className={cn('size-4 shrink-0 mt-0.5', iconColor)} />
                 <div className="flex flex-col">
-                  <a
-                    href="mailto:contacto@bopacorp.com"
-                    className={cn('transition-colors', textAnchor)}
-                  >
-                    contacto@bopacorp.com
+                  <a href={`mailto:${email}`} className={cn('transition-colors', textAnchor)}>
+                    {email}
                   </a>
                 </div>
               </div>
