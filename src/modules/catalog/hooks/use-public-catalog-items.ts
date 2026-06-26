@@ -9,6 +9,7 @@ interface CancelState {
 export interface UsePublicCatalogItemsResult {
   items: PublicCatalogItemResponse[];
   loading: boolean;
+  reloading: boolean;
   error: string | null;
   retry: () => void;
 }
@@ -18,6 +19,7 @@ export function usePublicCatalogItems(
 ): UsePublicCatalogItemsResult {
   const [items, setItems] = useState<PublicCatalogItemResponse[]>([]);
   const [loading, setLoading] = useState(true);
+  const [fetched, setFetched] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [retryCount, setRetryCount] = useState(0);
 
@@ -40,6 +42,7 @@ export function usePublicCatalogItems(
         );
         if (state.cancelled) return;
         setItems(data);
+        setFetched(true);
         setError(null);
       } catch (err) {
         if (state.cancelled) return;
@@ -70,5 +73,5 @@ export function usePublicCatalogItems(
     setRetryCount((n) => n + 1);
   }, []);
 
-  return { items, loading, error, retry };
+  return { items, loading: loading && !fetched, reloading: loading && fetched, error, retry };
 }

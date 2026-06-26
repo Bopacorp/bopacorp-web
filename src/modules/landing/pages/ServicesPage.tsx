@@ -28,6 +28,7 @@ import {
 } from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useDebouncedValue } from '@/hooks/use-debounced-value.js';
+import { cn } from '@/lib/utils';
 import { PlanCard } from '@/modules/catalog/components/PlanCard.js';
 import { usePublicCatalogItems } from '@/modules/catalog/hooks/use-public-catalog-items.js';
 import { usePublicCategories } from '@/modules/catalog/hooks/use-public-categories.js';
@@ -155,7 +156,7 @@ export default function ServicesPage() {
     return f;
   }, [categoryId, segmentId, debouncedMinPrice, debouncedMaxPrice]);
 
-  const { items, loading, error, retry } = usePublicCatalogItems(filters);
+  const { items, loading, reloading, error, retry } = usePublicCatalogItems(filters);
 
   const hasFilters = Boolean(
     (categoryId && categoryId !== defaultCategoryId) || segmentId || minPrice || maxPrice,
@@ -186,6 +187,7 @@ export default function ServicesPage() {
 
       <PlansSection
         loading={loading}
+        reloading={reloading}
         error={Boolean(error)}
         items={items}
         onRetry={retry}
@@ -210,6 +212,7 @@ export default function ServicesPage() {
 
 function PlansSection({
   loading,
+  reloading,
   error,
   items,
   onRetry,
@@ -227,6 +230,7 @@ function PlansSection({
   onClear,
 }: {
   loading: boolean;
+  reloading: boolean;
   error: boolean;
   items: ReturnType<typeof usePublicCatalogItems>['items'];
   onRetry: () => void;
@@ -369,7 +373,14 @@ function PlansSection({
         ) : items.length === 0 ? (
           <PlansEmpty />
         ) : (
-          <PlansGrid items={items} />
+          <div
+            className={cn(
+              'transition-opacity duration-200',
+              reloading && 'pointer-events-none opacity-50',
+            )}
+          >
+            <PlansGrid items={items} />
+          </div>
         )}
       </div>
     </section>
