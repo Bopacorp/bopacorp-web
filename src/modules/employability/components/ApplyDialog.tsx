@@ -105,7 +105,7 @@ export function ApplyDialog({ open, onOpenChange, vacancy, onSuccess }: ApplyDia
         firstName: values.firstName.trim(),
         lastName: values.lastName.trim(),
         email: values.email.trim(),
-        phone: values.phone?.trim() || undefined,
+        phone: values.phone.trim(),
         address: values.address?.trim() || undefined,
       },
       coverLetter: values.coverLetter || '',
