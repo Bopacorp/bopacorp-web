@@ -1,6 +1,6 @@
 import { LoginRequestSchema } from '@bopacorp/shared/auth';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Loader2 } from 'lucide-react';
+import { Globe, Loader2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -22,7 +22,13 @@ import { useAuth } from '../context/AuthContext.js';
 type LoginFormValues = z.input<typeof LoginRequestSchema>;
 
 export default function LoginPage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+
+  const toggleLang = () => {
+    const next = i18n.language === 'es' ? 'en' : 'es';
+    i18n.changeLanguage(next);
+    localStorage.setItem('lang', next);
+  };
   const { login } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
@@ -61,7 +67,11 @@ export default function LoginPage() {
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background p-4">
-      <div className="fixed top-4 right-4">
+      <div className="fixed top-4 right-4 flex items-center gap-1">
+        <Button variant="ghost" size="icon" onClick={toggleLang}>
+          <Globe className="size-4" />
+          <span className="sr-only">{i18n.language === 'es' ? 'English' : 'Español'}</span>
+        </Button>
         <ModeToggle />
       </div>
       <Card className="w-full max-w-sm">
