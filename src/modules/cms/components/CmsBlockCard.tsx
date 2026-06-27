@@ -24,11 +24,8 @@ export function CmsBlockCard({ block, onEdit }: CmsBlockCardProps) {
   return (
     <div className="group flex flex-col gap-3 rounded-xl border border-border p-4 transition-colors hover:border-primary/50">
       <div className="flex items-center justify-between gap-2">
-        <span className="font-mono text-[10px] text-muted-foreground truncate">{keyLabel}</span>
-        <Badge
-          variant="outline"
-          className="font-mono text-[10px] uppercase tracking-wider shrink-0"
-        >
+        <span className="text-[10px] text-muted-foreground truncate">{keyLabel}</span>
+        <Badge variant="outline" className="text-[10px] uppercase tracking-wider shrink-0">
           {block.contentType?.code ?? '—'}
         </Badge>
       </div>
@@ -54,7 +51,7 @@ export function CmsBlockCard({ block, onEdit }: CmsBlockCardProps) {
       )}
 
       <div className="flex items-center justify-between gap-2 pt-1 mt-auto">
-        <span className="font-mono text-[10px] text-muted-foreground">{updated}</span>
+        <span className="text-[10px] text-muted-foreground">{updated}</span>
         <Button variant="outline" size="sm" onClick={() => onEdit(block)} className="h-7 text-xs">
           <Pencil data-icon="inline-start" />
           {t('cms.edit')}

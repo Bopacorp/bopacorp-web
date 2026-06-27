@@ -19,7 +19,7 @@ function LastEditText({ date }: { date: Date | null }) {
 function MetaLine({ count, lastUpdatedAt }: { count: number; lastUpdatedAt: Date | null }) {
   const { t } = useTranslation();
   return (
-    <p className="font-mono text-xs text-muted-foreground">
+    <p className="text-sm text-muted-foreground">
       {count} {count === 1 ? t('cms.entry') : t('cms.entries')}{' '}
       <LastEditText date={lastUpdatedAt} />
     </p>
@@ -31,7 +31,7 @@ export function CmsMasthead({ count, lastUpdatedAt }: CmsMastheadProps) {
   return (
     <div className="relative flex flex-col gap-6">
       <div className="flex flex-col gap-2">
-        <h2 className="font-display text-3xl font-semibold tracking-tighter text-foreground sm:text-4xl">
+        <h2 className="text-3xl font-semibold tracking-tighter text-foreground sm:text-4xl">
           {t('cms.title')}
         </h2>
         <MetaLine count={count} lastUpdatedAt={lastUpdatedAt} />

@@ -8,7 +8,9 @@ import { Skeleton } from '@/components/ui/skeleton.js';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs.js';
 import i18n from '@/i18n/index.js';
 import { getErrorMessage } from '@/shared/errors/index.js';
+import { useUnsavedGuard } from '@/shared/hooks/use-unsaved-guard.js';
 import { ErrorState } from '@/shared/ui';
+import { DiscardChangesDialog } from '@/shared/ui/discard-changes-dialog.js';
 import { updateContentBlock, uploadContentBlockImage } from './cms.service.js';
 import { CmsArchiveEmpty } from './components/CmsArchiveEmpty.js';
 import { CmsBlockCard } from './components/CmsBlockCard.js';
@@ -164,6 +166,9 @@ export function CmsPage() {
     setSaving(false);
   }, []);
 
+  const { guardedClose, handleDirtyChange, showDiscard, handleDiscard, cancelDiscard } =
+    useUnsavedGuard({ onClose: closeEdit });
+
   const handleFileChange = useCallback((file: File | null) => {
     if (!file) {
       setEditFile(null);
@@ -214,7 +219,7 @@ export function CmsPage() {
             return (
               <TabsTrigger key={s.prefix} value={s.prefix} className="gap-1.5">
                 {label}
-                <Badge variant="secondary" className="font-mono text-[10px] px-1.5 py-0">
+                <Badge variant="secondary" className="text-[10px] px-1.5 py-0">
                   {s.count}
                 </Badge>
               </TabsTrigger>
@@ -262,8 +267,11 @@ export function CmsPage() {
         onBodyChange={setEditBody}
         onFileChange={handleFileChange}
         onSave={saveEdit}
-        onCancel={closeEdit}
+        onCancel={guardedClose}
+        onDirtyChange={handleDirtyChange}
       />
+
+      <DiscardChangesDialog open={showDiscard} onCancel={cancelDiscard} onDiscard={handleDiscard} />
     </div>
   );
 }

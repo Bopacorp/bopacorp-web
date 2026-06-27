@@ -72,5 +72,9 @@
 
   "common.confirm": "Confirmar",
   "common.cancel": "Cancelar",
-  "common.processing": "Procesando..."
+  "common.processing": "Procesando...",
+  "common.discardChanges": "¿Descartar cambios?",
+  "common.discardChangesDesc": "Los cambios no guardados se perderán.",
+  "common.keepEditing": "Seguir editando",
+  "common.discard": "Descartar"
 }

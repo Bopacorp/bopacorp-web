@@ -1,5 +1,6 @@
 import type { ContentBlockResponse } from '@bopacorp/shared/catalog';
 import { ArrowRight } from 'lucide-react';
+import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button.js';
 import {
@@ -24,13 +25,14 @@ interface CmsEditDialogProps {
   onFileChange: (file: File | null) => void;
   onSave: () => void;
   onCancel: () => void;
+  onDirtyChange: (dirty: boolean) => void;
 }
 
 function DialogEyebrow({ block }: { block: ContentBlockResponse | null }) {
   if (!block) return null;
   const code = block.contentType?.code ?? '—';
   return (
-    <span className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+    <span className="text-[10px] uppercase tracking-wider text-muted-foreground">
       CONTENT TYPE · {code}
     </span>
   );
@@ -39,7 +41,7 @@ function DialogEyebrow({ block }: { block: ContentBlockResponse | null }) {
 function CharacterCount({ body }: { body: string }) {
   const { t } = useTranslation();
   return (
-    <span className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+    <span className="text-[10px] uppercase tracking-wider text-muted-foreground">
       {t('cms.characters', { count: body.length })}
     </span>
   );
@@ -103,9 +105,16 @@ export function CmsEditDialog({
   onFileChange,
   onSave,
   onCancel,
+  onDirtyChange,
 }: CmsEditDialogProps) {
   const { t } = useTranslation();
   const visual = isVisualBlock(block?.contentType);
+
+  useEffect(() => {
+    if (!block) return;
+    const isDirty = visual ? file !== null : body !== (block.body ?? '');
+    onDirtyChange(isDirty);
+  }, [block, body, file, visual, onDirtyChange]);
 
   return (
     <Dialog
@@ -117,7 +126,7 @@ export function CmsEditDialog({
       <DialogContent className="sm:max-w-2xl">
         <DialogHeader>
           <DialogEyebrow block={block} />
-          <DialogTitle className="font-display text-xl font-semibold tracking-tight">
+          <DialogTitle className="text-xl font-semibold tracking-tight">
             {t('cms.editContent')}
           </DialogTitle>
           <DialogDescription>

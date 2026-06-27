@@ -33,7 +33,7 @@ export function CmsSection({ prefix, blocks, onEdit }: CmsSectionProps) {
           className={`size-4 text-muted-foreground transition-transform ${open ? '' : '-rotate-90'}`}
         />
         <span className="text-sm font-semibold text-foreground">{label}</span>
-        <Badge variant="secondary" className="font-mono text-[10px]">
+        <Badge variant="secondary" className="text-[10px]">
           {blocks.length}
         </Badge>
       </CollapsibleTrigger>

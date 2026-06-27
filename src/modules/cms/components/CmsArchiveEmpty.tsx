@@ -15,12 +15,10 @@ export function CmsArchiveEmpty({ searchQuery }: CmsArchiveEmptyProps) {
     <div className="flex items-center justify-center py-20">
       <Empty>
         <EmptyHeader>
-          <span className="font-display text-7xl font-semibold text-muted-foreground/30 leading-none select-none">
+          <span className="text-7xl font-semibold text-muted-foreground/30 leading-none select-none">
             —
           </span>
-          <EmptyTitle className="font-display text-lg font-semibold tracking-tight">
-            {title}
-          </EmptyTitle>
+          <EmptyTitle className="text-lg font-semibold tracking-tight">{title}</EmptyTitle>
           <EmptyDescription>{description}</EmptyDescription>
         </EmptyHeader>
       </Empty>

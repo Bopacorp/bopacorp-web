@@ -26,7 +26,7 @@ function ResultCount({
   const { t } = useTranslation();
   if (!query) return null;
   return (
-    <span className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+    <span className="text-[10px] uppercase tracking-wider text-muted-foreground">
       {t('cms.showingResults', { resultCount, total })}
     </span>
   );

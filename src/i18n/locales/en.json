@@ -72,5 +72,9 @@
 
   "common.confirm": "Confirm",
   "common.cancel": "Cancel",
-  "common.processing": "Processing..."
+  "common.processing": "Processing...",
+  "common.discardChanges": "Discard changes?",
+  "common.discardChangesDesc": "Unsaved changes will be lost.",
+  "common.keepEditing": "Keep editing",
+  "common.discard": "Discard"
 }
