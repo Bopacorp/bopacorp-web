@@ -1,8 +1,13 @@
+import { resolveValidationMessage, es, en } from '@bopacorp/shared/i18n'
+import type { LocaleMessages } from '@bopacorp/shared/i18n'
 import { cva, type VariantProps } from 'class-variance-authority'
 import { useMemo } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Label } from '@/components/ui/label'
 import { Separator } from '@/components/ui/separator'
 import { cn } from '@/lib/utils'
+
+const validationLocales: Record<string, LocaleMessages> = { es, en }
 
 function FieldSet({ className, ...props }: React.ComponentProps<'fieldset'>) {
   return (
@@ -169,9 +174,14 @@ function FieldError({
 }: React.ComponentProps<'div'> & {
   errors?: Array<{ message?: string } | undefined>
 }) {
+  const { i18n } = useTranslation()
+  const locale = validationLocales[i18n.language] ?? es
+
+  const resolve = (msg: string) => resolveValidationMessage(msg, locale)
+
   const content = useMemo(() => {
     if (children) {
-      return children
+      return typeof children === 'string' ? resolve(children) : children
     }
 
     if (!errors?.length) {
@@ -181,15 +191,18 @@ function FieldError({
     const uniqueErrors = [...new Map(errors.map((error) => [error?.message, error])).values()]
 
     if (uniqueErrors?.length == 1) {
-      return uniqueErrors[0]?.message
+      return resolve(uniqueErrors[0]?.message ?? '')
     }
 
     return (
       <ul className="ml-4 flex list-disc flex-col gap-1">
-        {uniqueErrors.map((error, index) => error?.message && <li key={index}>{error.message}</li>)}
+        {uniqueErrors.map(
+          (error, index) => error?.message && <li key={index}>{resolve(error.message)}</li>,
+        )}
       </ul>
     )
-  }, [children, errors])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [children, errors, locale])
 
   if (!content) {
     return null
