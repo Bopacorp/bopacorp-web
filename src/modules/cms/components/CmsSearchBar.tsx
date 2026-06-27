@@ -1,4 +1,5 @@
 import { Search, X } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import {
   InputGroup,
   InputGroupAddon,
@@ -22,15 +23,17 @@ function ResultCount({
   total: number;
   query: string;
 }) {
+  const { t } = useTranslation();
   if (!query) return null;
   return (
     <span className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
-      mostrando {resultCount} de {total}
+      {t('cms.showingResults', { resultCount, total })}
     </span>
   );
 }
 
 export function CmsSearchBar({ value, onChange, resultCount, total }: CmsSearchBarProps) {
+  const { t } = useTranslation();
   return (
     <div className="flex items-center gap-3">
       <div className="flex-1">
@@ -40,7 +43,7 @@ export function CmsSearchBar({ value, onChange, resultCount, total }: CmsSearchB
           </InputGroupAddon>
           <InputGroupInput
             type="text"
-            placeholder="Buscar por título, contenido o tipo…"
+            placeholder={t('cms.searchPlaceholder')}
             value={value}
             onChange={(e) => onChange(e.target.value)}
           />
@@ -48,7 +51,7 @@ export function CmsSearchBar({ value, onChange, resultCount, total }: CmsSearchB
             <InputGroupAddon align="inline-end">
               <InputGroupButton
                 size="icon-xs"
-                aria-label="Limpiar búsqueda"
+                aria-label={t('cms.clearSearch')}
                 onClick={() => onChange('')}
               >
                 <X />

@@ -285,7 +285,7 @@ export function ApplyDialog({ open, onOpenChange, vacancy, onSuccess }: ApplyDia
               </Button>
               <Button
                 type="submit"
-                disabled={submitting}
+                disabled={submitting || (form.formState.isSubmitted && !form.formState.isValid)}
                 className="h-11 rounded-md px-6 text-sm font-medium"
               >
                 {submitting ? (

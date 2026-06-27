@@ -5,6 +5,7 @@ import { BrowserRouter } from 'react-router-dom';
 import { Toaster } from 'sonner';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { AuthProvider } from '@/modules/auth/context/AuthContext.js';
+import './i18n/index.js';
 import './index.css';
 import App from './App.tsx';
 

@@ -1,6 +1,10 @@
 import { BlueprintGrid } from '../components/decor.js';
+import { useCmsLanding } from '../hooks/use-cms-landing.js';
 
 export default function TermsPage() {
+  const { blocks } = useCmsLanding();
+  const email = blocks?.['site.contact.email']?.body ?? 'contacto@bopacorp.com';
+  const phone = blocks?.['site.contact.phone']?.body ?? '0912345678';
   return (
     <div className="w-full flex flex-col font-sans bg-background min-h-screen">
       {/* Hero Header Section */}
@@ -127,10 +131,10 @@ export default function TermsPage() {
             <h2 className="text-lg font-semibold text-foreground">Contacto comercial</h2>
             <p className="text-sm text-muted-foreground">
               Si tiene dudas sobre estos términos, contáctenos en{' '}
-              <a href="mailto:contacto@bopacorp.com" className="text-primary hover:underline">
-                contacto@bopacorp.com
+              <a href={`mailto:${email}`} className="text-primary hover:underline">
+                {email}
               </a>{' '}
-              o llámenos al <span className="font-mono">0912345678</span>.
+              o llámenos al <span className="font-mono">{phone}</span>.
             </p>
           </div>
         </div>

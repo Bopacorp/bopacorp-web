@@ -1,31 +1,30 @@
 import type { ContentBlockResponse } from '@bopacorp/shared/catalog';
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { useDebounce } from 'use-debounce';
-import {
-  Pagination,
-  PaginationContent,
-  PaginationEllipsis,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from '@/components/ui/pagination.js';
-import { ApiError } from '@/services/api.js';
-import { ErrorState, PageLoader } from '@/shared/ui';
+import { Badge } from '@/components/ui/badge.js';
+import { Skeleton } from '@/components/ui/skeleton.js';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs.js';
+import i18n from '@/i18n/index.js';
+import { getErrorMessage } from '@/shared/errors/index.js';
+import { ErrorState } from '@/shared/ui';
 import { updateContentBlock, uploadContentBlockImage } from './cms.service.js';
 import { CmsArchiveEmpty } from './components/CmsArchiveEmpty.js';
+import { CmsBlockCard } from './components/CmsBlockCard.js';
 import { CmsEditDialog } from './components/CmsEditDialog.js';
 import { CmsMasthead } from './components/CmsMasthead.js';
 import { CmsSearchBar } from './components/CmsSearchBar.js';
-import { CmsSection } from './components/CmsSection.js';
 import { useContentBlocks } from './useContentBlocks.js';
+import { useSections } from './useSections.js';
 
-function getErrorMessage(err: unknown) {
-  if (err instanceof ApiError) return err.message;
-  if (err instanceof Error) return err.message;
-  return 'Error al guardar';
-}
+const SECTION_LABEL_KEYS: Record<string, string> = {
+  hero: 'cms.section.hero',
+  about: 'cms.section.about',
+  cta: 'cms.section.cta',
+  about_page: 'cms.section.aboutPage',
+  site: 'cms.section.site',
+};
 
 function updateBlock(prev: ContentBlockResponse[], id: string, updated: ContentBlockResponse) {
   return prev.map((block) => (block.id === id ? updated : block));
@@ -38,10 +37,10 @@ function isVisualBlock(type: ContentBlockResponse['contentType'] | undefined) {
 function validateImageFile(file: File): string | null {
   const allowed = ['image/png', 'image/jpeg', 'image/webp', 'image/avif'];
   if (!allowed.includes(file.type)) {
-    return 'Formato no válido. Usa JPG, PNG, WebP o AVIF.';
+    return i18n.t('cms.invalidFormat');
   }
   if (file.size > 5 * 1024 * 1024) {
-    return 'La imagen debe pesar menos de 5 MB.';
+    return i18n.t('cms.imageTooLarge');
   }
   return null;
 }
@@ -54,7 +53,7 @@ async function persistEdit(
 ) {
   const updated = await updateContentBlock(block.id, { body });
   setBlocks((prev) => updateBlock(prev, block.id, updated));
-  toast.success('Bloque actualizado');
+  toast.success(i18n.t('cms.blockUpdated'));
   onDone();
 }
 
@@ -66,11 +65,9 @@ async function persistImageEdit(
 ) {
   await uploadContentBlockImage(block.contentKey, file);
   await refresh();
-  toast.success('Imagen actualizada');
+  toast.success(i18n.t('cms.imageUpdated'));
   onDone();
 }
-
-const SECTION_ORDER = ['hero', 'about', 'cta', 'site'];
 
 function computeLastUpdatedAt(blocks: ContentBlockResponse[] | undefined): Date | null {
   if (!blocks?.length) return null;
@@ -83,22 +80,51 @@ function computeLastUpdatedAt(blocks: ContentBlockResponse[] | undefined): Date 
   return new Date(max);
 }
 
-function getPageNumbers(current: number, total: number) {
-  const pages: (number | string)[] = [];
-  if (total <= 7) {
-    for (let i = 1; i <= total; i++) pages.push(i);
-  } else {
-    if (current > 3) pages.push(1, '...');
-    const start = Math.max(2, current - 1);
-    const end = Math.min(total - 1, current + 1);
-    for (let i = start; i <= end; i++) pages.push(i);
-    if (current < total - 2) pages.push('...');
-    pages.push(total);
-  }
-  return pages;
+function CmsCardSkeleton() {
+  return (
+    <div className="flex flex-col gap-3 rounded-xl border border-border p-4">
+      <div className="flex items-center justify-between gap-2">
+        <Skeleton className="h-3 w-20" />
+        <Skeleton className="h-4 w-12 rounded-full" />
+      </div>
+      <Skeleton className="h-4 w-3/4" />
+      <Skeleton className="h-3 w-full" />
+      <Skeleton className="h-3 w-5/6" />
+      <div className="flex items-center justify-between gap-2 pt-1 mt-auto">
+        <Skeleton className="h-3 w-24" />
+        <Skeleton className="h-7 w-16 rounded-md" />
+      </div>
+    </div>
+  );
+}
+
+function CmsPageSkeleton() {
+  return (
+    <div className="flex flex-col gap-6 p-6 md:p-8">
+      <div className="flex flex-col gap-1">
+        <Skeleton className="h-7 w-48" />
+        <Skeleton className="h-4 w-72" />
+      </div>
+      <div className="flex gap-2">
+        {Array.from({ length: 5 }, (_, i) => (
+          // biome-ignore lint/suspicious/noArrayIndexKey: skeleton placeholders never reorder
+          <Skeleton key={i} className="h-9 w-24 rounded-md" />
+        ))}
+      </div>
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {Array.from({ length: 6 }, (_, i) => (
+          // biome-ignore lint/suspicious/noArrayIndexKey: skeleton placeholders never reorder
+          <CmsCardSkeleton key={i} />
+        ))}
+      </div>
+    </div>
+  );
 }
 
 export function CmsPage() {
+  const { t } = useTranslation();
+  const { sections, loading: sectionsLoading, error: sectionsError } = useSections();
+  const [activeSection, setActiveSection] = useState<string>('');
   const [editingBlock, setEditingBlock] = useState<ContentBlockResponse | null>(null);
   const [editBody, setEditBody] = useState('');
   const [editFile, setEditFile] = useState<File | null>(null);
@@ -106,39 +132,20 @@ export function CmsPage() {
   const [saving, setSaving] = useState(false);
   const [rawSearchQuery, setSearchQuery] = useState('');
   const [debouncedQuery] = useDebounce(rawSearchQuery, 300);
-  const [page, setPage] = useState(1);
-  const { contentBlocks, meta, loading, error, retry, refresh, setContentBlocks } =
-    useContentBlocks(page, debouncedQuery);
 
-  const filteredBlocks = useMemo(() => {
-    if (!rawSearchQuery.trim()) return contentBlocks;
-    return contentBlocks;
-  }, [contentBlocks, rawSearchQuery]);
-
-  const groupedSections = useMemo(() => {
-    const groups: Record<string, typeof filteredBlocks> = {};
-    for (const block of filteredBlocks) {
-      const prefix = block.contentKey.split('.')[0];
-      if (!groups[prefix]) groups[prefix] = [];
-      groups[prefix].push(block);
-    }
-    const ordered = SECTION_ORDER.filter((p) => groups[p]);
-    const extra = Object.keys(groups)
-      .filter((p) => !SECTION_ORDER.includes(p))
-      .sort();
-    return [...ordered, ...extra].map((prefix) => ({
-      prefix,
-      blocks: groups[prefix],
-    }));
-  }, [filteredBlocks]);
-
-  const totalPages = meta?.totalPages ?? 1;
-  const pageNumbers = useMemo(() => getPageNumbers(page, totalPages), [page, totalPages]);
-
-  // biome-ignore lint/correctness/useExhaustiveDependencies: debouncedQuery is intentionally the trigger to reset pagination
   useEffect(() => {
-    setPage(1);
-  }, [debouncedQuery]);
+    if (sections.length > 0 && !activeSection) {
+      setActiveSection(sections[0].prefix);
+    }
+  }, [sections, activeSection]);
+
+  const { contentBlocks, loading, error, retry, refresh, setContentBlocks } = useContentBlocks(
+    1,
+    activeSection,
+    debouncedQuery,
+  );
+
+  const totalCount = useMemo(() => sections.reduce((sum, s) => sum + s.count, 0), [sections]);
 
   const lastUpdatedAt = useMemo(() => computeLastUpdatedAt(contentBlocks), [contentBlocks]);
 
@@ -191,82 +198,60 @@ export function CmsPage() {
     }
   }, [editingBlock, editBody, editFile, refresh, closeEdit, setContentBlocks]);
 
-  if (loading) return <PageLoader />;
-  if (error) return <ErrorState message={error} onRetry={retry} />;
+  if (sectionsLoading) return <CmsPageSkeleton />;
+  if (sectionsError)
+    return <ErrorState message={sectionsError} onRetry={() => window.location.reload()} />;
 
   return (
     <div className="relative grain flex flex-col gap-6 bg-background p-6 md:p-8">
-      <CmsMasthead count={contentBlocks.length} lastUpdatedAt={lastUpdatedAt} />
+      <CmsMasthead count={totalCount} lastUpdatedAt={lastUpdatedAt} />
 
-      <CmsSearchBar
-        value={rawSearchQuery}
-        onChange={setSearchQuery}
-        resultCount={filteredBlocks.length}
-        total={contentBlocks.length}
-      />
+      <Tabs value={activeSection} onValueChange={setActiveSection}>
+        <TabsList className="w-full max-w-full overflow-x-auto no-scrollbar gap-1">
+          {sections.map((s) => {
+            const labelKey = SECTION_LABEL_KEYS[s.prefix];
+            const label = labelKey ? t(labelKey) : s.prefix;
+            return (
+              <TabsTrigger key={s.prefix} value={s.prefix} className="gap-1.5">
+                {label}
+                <Badge variant="secondary" className="font-mono text-[10px] px-1.5 py-0">
+                  {s.count}
+                </Badge>
+              </TabsTrigger>
+            );
+          })}
+        </TabsList>
 
-      {contentBlocks.length === 0 || filteredBlocks.length === 0 ? (
-        <CmsArchiveEmpty searchQuery={rawSearchQuery} />
-      ) : (
-        <div className="flex flex-col gap-6">
-          {groupedSections.map((section) => (
-            <CmsSection
-              key={section.prefix}
-              prefix={section.prefix}
-              blocks={section.blocks}
-              onEdit={openEdit}
+        {sections.map((s) => (
+          <TabsContent key={s.prefix} value={s.prefix} className="mt-4">
+            <CmsSearchBar
+              value={rawSearchQuery}
+              onChange={setSearchQuery}
+              resultCount={contentBlocks.length}
+              total={s.count}
             />
-          ))}
-        </div>
-      )}
 
-      {totalPages > 1 && (
-        <Pagination>
-          <PaginationContent>
-            <PaginationItem>
-              <PaginationPrevious
-                text="Anterior"
-                href="#"
-                onClick={(e) => {
-                  e.preventDefault();
-                  if (page > 1) setPage(page - 1);
-                }}
-              />
-            </PaginationItem>
-            {pageNumbers.map((p, i) =>
-              p === '...' ? (
-                // biome-ignore lint/suspicious/noArrayIndexKey: pagination controls are static and never reorder
-                <PaginationItem key={`ellipsis-${i}`}>
-                  <PaginationEllipsis />
-                </PaginationItem>
-              ) : (
-                <PaginationItem key={p}>
-                  <PaginationLink
-                    href="#"
-                    isActive={p === page}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      setPage(Number(p));
-                    }}
-                  >
-                    {p}
-                  </PaginationLink>
-                </PaginationItem>
-              ),
+            {loading ? (
+              <div className="grid grid-cols-1 gap-4 mt-4 sm:grid-cols-2 lg:grid-cols-3">
+                {Array.from({ length: 3 }, (_, i) => (
+                  // biome-ignore lint/suspicious/noArrayIndexKey: skeleton placeholders never reorder
+                  <CmsCardSkeleton key={i} />
+                ))}
+              </div>
+            ) : error ? (
+              <ErrorState message={error} onRetry={retry} />
+            ) : contentBlocks.length === 0 ? (
+              <CmsArchiveEmpty searchQuery={rawSearchQuery} />
+            ) : (
+              <div className="grid grid-cols-1 gap-4 mt-4 sm:grid-cols-2 lg:grid-cols-3">
+                {contentBlocks.map((block) => (
+                  <CmsBlockCard key={block.id} block={block} onEdit={openEdit} />
+                ))}
+              </div>
             )}
-            <PaginationItem>
-              <PaginationNext
-                text="Siguiente"
-                href="#"
-                onClick={(e) => {
-                  e.preventDefault();
-                  if (page < totalPages) setPage(page + 1);
-                }}
-              />
-            </PaginationItem>
-          </PaginationContent>
-        </Pagination>
-      )}
+          </TabsContent>
+        ))}
+      </Tabs>
 
       <CmsEditDialog
         block={editingBlock}

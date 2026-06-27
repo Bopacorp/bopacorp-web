@@ -1,18 +1,39 @@
+import type { ListPublicCatalogQuery } from '@bopacorp/shared';
 import {
   AlertCircle,
-  Gift,
+  FileText,
+  Globe,
+  Headset,
+  LayoutGrid,
+  ListFilter,
   MessageCircle,
-  Phone,
-  Plane,
   RefreshCw,
-  Share2,
-  Smartphone,
+  Shield,
+  Tag,
+  X,
 } from 'lucide-react';
 import type { ComponentType } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Card, CardAction, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useDebouncedValue } from '@/hooks/use-debounced-value.js';
+import { cn } from '@/lib/utils';
 import { PlanCard } from '@/modules/catalog/components/PlanCard.js';
 import { usePublicCatalogItems } from '@/modules/catalog/hooks/use-public-catalog-items.js';
+import { usePublicCategories } from '@/modules/catalog/hooks/use-public-categories.js';
+import { usePublicSegments } from '@/modules/catalog/hooks/use-public-segments.js';
 import { useContactDialog } from '@/modules/contact/index.js';
 import { ContourMotif } from '../components/decor.js';
 
@@ -24,34 +45,34 @@ interface Benefit {
 
 const BENEFITS: Benefit[] = [
   {
-    icon: Smartphone,
-    title: 'Gigas para navegar',
-    desc: 'Datos estructurales y bonos adicionales incluidos para que tu equipo trabaje sin interrupciones.',
+    icon: LayoutGrid,
+    title: 'Catálogo integral',
+    desc: 'Voz, conectividad, servicios digitales y equipos en un solo lugar para tu empresa.',
   },
   {
-    icon: Phone,
-    title: 'Minutos y SMS',
-    desc: 'Minutos a todo destino, SMS libres y minutos al extranjero para comunicarte con tus clientes.',
+    icon: Tag,
+    title: 'Precios corporativos',
+    desc: 'Tarifas preferenciales diseñadas para empresas con condiciones exclusivas de mercado.',
   },
   {
-    icon: Share2,
-    title: 'Redes sociales ilimitadas',
-    desc: 'Navegación sin límite en tus redes sociales favoritas para gestionar la presencia digital de tu negocio.',
+    icon: Headset,
+    title: 'Soporte dedicado',
+    desc: 'Atención personalizada con un equipo comercial exclusivo para resolver tus necesidades.',
   },
   {
-    icon: MessageCircle,
-    title: 'WhatsApp gratis',
-    desc: 'Mensajería ilimitada para coordinar con tu equipo y atender clientes en tiempo real.',
+    icon: Globe,
+    title: 'Cobertura nacional',
+    desc: 'Red Tigo con presencia en todo Ecuador para mantener tu operación siempre conectada.',
   },
   {
-    icon: Plane,
-    title: 'Roaming internacional',
-    desc: 'Conectividad en el extranjero con datos en zona CAN y pasaportes de roaming para viajes de negocio.',
+    icon: FileText,
+    title: 'Facturación centralizada',
+    desc: 'Un solo proveedor y una sola factura para todos los servicios de telecomunicaciones.',
   },
   {
-    icon: Gift,
-    title: 'Bonos de fidelización',
-    desc: 'Gigas adicionales como beneficio de lealtad para clientes con permanencia en su plan.',
+    icon: Shield,
+    title: 'Respaldo empresarial',
+    desc: 'Contratos flexibles con el respaldo de un distribuidor oficial Tigo certificado.',
   },
 ];
 
@@ -102,8 +123,72 @@ function BeneficiosSection() {
   );
 }
 
+const DEFAULT_CATEGORY_SLUG = 'voz';
+
 export default function ServicesPage() {
-  const { items, loading, error, retry } = usePublicCatalogItems();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const categoriaParam = searchParams.get('categoria');
+  const categorySlug = categoriaParam ?? DEFAULT_CATEGORY_SLUG;
+
+  const { categories } = usePublicCategories();
+  const { segments } = usePublicSegments();
+
+  const categoryIdFromSlug = useMemo(
+    () => categories.find((c) => c.slug === categorySlug)?.id,
+    [categories, categorySlug],
+  );
+
+  const [categoryId, setCategoryId] = useState<string>();
+  const [segmentId, setSegmentId] = useState<string>();
+  const [minPrice, setMinPrice] = useState<string>('');
+  const [maxPrice, setMaxPrice] = useState<string>('');
+
+  useEffect(() => {
+    if (categoryIdFromSlug) {
+      setCategoryId(categoryIdFromSlug);
+    }
+  }, [categoryIdFromSlug]);
+
+  function handleCategoryChange(id: string | undefined) {
+    setCategoryId(id);
+    const slug = categories.find((c) => c.id === id)?.slug;
+    if (slug && slug !== DEFAULT_CATEGORY_SLUG) {
+      setSearchParams({ categoria: slug }, { replace: true });
+    } else {
+      setSearchParams({}, { replace: true });
+    }
+  }
+
+  const debouncedMinPrice = useDebouncedValue(minPrice);
+  const debouncedMaxPrice = useDebouncedValue(maxPrice);
+
+  const filters = useMemo<ListPublicCatalogQuery | undefined>(() => {
+    if (!categoryId && !categorySlug) return undefined;
+    const f: ListPublicCatalogQuery = {};
+    if (categoryId) {
+      f.categoryId = categoryId;
+    } else {
+      f.categorySlug = categorySlug;
+    }
+    if (segmentId) f.segmentId = segmentId;
+    if (debouncedMinPrice) f.minPrice = Number(debouncedMinPrice);
+    if (debouncedMaxPrice) f.maxPrice = Number(debouncedMaxPrice);
+    return f;
+  }, [categoryId, categorySlug, segmentId, debouncedMinPrice, debouncedMaxPrice]);
+
+  const { items, loading, reloading, error, retry } = usePublicCatalogItems(filters);
+
+  const hasFilters = Boolean(
+    (categoryId && categoryId !== categoryIdFromSlug) || segmentId || minPrice || maxPrice,
+  );
+
+  function clearFilters() {
+    setCategoryId(categoryIdFromSlug);
+    setSegmentId(undefined);
+    setMinPrice('');
+    setMaxPrice('');
+    setSearchParams({}, { replace: true });
+  }
 
   return (
     <div className="w-full flex flex-col font-sans">
@@ -121,7 +206,25 @@ export default function ServicesPage() {
 
       <BeneficiosSection />
 
-      <PlansSection loading={loading} error={Boolean(error)} items={items} onRetry={retry} />
+      <PlansSection
+        loading={loading}
+        reloading={reloading}
+        error={Boolean(error)}
+        items={items}
+        onRetry={retry}
+        categories={categories}
+        categoryId={categoryId}
+        onCategoryChange={handleCategoryChange}
+        segments={segments}
+        segmentId={segmentId}
+        onSegmentChange={setSegmentId}
+        minPrice={minPrice}
+        onMinPriceChange={setMinPrice}
+        maxPrice={maxPrice}
+        onMaxPriceChange={setMaxPrice}
+        hasFilters={hasFilters}
+        onClear={clearFilters}
+      />
 
       <CtaSection />
     </div>
@@ -130,22 +233,160 @@ export default function ServicesPage() {
 
 function PlansSection({
   loading,
+  reloading,
   error,
   items,
   onRetry,
+  categories,
+  categoryId,
+  onCategoryChange,
+  segments,
+  segmentId,
+  onSegmentChange,
+  minPrice,
+  onMinPriceChange,
+  maxPrice,
+  onMaxPriceChange,
+  hasFilters,
+  onClear,
 }: {
   loading: boolean;
+  reloading: boolean;
   error: boolean;
   items: ReturnType<typeof usePublicCatalogItems>['items'];
   onRetry: () => void;
+  categories: { id: string; name: string; slug: string }[];
+  categoryId: string | undefined;
+  onCategoryChange: (v: string | undefined) => void;
+  segments: { id: string; code: string; name: string }[];
+  segmentId: string | undefined;
+  onSegmentChange: (v: string | undefined) => void;
+  minPrice: string;
+  onMinPriceChange: (v: string) => void;
+  maxPrice: string;
+  onMaxPriceChange: (v: string) => void;
+  hasFilters: boolean;
+  onClear: () => void;
 }) {
   return (
     <section className="w-full py-16 px-6 bg-muted">
       <div className="max-w-7xl mx-auto flex flex-col gap-10">
         <SectionHeader
-          title="Nuestros planes corporativos"
-          desc="Elige el plan que mejor se adapte a las necesidades de tu empresa. Todos incluyen los beneficios anteriores."
+          title="Nuestro catálogo de servicios"
+          desc="Encuentra la solución que mejor se adapte a las necesidades de tu empresa."
         />
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <ListFilter className="size-4 text-muted-foreground" />
+              Filtrar servicios
+              {hasFilters && !loading && (
+                <Badge variant="secondary" className="tabular-nums">
+                  {items.length} {items.length === 1 ? 'resultado' : 'resultados'}
+                </Badge>
+              )}
+            </CardTitle>
+            {hasFilters && (
+              <CardAction>
+                <Button variant="ghost" size="sm" onClick={onClear} className="gap-1.5">
+                  <X className="size-3.5" />
+                  Limpiar
+                </Button>
+              </CardAction>
+            )}
+          </CardHeader>
+          <CardContent>
+            <div className="flex flex-wrap items-end gap-4">
+              <div className="flex w-full flex-col gap-1.5 sm:w-52">
+                <label
+                  htmlFor="filter-category"
+                  className="text-xs font-medium text-muted-foreground"
+                >
+                  Categoría
+                </label>
+                <Select
+                  value={categoryId ?? 'all'}
+                  onValueChange={(v) => onCategoryChange(v === 'all' ? undefined : v)}
+                >
+                  <SelectTrigger id="filter-category" className="w-full">
+                    <SelectValue placeholder="Todas las categorías" />
+                  </SelectTrigger>
+                  <SelectContent position="popper" className="w-(--radix-select-trigger-width)">
+                    <SelectGroup>
+                      <SelectItem value="all">Todas las categorías</SelectItem>
+                      {categories.map((c) => (
+                        <SelectItem key={c.id} value={c.id}>
+                          {c.name}
+                        </SelectItem>
+                      ))}
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="flex w-full flex-col gap-1.5 sm:w-52">
+                <label
+                  htmlFor="filter-segment"
+                  className="text-xs font-medium text-muted-foreground"
+                >
+                  Segmento
+                </label>
+                <Select
+                  value={segmentId ?? 'all'}
+                  onValueChange={(v) => onSegmentChange(v === 'all' ? undefined : v)}
+                >
+                  <SelectTrigger id="filter-segment" className="w-full">
+                    <SelectValue placeholder="Todos los segmentos" />
+                  </SelectTrigger>
+                  <SelectContent position="popper" className="w-(--radix-select-trigger-width)">
+                    <SelectGroup>
+                      <SelectItem value="all">Todos los segmentos</SelectItem>
+                      {segments.map((s) => (
+                        <SelectItem key={s.id} value={s.id}>
+                          {s.name}
+                        </SelectItem>
+                      ))}
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="flex w-full flex-col gap-1.5 sm:w-32">
+                <label htmlFor="filter-min" className="text-xs font-medium text-muted-foreground">
+                  Precio mín. ($)
+                </label>
+                <Input
+                  id="filter-min"
+                  type="number"
+                  min={0}
+                  step="0.01"
+                  placeholder="0.00"
+                  value={minPrice}
+                  onChange={(e) => onMinPriceChange(e.target.value)}
+                  className="tabular-nums"
+                />
+              </div>
+
+              <div className="flex w-full flex-col gap-1.5 sm:w-32">
+                <label htmlFor="filter-max" className="text-xs font-medium text-muted-foreground">
+                  Precio máx. ($)
+                </label>
+                <Input
+                  id="filter-max"
+                  type="number"
+                  min={0}
+                  step="0.01"
+                  placeholder="999.99"
+                  value={maxPrice}
+                  onChange={(e) => onMaxPriceChange(e.target.value)}
+                  className="tabular-nums"
+                />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
         {loading ? (
           <PlansSkeleton />
         ) : error ? (
@@ -153,7 +394,14 @@ function PlansSection({
         ) : items.length === 0 ? (
           <PlansEmpty />
         ) : (
-          <PlansGrid items={items} />
+          <div
+            className={cn(
+              'transition-opacity duration-200',
+              reloading && 'pointer-events-none opacity-50',
+            )}
+          >
+            <PlansGrid items={items} />
+          </div>
         )}
       </div>
     </section>

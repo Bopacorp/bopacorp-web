@@ -37,7 +37,7 @@ export default function JobDetailPage() {
       <section className="border-b border-border bg-gradient-to-br from-background via-background to-muted/30 px-6 py-12">
         <div className="mx-auto flex max-w-7xl flex-col gap-4">
           <Button asChild variant="ghost" size="sm" className="w-fit">
-            <Link to="/jobs">
+            <Link to="/empleos">
               <ArrowLeft data-icon="inline-start" />
               Volver a vacantes
             </Link>
@@ -80,7 +80,7 @@ export default function JobDetailPage() {
                 <VacanciesEmpty />
                 <div className="mt-4 flex justify-center">
                   <Button asChild>
-                    <Link to="/jobs">Ver vacantes disponibles</Link>
+                    <Link to="/empleos">Ver vacantes disponibles</Link>
                   </Button>
                 </div>
               </CardContent>

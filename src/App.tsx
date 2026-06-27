@@ -22,12 +22,12 @@ export default function App() {
       <Routes>
         <Route element={<MainLayout />}>
           <Route path="/" element={<LandingPage />} />
-          <Route path="/services" element={<ServicesPage />} />
-          <Route path="/about" element={<AboutPage />} />
-          <Route path="/jobs" element={<JobsPage />} />
-          <Route path="/jobs/:id" element={<JobDetailPage />} />
-          <Route path="/terms" element={<TermsPage />} />
-          <Route path="/privacy" element={<PrivacyPage />} />
+          <Route path="/servicios" element={<ServicesPage />} />
+          <Route path="/nosotros" element={<AboutPage />} />
+          <Route path="/empleos" element={<JobsPage />} />
+          <Route path="/empleos/:id" element={<JobDetailPage />} />
+          <Route path="/terminos" element={<TermsPage />} />
+          <Route path="/privacidad" element={<PrivacyPage />} />
         </Route>
 
         <Route path="/login" element={<LoginPage />} />
@@ -51,7 +51,7 @@ export default function App() {
               </PermissionRoute>
             }
           />
-          <Route path="*" element={<div className="p-8">Sección no encontrada</div>} />
+          <Route path="*" element={<Navigate to="/admin/cms" replace />} />
         </Route>
 
         <Route path="*" element={<Navigate to="/" replace />} />

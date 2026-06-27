@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { Empty, EmptyDescription, EmptyHeader, EmptyTitle } from '@/components/ui/empty';
 
@@ -7,29 +8,31 @@ interface ErrorStateProps {
   onRetry?: () => void;
 }
 
-const errorMessages: Record<string, string> = {
-  UNAUTHORIZED: 'Sesion expirada. Por favor inicia sesion nuevamente.',
-  VALIDATION_ERROR: 'Algunos campos tienen errores. Revisalos e intenta de nuevo.',
-  FORBIDDEN: 'No tienes permisos para realizar esta accion.',
-  NOT_FOUND: 'El recurso solicitado no existe.',
-  CONFLICT: 'Ya existe un registro con esos datos.',
+const ERROR_KEYS: Record<string, string> = {
+  UNAUTHORIZED: 'error.unauthorized',
+  VALIDATION_ERROR: 'error.validation',
+  FORBIDDEN: 'error.forbidden',
+  NOT_FOUND: 'error.notFound',
+  CONFLICT: 'error.conflict',
 };
 
-function getErrorMessage(code: string | undefined, fallback?: string): string {
-  if (code && errorMessages[code]) return errorMessages[code];
-  if (fallback) return fallback;
-  return 'Ocurrio un error inesperado. Intenta de nuevo mas tarde.';
-}
-
 export function ErrorState({ message, code, onRetry }: ErrorStateProps) {
+  const { t } = useTranslation();
+
+  const resolvedMessage = (() => {
+    if (code && ERROR_KEYS[code]) return t(ERROR_KEYS[code]);
+    if (message) return message;
+    return t('error.generic');
+  })();
+
   return (
     <div className="flex items-center justify-center py-20">
       <Empty>
         <EmptyHeader>
-          <EmptyTitle>Error al cargar el contenido</EmptyTitle>
-          <EmptyDescription>{getErrorMessage(code, message)}</EmptyDescription>
+          <EmptyTitle>{t('error.loadFailed')}</EmptyTitle>
+          <EmptyDescription>{resolvedMessage}</EmptyDescription>
         </EmptyHeader>
-        {onRetry && <Button onClick={onRetry}>Reintentar</Button>}
+        {onRetry && <Button onClick={onRetry}>{t('error.retry')}</Button>}
       </Empty>
     </div>
   );

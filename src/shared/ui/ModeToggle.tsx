@@ -1,13 +1,14 @@
 import { Monitor, Moon, Sun } from 'lucide-react';
 import { useTheme } from 'next-themes';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
 const themes = ['light', 'dark', 'system'] as const;
-const labels: Record<string, string> = {
-  light: 'Claro',
-  dark: 'Oscuro',
-  system: 'Sistema',
+const LABEL_KEYS: Record<string, string> = {
+  light: 'theme.light',
+  dark: 'theme.dark',
+  system: 'theme.system',
 };
 const icons: Record<string, typeof Sun> = {
   light: Sun,
@@ -16,6 +17,7 @@ const icons: Record<string, typeof Sun> = {
 };
 
 export function ModeToggle() {
+  const { t } = useTranslation();
   const { theme = 'system', setTheme } = useTheme();
 
   const cycle = () => {
@@ -24,7 +26,7 @@ export function ModeToggle() {
   };
 
   const Icon = icons[theme] ?? Monitor;
-  const label = labels[theme] ?? 'Sistema';
+  const label = t(LABEL_KEYS[theme] ?? 'theme.system');
 
   return (
     <Tooltip>

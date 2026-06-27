@@ -1,14 +1,8 @@
 import type { ContentBlockResponse } from '@bopacorp/shared/catalog';
 import type { PaginationMeta } from '@bopacorp/shared/common';
 import { useCallback, useEffect, useState } from 'react';
-import { ApiError } from '@/services/api.js';
+import { getErrorMessage } from '@/shared/errors/index.js';
 import { listContentBlocks } from './cms.service.js';
-
-function getErrorMessage(err: unknown) {
-  if (err instanceof ApiError) return err.message;
-  if (err instanceof Error) return err.message;
-  return 'Error desconocido';
-}
 
 function saveBlocks(
   data: ContentBlockResponse[],
@@ -37,6 +31,7 @@ function saveError(
 
 async function loadBlocks(
   page: number,
+  section: string,
   query: string,
   setContentBlocks: React.Dispatch<React.SetStateAction<ContentBlockResponse[]>>,
   setMeta: React.Dispatch<React.SetStateAction<PaginationMeta | null>>,
@@ -45,7 +40,7 @@ async function loadBlocks(
   ctrl: { cancelled: boolean },
 ) {
   try {
-    const { data, meta } = await listContentBlocks(page, query);
+    const { data, meta } = await listContentBlocks(page, section, query);
     saveBlocks(data, meta, ctrl, setContentBlocks, setMeta, setLoading);
   } catch (err) {
     saveError(err, ctrl, setErr, setLoading);
@@ -54,16 +49,17 @@ async function loadBlocks(
 
 async function refreshBlocks(
   page: number,
+  section: string,
   query: string,
   setContentBlocks: React.Dispatch<React.SetStateAction<ContentBlockResponse[]>>,
   setMeta: React.Dispatch<React.SetStateAction<PaginationMeta | null>>,
 ) {
-  const { data, meta } = await listContentBlocks(page, query);
+  const { data, meta } = await listContentBlocks(page, section, query);
   setContentBlocks(data);
   setMeta(meta);
 }
 
-export function useContentBlocks(page: number, query: string) {
+export function useContentBlocks(page: number, section: string, query: string) {
   const [contentBlocks, setContentBlocks] = useState<ContentBlockResponse[]>([]);
   const [meta, setMeta] = useState<PaginationMeta | null>(null);
   const [loading, setLoading] = useState(true);
@@ -73,11 +69,13 @@ export function useContentBlocks(page: number, query: string) {
   // biome-ignore lint/correctness/useExhaustiveDependencies: retryCount is an intentional trigger for refetch
   useEffect(() => {
     const ctrl = { cancelled: false };
-    loadBlocks(page, query, setContentBlocks, setMeta, setError, setLoading, ctrl);
+    setLoading(true);
+    setError(null);
+    loadBlocks(page, section, query, setContentBlocks, setMeta, setError, setLoading, ctrl);
     return () => {
       ctrl.cancelled = true;
     };
-  }, [page, query, retryCount]);
+  }, [page, section, query, retryCount]);
 
   const retry = useCallback(() => {
     setLoading(true);
@@ -86,8 +84,8 @@ export function useContentBlocks(page: number, query: string) {
   }, []);
 
   const refresh = useCallback(async () => {
-    await refreshBlocks(page, query, setContentBlocks, setMeta);
-  }, [page, query]);
+    await refreshBlocks(page, section, query, setContentBlocks, setMeta);
+  }, [page, section, query]);
 
   return { contentBlocks, meta, loading, error, retry, refresh, setContentBlocks };
 }

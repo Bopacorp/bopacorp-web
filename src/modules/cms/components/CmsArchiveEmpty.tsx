@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { Empty, EmptyDescription, EmptyHeader, EmptyTitle } from '@/components/ui/empty.js';
 
 interface CmsArchiveEmptyProps {
@@ -5,11 +6,10 @@ interface CmsArchiveEmptyProps {
 }
 
 export function CmsArchiveEmpty({ searchQuery }: CmsArchiveEmptyProps) {
+  const { t } = useTranslation();
   const hasSearch = !!searchQuery;
-  const title = hasSearch ? 'Sin resultados' : 'El archivo está vacío';
-  const description = hasSearch
-    ? 'Ningún bloque coincide con tu búsqueda.'
-    : 'No hay bloques CMS publicados todavía.';
+  const title = hasSearch ? t('cms.noResults') : t('cms.emptyArchive');
+  const description = hasSearch ? t('cms.noResultsDesc') : t('cms.emptyDesc');
 
   return (
     <div className="flex items-center justify-center py-20">

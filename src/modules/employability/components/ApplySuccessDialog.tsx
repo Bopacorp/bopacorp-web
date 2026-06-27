@@ -1,4 +1,4 @@
-import { Briefcase, CheckCircle2, X } from 'lucide-react';
+import { Briefcase, CheckCircle2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog';
 import type { ApplyJobVacancyResponse } from '../employability.types.js';
@@ -13,19 +13,8 @@ export function ApplySuccessDialog({ open, onOpenChange, response }: ApplySucces
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
-        <div className="flex items-start justify-between gap-4">
-          <div className="flex size-12 items-center justify-center rounded-xl border border-primary/20 bg-primary/10 text-primary">
-            <CheckCircle2 className="size-6" />
-          </div>
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon-sm"
-            onClick={() => onOpenChange(false)}
-            aria-label="Cerrar"
-          >
-            <X />
-          </Button>
+        <div className="flex size-12 items-center justify-center rounded-xl border border-primary/20 bg-primary/10 text-primary">
+          <CheckCircle2 className="size-6" />
         </div>
         <div className="flex flex-col gap-2">
           <DialogTitle className="font-brand text-lg font-semibold tracking-tight">
@@ -51,9 +40,6 @@ export function ApplySuccessDialog({ open, onOpenChange, response }: ApplySucces
                 {new Date(response.appliedAt).toLocaleString('es-EC')}
               </span>
             )}
-            <span>
-              <span className="font-medium text-foreground">Estado:</span> {response.state}
-            </span>
           </div>
         </div>
         <div className="flex flex-wrap gap-3">
