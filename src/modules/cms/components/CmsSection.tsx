@@ -1,15 +1,17 @@
 import type { ContentBlockResponse } from '@bopacorp/shared/catalog';
 import { ChevronDown } from 'lucide-react';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Badge } from '@/components/ui/badge.js';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { CmsBlockCard } from './CmsBlockCard.js';
 
-const SECTION_LABELS: Record<string, string> = {
-  hero: 'Hero',
-  about: 'Acerca de',
-  cta: 'Llamada a acción',
-  site: 'Sitio general',
+const SECTION_LABEL_KEYS: Record<string, string> = {
+  hero: 'cms.section.hero',
+  about: 'cms.section.about',
+  cta: 'cms.section.cta',
+  about_page: 'cms.section.aboutPage',
+  site: 'cms.section.site',
 };
 
 interface CmsSectionProps {
@@ -19,8 +21,10 @@ interface CmsSectionProps {
 }
 
 export function CmsSection({ prefix, blocks, onEdit }: CmsSectionProps) {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(true);
-  const label = SECTION_LABELS[prefix] ?? prefix;
+  const labelKey = SECTION_LABEL_KEYS[prefix];
+  const label = labelKey ? t(labelKey) : prefix;
 
   return (
     <Collapsible open={open} onOpenChange={setOpen}>

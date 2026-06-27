@@ -1,12 +1,23 @@
-import type { ContentBlockResponse, UpdateContentBlockRequest } from '@bopacorp/shared/catalog';
+import type {
+  ContentBlockResponse,
+  ContentBlockSectionResponse,
+  UpdateContentBlockRequest,
+} from '@bopacorp/shared/catalog';
 import type { PaginationMeta } from '@bopacorp/shared/common';
 import { request, requestPaginated } from '@/services/api.js';
 
-export function listContentBlocks(page: number, search: string) {
+export function listContentBlockSections() {
+  return request<ContentBlockSectionResponse[]>({
+    method: 'GET',
+    url: '/catalog/content-blocks/sections',
+  });
+}
+
+export function listContentBlocks(page: number, section: string, search: string) {
   return requestPaginated<ContentBlockResponse, PaginationMeta>({
     method: 'GET',
     url: '/catalog/content-blocks',
-    params: { page, search },
+    params: { page, limit: 50, section: section || undefined, search: search || undefined },
   });
 }
 

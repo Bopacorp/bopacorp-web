@@ -1,5 +1,6 @@
 import type { ContentBlockResponse } from '@bopacorp/shared/catalog';
 import { ArrowRight } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button.js';
 import {
   Dialog,
@@ -36,9 +37,10 @@ function DialogEyebrow({ block }: { block: ContentBlockResponse | null }) {
 }
 
 function CharacterCount({ body }: { body: string }) {
+  const { t } = useTranslation();
   return (
     <span className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
-      {body.length} caracteres
+      {t('cms.characters', { count: body.length })}
     </span>
   );
 }
@@ -102,6 +104,7 @@ export function CmsEditDialog({
   onSave,
   onCancel,
 }: CmsEditDialogProps) {
+  const { t } = useTranslation();
   const visual = isVisualBlock(block?.contentType);
 
   return (
@@ -115,15 +118,17 @@ export function CmsEditDialog({
         <DialogHeader>
           <DialogEyebrow block={block} />
           <DialogTitle className="font-display text-xl font-semibold tracking-tight">
-            Editar contenido
+            {t('cms.editContent')}
           </DialogTitle>
-          <DialogDescription>Editando: {block?.contentKey ?? '—'}</DialogDescription>
+          <DialogDescription>
+            {t('cms.editing', { key: block?.contentKey ?? '—' })}
+          </DialogDescription>
         </DialogHeader>
 
         <FieldGroup>
           <Field>
             <FieldLabel htmlFor="edit-body" className="sr-only">
-              Contenido
+              {t('cms.content')}
             </FieldLabel>
             <BodyField
               block={block}
@@ -145,10 +150,10 @@ export function CmsEditDialog({
 
         <DialogFooter>
           <Button variant="outline" onClick={onCancel} disabled={saving}>
-            Cancelar
+            {t('cms.cancel')}
           </Button>
           <Button onClick={onSave} disabled={saving || (visual && !file) || !!imageError}>
-            {saving ? 'Guardando…' : 'Guardar cambios'}
+            {saving ? t('cms.saving') : t('cms.saveChanges')}
             <ArrowRight data-icon="inline-end" />
           </Button>
         </DialogFooter>

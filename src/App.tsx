@@ -51,7 +51,7 @@ export default function App() {
               </PermissionRoute>
             }
           />
-          <Route path="*" element={<div className="p-8">Sección no encontrada</div>} />
+          <Route path="*" element={<Navigate to="/admin/cms" replace />} />
         </Route>
 
         <Route path="*" element={<Navigate to="/" replace />} />

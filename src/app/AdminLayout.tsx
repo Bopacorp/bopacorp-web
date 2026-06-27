@@ -1,6 +1,7 @@
-import { ChevronsUpDown, ExternalLink, LogOut, Monitor, Moon, Sun } from 'lucide-react';
+import { ChevronsUpDown, ExternalLink, Globe, LogOut, Monitor, Moon, Sun } from 'lucide-react';
 import { useTheme } from 'next-themes';
-import { Link, Outlet, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { Outlet, useNavigate } from 'react-router-dom';
 import logoFallback from '@/assets/logo.png';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -24,22 +25,23 @@ function getInitials(profile: { firstName: string; lastName: string } | null | u
 
 function ThemeMenuItems() {
   const { theme, setTheme } = useTheme();
+  const { t } = useTranslation();
 
   return (
     <DropdownMenuGroup>
       <DropdownMenuItem onClick={() => setTheme('light')}>
         <Sun />
-        Claro
+        {t('theme.light')}
         {theme === 'light' && <span className="ml-auto text-xs text-muted-foreground">✓</span>}
       </DropdownMenuItem>
       <DropdownMenuItem onClick={() => setTheme('dark')}>
         <Moon />
-        Oscuro
+        {t('theme.dark')}
         {theme === 'dark' && <span className="ml-auto text-xs text-muted-foreground">✓</span>}
       </DropdownMenuItem>
       <DropdownMenuItem onClick={() => setTheme('system')}>
         <Monitor />
-        Sistema
+        {t('theme.system')}
         {theme === 'system' && <span className="ml-auto text-xs text-muted-foreground">✓</span>}
       </DropdownMenuItem>
     </DropdownMenuGroup>
@@ -47,10 +49,17 @@ function ThemeMenuItems() {
 }
 
 export default function AdminLayout() {
+  const { t, i18n } = useTranslation();
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const { blocks } = useCmsLanding();
   const logoUrl = blocks?.[CMS_IMAGE_KEYS.logo]?.body ?? logoFallback;
+
+  const toggleLang = () => {
+    const next = i18n.language === 'es' ? 'en' : 'es';
+    i18n.changeLanguage(next);
+    localStorage.setItem('lang', next);
+  };
 
   const handleLogout = async () => {
     await logout();
@@ -74,11 +83,21 @@ export default function AdminLayout() {
 
         <div className="flex-1" />
 
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={toggleLang}
+          className="gap-1.5 text-muted-foreground"
+        >
+          <Globe className="size-3.5" />
+          <span className="text-xs font-semibold uppercase">{i18n.language}</span>
+        </Button>
+
         <Button variant="ghost" size="sm" asChild className="gap-1.5 text-muted-foreground">
-          <Link to="/">
+          <a href="/" target="_blank" rel="noopener noreferrer">
             <ExternalLink className="size-3.5" />
-            <span className="hidden sm:inline">Ver sitio</span>
-          </Link>
+            <span className="hidden sm:inline">{t('admin.viewSite')}</span>
+          </a>
         </Button>
 
         <DropdownMenu>
@@ -114,7 +133,7 @@ export default function AdminLayout() {
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={handleLogout}>
               <LogOut />
-              Cerrar sesión
+              {t('admin.logout')}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

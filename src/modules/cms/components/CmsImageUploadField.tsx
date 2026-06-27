@@ -1,5 +1,6 @@
 import { ImageIcon, UploadCloud, X } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button.js';
 import { FieldDescription, FieldError, FieldLabel } from '@/components/ui/field.js';
 import { Input } from '@/components/ui/input.js';
@@ -44,6 +45,7 @@ export function CmsImageUploadField({
   disabled,
   error,
 }: CmsImageUploadFieldProps) {
+  const { t } = useTranslation();
   const preview = usePreview(file, currentUrl);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -61,7 +63,7 @@ export function CmsImageUploadField({
 
   return (
     <div className="flex flex-col gap-2">
-      <FieldLabel htmlFor={id}>Imagen</FieldLabel>
+      <FieldLabel htmlFor={id}>{t('cms.imageLabel')}</FieldLabel>
       <label
         htmlFor={id}
         className={cn(
@@ -75,7 +77,7 @@ export function CmsImageUploadField({
         {preview ? (
           <img
             src={preview}
-            alt="Vista previa"
+            alt={t('cms.preview')}
             className="h-40 w-auto rounded-md border border-border object-cover"
           />
         ) : (
@@ -96,8 +98,8 @@ export function CmsImageUploadField({
             {file
               ? formatFileName(file.name)
               : preview
-                ? 'Haz clic para cambiar la imagen'
-                : 'Haz clic para seleccionar una imagen'}
+                ? t('cms.clickToChange')
+                : t('cms.clickToSelect')}
           </span>
         </span>
 
@@ -122,11 +124,11 @@ export function CmsImageUploadField({
           className="self-start"
         >
           <X data-icon="inline-start" />
-          Quitar imagen
+          {t('cms.removeImage')}
         </Button>
       )}
 
-      <FieldDescription>JPG, PNG, WebP o AVIF. Máximo 5 MB.</FieldDescription>
+      <FieldDescription>{t('cms.imageRequirements')}</FieldDescription>
       {error && <FieldError>{error}</FieldError>}
     </div>
   );

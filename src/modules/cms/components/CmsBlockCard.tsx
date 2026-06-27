@@ -1,7 +1,8 @@
 import type { ContentBlockResponse } from '@bopacorp/shared/catalog';
 import { format } from 'date-fns';
-import { es } from 'date-fns/locale';
+import { enUS, es } from 'date-fns/locale';
 import { Pencil } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { Badge } from '@/components/ui/badge.js';
 import { Button } from '@/components/ui/button.js';
 
@@ -15,8 +16,10 @@ function isVisualBlock(type: ContentBlockResponse['contentType']) {
 }
 
 export function CmsBlockCard({ block, onEdit }: CmsBlockCardProps) {
+  const { t, i18n } = useTranslation();
   const keyLabel = block.contentKey.split('.').slice(1).join('.');
-  const updated = format(new Date(block.updatedAt), 'dd MMM yyyy', { locale: es });
+  const locale = i18n.language === 'en' ? enUS : es;
+  const updated = format(new Date(block.updatedAt), 'dd MMM yyyy', { locale });
 
   return (
     <div className="group flex flex-col gap-3 rounded-xl border border-border p-4 transition-colors hover:border-primary/50">
@@ -38,15 +41,15 @@ export function CmsBlockCard({ block, onEdit }: CmsBlockCardProps) {
         block.body ? (
           <img
             src={block.body}
-            alt="Vista previa"
+            alt={t('cms.preview')}
             className="h-20 w-full rounded-md border border-border object-cover"
           />
         ) : (
-          <p className="text-xs text-muted-foreground italic">Sin URL de imagen.</p>
+          <p className="text-xs text-muted-foreground italic">{t('cms.noImage')}</p>
         )
       ) : (
         <p className="text-xs leading-relaxed text-muted-foreground line-clamp-3">
-          {block.body || 'Sin contenido.'}
+          {block.body || t('cms.noContent')}
         </p>
       )}
 
@@ -54,7 +57,7 @@ export function CmsBlockCard({ block, onEdit }: CmsBlockCardProps) {
         <span className="font-mono text-[10px] text-muted-foreground">{updated}</span>
         <Button variant="outline" size="sm" onClick={() => onEdit(block)} className="h-7 text-xs">
           <Pencil data-icon="inline-start" />
-          Editar
+          {t('cms.edit')}
         </Button>
       </div>
     </div>

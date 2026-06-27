@@ -3,6 +3,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Loader2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import type { z } from 'zod';
@@ -12,7 +13,7 @@ import { Field, FieldError, FieldGroup, FieldLabel } from '@/components/ui/field
 import { Input } from '@/components/ui/input.js';
 import { PasswordInput } from '@/components/ui/password-input.js';
 import { hasAnyAdminRole } from '@/modules/auth/constants.js';
-import { LOGIN_ERRORS } from '@/shared/errors/auth.js';
+import { LOGIN_ERROR_KEYS } from '@/shared/errors/auth.js';
 import { getErrorMessage } from '@/shared/errors/index.js';
 import { FormAlert } from '@/shared/ui/FormAlert.js';
 import { ModeToggle } from '@/shared/ui/ModeToggle.js';
@@ -21,6 +22,7 @@ import { useAuth } from '../context/AuthContext.js';
 type LoginFormValues = z.input<typeof LoginRequestSchema>;
 
 export default function LoginPage() {
+  const { t } = useTranslation();
   const { login } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
@@ -50,10 +52,10 @@ export default function LoginPage() {
         { email: values.email, password: values.password },
         { validate: (u) => hasAnyAdminRole(u.roles) },
       );
-      toast.success('Sesión iniciada');
+      toast.success(t('auth.sessionStarted'));
       navigate(from, { replace: true });
     } catch (err) {
-      setAuthError(getErrorMessage(err, LOGIN_ERRORS));
+      setAuthError(getErrorMessage(err, LOGIN_ERROR_KEYS));
     }
   };
 
@@ -65,7 +67,7 @@ export default function LoginPage() {
       <Card className="w-full max-w-sm">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl font-bold tracking-tight">BOPACORP</CardTitle>
-          <CardDescription>Iniciar sesión</CardDescription>
+          <CardDescription>{t('auth.login')}</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-4" noValidate>
@@ -73,7 +75,7 @@ export default function LoginPage() {
 
             <FieldGroup>
               <Field data-invalid={form.formState.errors.email ? true : undefined}>
-                <FieldLabel htmlFor="email">Correo electrónico</FieldLabel>
+                <FieldLabel htmlFor="email">{t('auth.email')}</FieldLabel>
                 <Input
                   id="email"
                   type="email"
@@ -89,7 +91,7 @@ export default function LoginPage() {
               </Field>
 
               <Field data-invalid={form.formState.errors.password ? true : undefined}>
-                <FieldLabel htmlFor="password">Contraseña</FieldLabel>
+                <FieldLabel htmlFor="password">{t('auth.password')}</FieldLabel>
                 <PasswordInput
                   id="password"
                   placeholder="••••••••"
@@ -114,7 +116,7 @@ export default function LoginPage() {
               {form.formState.isSubmitting && (
                 <Loader2 data-icon="inline-start" className="animate-spin" />
               )}
-              Iniciar sesión
+              {t('auth.login')}
             </Button>
           </form>
         </CardContent>

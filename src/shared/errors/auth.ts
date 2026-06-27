@@ -1,6 +1,6 @@
-export const LOGIN_ERRORS: Record<string, string> = {
-  INVALID_CREDENTIALS: 'Correo o contraseña incorrectos.',
-  ACCOUNT_LOCKED: 'Cuenta bloqueada temporalmente por intentos fallidos. Intenta más tarde.',
-  ACCOUNT_DISABLED: 'Tu cuenta está desactivada. Contacta al administrador.',
-  RATE_LIMITED: 'Demasiados intentos. Intenta de nuevo en unos minutos.',
+export const LOGIN_ERROR_KEYS: Record<string, string> = {
+  INVALID_CREDENTIALS: 'error.invalidCredentials',
+  ACCOUNT_LOCKED: 'error.accountLocked',
+  ACCOUNT_DISABLED: 'error.accountDisabled',
+  RATE_LIMITED: 'error.rateLimited',
 };

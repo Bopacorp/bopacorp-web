@@ -1,5 +1,6 @@
 import { createContext, type ReactNode, useCallback, useContext, useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
+import i18n from '@/i18n/index.js';
 import * as authService from '@/services/auth.service.js';
 import { type AuthUser, buildAuthUser, fetchMe } from '@/services/auth.service.js';
 import {
@@ -93,7 +94,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     ) => {
       const response = await authService.login(data);
       if (opts?.validate && !opts.validate(response.user)) {
-        throw new Error('No tienes permisos para acceder al panel de administración.');
+        throw new Error(i18n.t('auth.noAdminPermission'));
       }
       saveTokens(response.tokens);
       saveUser(response.user);

@@ -1,26 +1,27 @@
+import i18n from '@/i18n/index.js';
 import { ApiError } from '@/services/api.js';
 
-const GENERIC_MESSAGES: Record<string, string> = {
-  UNAUTHORIZED: 'Sesión expirada. Inicia sesión nuevamente.',
-  FORBIDDEN: 'No tienes permisos para realizar esta acción.',
-  RESOURCE_NOT_FOUND: 'El recurso solicitado no existe.',
-  CONFLICT: 'Ya existe un registro con esos datos.',
-  VALIDATION_ERROR: 'Algunos campos tienen errores. Revísalos e intenta de nuevo.',
-  BAD_REQUEST: 'Solicitud inválida. Verifica los datos enviados.',
-  INTERNAL_ERROR: 'Ocurrió un error inesperado. Intenta de nuevo más tarde.',
-  ROUTE_NOT_FOUND: 'La ruta solicitada no existe.',
+const GENERIC_KEYS: Record<string, string> = {
+  UNAUTHORIZED: 'error.unauthorized',
+  FORBIDDEN: 'error.forbidden',
+  RESOURCE_NOT_FOUND: 'error.notFound',
+  CONFLICT: 'error.conflict',
+  VALIDATION_ERROR: 'error.validation',
+  BAD_REQUEST: 'error.badRequest',
+  INTERNAL_ERROR: 'error.generic',
+  ROUTE_NOT_FOUND: 'error.routeNotFound',
 };
 
-const FALLBACK = 'Ocurrió un error inesperado. Intenta de nuevo más tarde.';
-
-export function getErrorMessage(error: unknown, overrides?: Record<string, string>): string {
+export function getErrorMessage(error: unknown, overrideKeys?: Record<string, string>): string {
   if (error instanceof ApiError) {
-    return overrides?.[error.code] ?? GENERIC_MESSAGES[error.code] ?? error.message;
+    const key = overrideKeys?.[error.code] ?? GENERIC_KEYS[error.code];
+    if (key) return i18n.t(key);
+    return error.message;
   }
   if (error instanceof Error) {
     return error.message;
   }
-  return FALLBACK;
+  return i18n.t('error.generic');
 }
 
 export function getErrorCode(error: unknown): string | undefined {
