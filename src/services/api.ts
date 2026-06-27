@@ -1,4 +1,9 @@
-import type { AxiosError, AxiosRequestConfig, InternalAxiosRequestConfig } from 'axios';
+import type {
+  AxiosError,
+  AxiosRequestConfig,
+  AxiosResponse,
+  InternalAxiosRequestConfig,
+} from 'axios';
 import axios from 'axios';
 import {
   clearAll,
@@ -46,10 +51,19 @@ export class ApiError extends Error {
 }
 
 export async function request<T>(config: AxiosRequestConfig): Promise<T> {
-  const response = await api(config);
+  let response: AxiosResponse;
+  try {
+    response = await api(config);
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response?.data?.error) {
+      const { code, message, details } = error.response.data.error;
+      throw new ApiError(code, message, normalizeDetails(details));
+    }
+    throw error;
+  }
   if (!response.data.success) {
-    const errorBody = response.data.error as { code: string; message: string; details?: unknown };
-    throw new ApiError(errorBody.code, errorBody.message, normalizeDetails(errorBody.details));
+    const { code, message, details } = response.data.error;
+    throw new ApiError(code, message, normalizeDetails(details));
   }
   return response.data.data as T;
 }
@@ -62,10 +76,19 @@ export interface PaginatedResponse<T, M = unknown> {
 export async function requestPaginated<T, M = unknown>(
   config: AxiosRequestConfig,
 ): Promise<PaginatedResponse<T, M>> {
-  const response = await api(config);
+  let response: AxiosResponse;
+  try {
+    response = await api(config);
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response?.data?.error) {
+      const { code, message, details } = error.response.data.error;
+      throw new ApiError(code, message, normalizeDetails(details));
+    }
+    throw error;
+  }
   if (!response.data.success) {
-    const errorBody = response.data.error as { code: string; message: string; details?: unknown };
-    throw new ApiError(errorBody.code, errorBody.message, normalizeDetails(errorBody.details));
+    const { code, message, details } = response.data.error;
+    throw new ApiError(code, message, normalizeDetails(details));
   }
   return { data: response.data.data as T[], meta: response.data.meta as M };
 }

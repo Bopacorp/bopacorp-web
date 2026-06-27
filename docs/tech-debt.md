@@ -2,7 +2,7 @@
 
 ## ZOD-I18N — Mensajes de validación Zod no soportan i18n
 
-**Estado**: Pendiente
+**Estado**: Resuelto (`@bopacorp/shared@0.2.41`)
 **Prioridad**: Baja
 **Afecta**: `@bopacorp/shared` + `bopacorp-web` + `bopacorp-crm`
 
