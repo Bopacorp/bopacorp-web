@@ -1,6 +1,6 @@
 # Registro de evidencia de testing — BOPACORP Web
 
-**Estado de Fase 1:** runner, smoke test, cobertura y validaciones de calidad ejecutados.
+**Estado de Fase 2:** autenticación, autorización, storage, JWT y frontera HTTP ejecutados.
 **Regla:** `Existente` o `Implementado` no significa `Pass`; el resultado debe observarse en una ejecución reproducible.
 
 ## 1. Identificación de la ejecución
@@ -8,11 +8,11 @@
 | Campo | Valor |
 |---|---|
 | Repositorio Web | `bopacorp-web` |
-| SHA Web | `1311e685edfc` |
-| SHA API | No aplica para Fase 1 |
-| SHA Shared | No aplica para Fase 1 |
+| SHA Web | `5e1b103cc128` + working tree de Fase 2 |
+| SHA API | No aplica para pruebas con dobles deterministas |
+| SHA Shared | `0.3.2` instalado; no modificado |
 | Rama | `main` |
-| Fecha y hora | `2026-08-15T15:37:40-05:00` |
+| Fecha y hora | `2026-08-15T16:09:56-05:00` |
 | Responsable | Agente Codex |
 | Sistema operativo | Linux |
 | Node | `v22.22.2` |
@@ -20,7 +20,7 @@
 | Navegador | Pendiente / no aplica |
 | Ambiente | Local, Vitest con `jsdom` |
 | Base URL | `http://test.local/api/v1` simulada por setup, sin backend real |
-| Datos usados | Smoke test sintético; no usa datos personales ni credenciales |
+| Datos usados | Fixtures sintéticas de usuarios, tokens, permisos y respuestas API; sin credenciales reales |
 
 ## 2. Línea base de comandos
 
@@ -43,6 +43,7 @@ Copiar una fila por corrida significativa y conservar el log o artifact.
 | ID corrida | Comando/suite | Alcance | Fecha | SHA | Resultado | Fallos | Artifact |
 |---|---|---|---|---|---|---|---|
 | WEB-RUN-001 | `npm run test:run` | Smoke de Vitest en `jsdom` y resolución del alias `@/` | 2026-08-15 | `1311e685edfc` | Pass | — | Consola: 1 archivo, 2 tests |
+| WEB-RUN-002 | `npm run test:run` | Auth, RBAC, storage, JWT, Login y API boundary | 2026-08-15 | `5e1b103cc128` + WT | Pass | — | Consola: 15 archivos, 58 tests |
 
 ## 4. Registro de cobertura
 
@@ -51,6 +52,7 @@ La cobertura debe indicar exactamente qué archivos fueron incluidos. No reporta
 | ID | Comando | Include/exclude | Lines | Functions | Branches | Statements | SHA | Artifact |
 |---|---|---|---:|---:|---:|---:|---|---|
 | WEB-COV-001 | `npm run test:coverage` | `coverageInclude` y `coverageExclude` definidos en `vite.config.ts`; detalle abajo | 1.28% (13/1010) | 0% (0/308) | 0.25% (2/791) | 1.17% (13/1106) | `1311e685edfc` | `coverage/index.html`, `coverage/lcov.info` |
+| WEB-COV-002 | `npm run test:coverage` | Mismo conjunto crítico; suites de Fase 2 agregadas al smoke baseline | 24.77% (250/1009) | 20.77% (64/308) | 15.67% (124/791) | 23.64% (261/1104) | `5e1b103cc128` + WT | `coverage/index.html`, `coverage/lcov.info` |
 
 El `include` de cobertura comprende `src/App.tsx`, `src/services/**/*.ts`, los módulos de autenticación, administración, catálogo, contacto, empleabilidad y CMS, las páginas/hooks públicos priorizados y los helpers compartidos listados en `vite.config.ts`. El `exclude` omite `src/test/**`, tests, declaraciones, assets y primitivas `src/components/ui/**`. La cobertura es una línea base: todavía no se aplica el umbral de 80% porque los casos de negocio se implementan en las fases siguientes.
 
@@ -59,6 +61,7 @@ El `include` de cobertura comprende `src/App.tsx`, `src/services/**/*.ts`, los m
 | Archivo | Líneas/decisiones | Riesgo | Caso pendiente | Acción |
 |---|---|---|---|---|
 | `src/App.tsx`, `src/services/**` y módulos críticos incluidos | Cobertura de línea base menor al 80% con solo smoke tests | Autenticación, contratos HTTP y flujos de negocio aún no tienen casos dirigidos | Implementar casos WEB-AUTH, WEB-API, WEB-CAT, WEB-CON, WEB-EMP y WEB-CMS | Añadir suites por riesgo en Fases 2–7 y activar el gate al completar el alcance crítico |
+| `AuthContext.tsx`, `LoginPage.tsx`, `api.ts`, `auth.service.ts` | Ramas restantes: AuthContext 79.16%, LoginPage 78.26%, API 72.22%; `auth.service.ts` cubre wrappers parcialmente | Decisiones residuales de transporte y errores no cambian el resultado de los casos P0 ejecutados | Revisar líneas no cubiertas antes del gate final | Mantener gate informativo en Fase 2 y cerrar cobertura crítica en Fase 9 |
 
 ## 5. Registro de aceptación E2E
 
@@ -77,13 +80,14 @@ Cada ejecución debe registrar precondiciones y resultado observado, no solo una
 
 | Caso | Requisito | Riesgo | Archivo/suite | Fecha | SHA | Esperado | Observado | Estado | Evidencia |
 |---|---|---|---|---|---|---|---|---|---|
-| Pendiente | Pendiente | Pendiente | Pendiente | — | — | — | — | Not run | — |
+| WEB-AUTH-001..015 | Auth, RBAC y sesión | P0/P1 | `LoginPage.test.tsx`, `AuthContext.test.tsx`, guards, permission, JWT y storage suites | 2026-08-15 | `5e1b103cc128` + WT | Flujos válidos, inválidos, no autorizados y públicos se comportan según la matriz | 15 archivos de suite ejecutados; todos los casos seleccionados pasan | Pass | `WEB-RUN-002`, `WEB-COV-002` |
+| WEB-API-001..013 | Configuración y Axios boundary | P0/P1 | `api-config.test.ts`, `api.test.ts`, `auth.service.test.ts` | 2026-08-15 | `5e1b103cc128` + WT | Envelopes, errores, headers, refresh único/concurrente y expiración se comportan según la matriz | 15 archivos de suite ejecutados; todos los casos seleccionados pasan | Pass | `WEB-RUN-002`, `WEB-COV-002` |
 
 ## 7. Registro de defectos y retests
 
 | Defecto | Caso afectado | Síntoma | Ambiente | Fix SHA | Fecha fix | Retest SHA | Resultado retest | Evidencia |
 |---|---|---|---|---|---|---|---|---|
-| Pendiente | Pendiente | — | — | — | — | — | Not run | — |
+| WEB-DEF-001 | WEB-AUTH-005, WEB-AUTH-015, WEB-API-013 | `AuthContext` usaba prefijos ingleses y `window.location.pathname`, por lo que rutas españolas y eventos bajo MemoryRouter podían tratarse como protegidos | Local/jsdom | `5e1b103cc128 + WT` | 2026-08-15 | `5e1b103cc128 + WT` | Pass: rutas `/servicios`, `/nosotros`, `/empleos` y token refresh event cubiertos | `WEB-RUN-002` |
 
 ## 8. Registro de limitaciones y bloqueos
 

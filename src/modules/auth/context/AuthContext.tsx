@@ -26,7 +26,7 @@ interface AuthState {
 
 const AuthContext = createContext<AuthState | null>(null);
 
-const PUBLIC_PATH_PREFIXES = ['/services', '/about', '/jobs'];
+const PUBLIC_PATH_PREFIXES = ['/servicios', '/nosotros', '/empleos'];
 const PUBLIC_PATHS = new Set(['/', '/login']);
 
 function isPublicPath(pathname: string): boolean {
@@ -39,10 +39,9 @@ function isPublicPath(pathname: string): boolean {
 export function AuthProvider({ children }: { children: ReactNode }) {
   const location = useLocation();
   const [user, setUser] = useState<AuthUser | null>(() => getStoredUser<AuthUser>());
-  const [isLoading, setIsLoading] = useState(() => {
-    if (!getAccessToken()) return false;
-    return !isPublicPath(window.location.pathname);
-  });
+  const [isLoading, setIsLoading] = useState(
+    () => Boolean(getAccessToken()) && !isPublicPath(location.pathname),
+  );
 
   useEffect(() => {
     if (isPublicPath(location.pathname)) {
@@ -71,7 +70,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const handleTokenRefresh = async () => {
-      if (isPublicPath(window.location.pathname)) return;
+      if (isPublicPath(location.pathname)) return;
       try {
         const meData = await fetchMe();
         const fullUser = buildAuthUser(meData);
@@ -85,7 +84,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     window.addEventListener('bopacorp:token-refreshed', handleTokenRefresh);
     return () => window.removeEventListener('bopacorp:token-refreshed', handleTokenRefresh);
-  }, []);
+  }, [location.pathname]);
 
   const login = useCallback(
     async (

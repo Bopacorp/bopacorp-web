@@ -16,39 +16,39 @@
 
 | ID | Capa | Caso | Prioridad | Estado | Destino sugerido |
 |---|---|---|---|---|---|
-| WEB-AUTH-001 | Componente | Login válido inicia sesión y navega al destino solicitado | P0 | Pendiente | `LoginPage.test.tsx` |
-| WEB-AUTH-002 | Componente | Login inválido muestra error de autenticación | P0 | Pendiente | `LoginPage.test.tsx` |
-| WEB-AUTH-003 | Componente | Campos de login vacíos o inválidos no envían | P0 | Pendiente | `LoginPage.test.tsx` |
-| WEB-AUTH-004 | Unitario | Usuario sin rol `admin`/`web-admin` es rechazado | P0 | Pendiente | `AuthContext.test.tsx` |
-| WEB-AUTH-005 | Integración | Sesión almacenada consulta `/auth/me` en ruta protegida | P0 | Pendiente | `AuthContext.test.tsx` |
-| WEB-AUTH-006 | Integración | Fallo de `/auth/me` limpia usuario y tokens | P0 | Pendiente | `AuthContext.test.tsx` |
-| WEB-AUTH-007 | Componente | `RequireAuth` muestra loader durante la verificación | P1 | Pendiente | `RequireAuth.test.tsx` |
-| WEB-AUTH-008 | Componente | `RequireAuth` redirige a login y conserva `from` | P0 | Pendiente | `RequireAuth.test.tsx` |
-| WEB-AUTH-009 | Componente | `RequireAdminRole` redirige a usuario no administrativo | P0 | Pendiente | `RequireAdminRole.test.tsx` |
-| WEB-AUTH-010 | Componente | `PermissionRoute` muestra acceso denegado sin permiso | P0 | Pendiente | `PermissionRoute.test.tsx` |
-| WEB-AUTH-011 | Componente | `Can` oculta una acción sin permiso | P0 | Pendiente | `Can.test.tsx` |
-| WEB-AUTH-012 | Componente | `Can` muestra una acción con alguno de los permisos permitidos | P1 | Pendiente | `Can.test.tsx` |
-| WEB-AUTH-013 | Integración | Logout limpia sesión aunque falle la revocación remota | P0 | Pendiente | `AuthContext.test.tsx` |
-| WEB-AUTH-014 | Unitario | JWT válido obtiene permisos y JWT inválido cae a permisos vacíos | P1 | Pendiente | `jwt.test.ts` |
-| WEB-AUTH-015 | Integración | `AuthContext` reconoce las rutas públicas reales en español | P0 | Pendiente | `AuthContext.test.tsx` |
+| WEB-AUTH-001 | Componente | Login válido inicia sesión y navega al destino solicitado | P0 | Pass | `LoginPage.test.tsx` |
+| WEB-AUTH-002 | Componente | Login inválido muestra error de autenticación | P0 | Pass | `LoginPage.test.tsx` |
+| WEB-AUTH-003 | Componente | Campos de login vacíos o inválidos no envían | P0 | Pass | `LoginPage.test.tsx` |
+| WEB-AUTH-004 | Unitario | Usuario sin rol `admin`/`web-admin` es rechazado | P0 | Pass | `AuthContext.test.tsx` |
+| WEB-AUTH-005 | Integración | Sesión almacenada consulta `/auth/me` en ruta protegida | P0 | Pass | `AuthContext.test.tsx` |
+| WEB-AUTH-006 | Integración | Fallo de `/auth/me` limpia usuario y tokens | P0 | Pass | `AuthContext.test.tsx` |
+| WEB-AUTH-007 | Componente | `RequireAuth` muestra loader durante la verificación | P1 | Pass | `RequireAuth.loader.test.tsx` |
+| WEB-AUTH-008 | Componente | `RequireAuth` redirige a login y conserva `from` | P0 | Pass | `RequireAuth.test.tsx` |
+| WEB-AUTH-009 | Componente | `RequireAdminRole` redirige a usuario no administrativo | P0 | Pass | `RequireAdminRole.test.tsx` |
+| WEB-AUTH-010 | Componente | `PermissionRoute` muestra acceso denegado sin permiso | P0 | Pass | `PermissionRoute.test.tsx` |
+| WEB-AUTH-011 | Componente | `Can` oculta una acción sin permiso | P0 | Pass | `Can.test.tsx` |
+| WEB-AUTH-012 | Componente | `Can` muestra una acción con alguno de los permisos permitidos | P1 | Pass | `Can.test.tsx` |
+| WEB-AUTH-013 | Integración | Logout limpia sesión aunque falle la revocación remota | P0 | Pass | `AuthContext.test.tsx` |
+| WEB-AUTH-014 | Unitario | JWT válido obtiene permisos y JWT inválido cae a permisos vacíos | P1 | Pass | `jwt.test.ts` / `auth.service.test.ts` |
+| WEB-AUTH-015 | Integración | `AuthContext` reconoce las rutas públicas reales en español | P0 | Pass | `AuthContext.test.tsx` |
 
 ## 3. Cliente HTTP y contratos
 
 | ID | Capa | Caso | Prioridad | Estado | Destino sugerido |
 |---|---|---|---|---|---|
-| WEB-API-001 | Unitario | `VITE_API_URL` ausente produce error explícito | P0 | Pendiente | `api.test.ts` |
-| WEB-API-002 | Unitario | URL sin `/api/` produce error explícito | P1 | Pendiente | `api.test.ts` |
-| WEB-API-003 | Unitario | Sobre exitoso devuelve `data` | P0 | Pendiente | `api.test.ts` |
-| WEB-API-004 | Unitario | Sobre paginado devuelve `data` y `meta` | P1 | Pendiente | `api.test.ts` |
-| WEB-API-005 | Unitario | Error con detalles se convierte en `ApiError` | P0 | Pendiente | `api.test.ts` |
-| WEB-API-006 | Unitario | Detalles inválidos no rompen la normalización | P1 | Pendiente | `api.test.ts` |
-| WEB-API-007 | Unitario | Rutas públicas no agregan Bearer ni hacen refresh por 401 | P0 | Pendiente | `api.test.ts` |
-| WEB-API-008 | Unitario | Ruta protegida recibe Bearer token | P0 | Pendiente | `api.test.ts` |
-| WEB-API-009 | Integración | 401 protegido refresca y reintenta una sola vez | P0 | Pendiente | `api.test.ts` |
-| WEB-API-010 | Integración | Requests concurrentes esperan el mismo refresh | P1 | Pendiente | `api.test.ts` |
-| WEB-API-011 | Integración | Refresh fallido limpia storage y redirige a login | P0 | Pendiente | `api.test.ts` |
-| WEB-API-012 | Integración | Refresh proactivo actualiza el token próximo a vencer | P1 | Pendiente | `api.test.ts` |
-| WEB-API-013 | Integración | Evento de token refrescado actualiza el usuario | P1 | Pendiente | `AuthContext.test.tsx` |
+| WEB-API-001 | Unitario | `VITE_API_URL` ausente produce error explícito | P0 | Pass | `api-config.test.ts` |
+| WEB-API-002 | Unitario | URL sin `/api/` produce error explícito | P1 | Pass | `api-config.test.ts` |
+| WEB-API-003 | Unitario | Sobre exitoso devuelve `data` | P0 | Pass | `api.test.ts` |
+| WEB-API-004 | Unitario | Sobre paginado devuelve `data` y `meta` | P1 | Pass | `api.test.ts` |
+| WEB-API-005 | Unitario | Error con detalles se convierte en `ApiError` | P0 | Pass | `api.test.ts` |
+| WEB-API-006 | Unitario | Detalles inválidos no rompen la normalización | P1 | Pass | `api.test.ts` |
+| WEB-API-007 | Unitario | Rutas públicas no agregan Bearer ni hacen refresh por 401 | P0 | Pass | `api.test.ts` |
+| WEB-API-008 | Unitario | Ruta protegida recibe Bearer token | P0 | Pass | `api.test.ts` |
+| WEB-API-009 | Integración | 401 protegido refresca y reintenta una sola vez | P0 | Pass | `api.test.ts` |
+| WEB-API-010 | Integración | Requests concurrentes esperan el mismo refresh | P1 | Pass | `api.test.ts` |
+| WEB-API-011 | Integración | Refresh fallido limpia storage y redirige a login | P0 | Pass | `api.test.ts` |
+| WEB-API-012 | Integración | Refresh proactivo actualiza el token próximo a vencer | P1 | Pass | `api.test.ts` |
+| WEB-API-013 | Integración | Evento de token refrescado actualiza el usuario | P1 | Pass | `AuthContext.test.tsx` / `api.test.ts` |
 
 ## 4. Catálogo público
 

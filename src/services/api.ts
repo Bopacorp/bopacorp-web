@@ -12,6 +12,7 @@ import {
   getTokenExpiresAt,
   saveTokens,
 } from './auth-storage.js';
+import { redirectToLogin } from './navigation.js';
 
 const baseURL = import.meta.env.VITE_API_URL as string;
 
@@ -229,10 +230,6 @@ function handleRefreshError(error: AxiosError) {
   clearAll();
   redirectToLogin();
   return Promise.reject(error);
-}
-
-function redirectToLogin() {
-  window.location.href = '/login';
 }
 
 function isPublicPath(url: string | undefined): boolean {
