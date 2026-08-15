@@ -472,6 +472,36 @@ La revisión visual y responsive requiere navegador; no se considera cubierta so
 - SHA coordinado de API, Web y Shared;
 - caso de contrato cuando exista drift de versiones.
 
+### Implementación en el Web
+
+- `vitest.integration.config.ts` separa la suite HTTP de los tests deterministas y no modifica la configuración de cobertura.
+- `npm run test:integration` ejecuta `src/integration/**/*.test.ts` contra la URL entregada por `VITE_API_URL`.
+- Las cuentas se inyectan con `VITE_WEB_TEST_CMS_EMAIL`, `VITE_WEB_TEST_CMS_PASSWORD`, `VITE_WEB_TEST_LIMITED_EMAIL` y `VITE_WEB_TEST_LIMITED_PASSWORD`; sus valores no deben versionarse ni aparecer en logs.
+- Contacto, actualización CMS y postulación requieren `VITE_WEB_TEST_ALLOW_MUTATIONS=true`; el upload requiere además `VITE_WEB_TEST_ALLOW_STORAGE_MUTATIONS=true`.
+- La suite cubre sobres públicos, `auth/me`, 401, 403, 404, 422 con `details`, catálogo, vacantes, CMS, contacto y multipart de postulación. Los casos 409/429 y validaciones de tamaño que puedan consumir cuota quedan para una corrida controlada del ambiente.
+
+Ejemplo de ejecución con variables temporales del ambiente (sin escribirlas en `.env` ni en el repositorio):
+
+```bash
+VITE_API_URL=http://localhost:3000/api/v1 \
+VITE_WEB_TEST_CMS_EMAIL="$CMS_TEST_EMAIL" \
+VITE_WEB_TEST_CMS_PASSWORD="$CMS_TEST_PASSWORD" \
+VITE_WEB_TEST_LIMITED_EMAIL="$LIMITED_TEST_EMAIL" \
+VITE_WEB_TEST_LIMITED_PASSWORD="$LIMITED_TEST_PASSWORD" \
+npm run test:integration
+```
+
+La primera corrida debe ejecutarse desde un entorno que pueda resolver la URL del API. Si el servidor corre en otro namespace, contenedor o máquina, se debe usar un hostname alcanzable en `VITE_API_URL` y registrar el SHA real de API/Web/Shared.
+
+### Resultado observado — 2026-08-15
+
+- API local `http://localhost:3000/api/v1`, API `4018bd5`, Shared `0.3.2` y Web `cf33057` más working tree de Fase 7.
+- Contratos públicos: `7/7` passed; auth/RBAC: `4/4` passed.
+- Mutaciones: `4/4` passed: contacto, postulación multipart, actualización/restauración CMS y upload/restauración de imagen.
+- Resultado acumulado de la fase para el alcance HTTP ejecutado: `15/15` passed.
+- El fixture de PDF usa 10 KB para satisfacer el contrato de tamaño mínimo del API; el PDF sintético inicial de 4 bytes producía `0.00 MB` y fue corregido en el test.
+- Fase 8 — E2E en navegador, revisión visual y responsive — permanece pendiente.
+
 ### Criterio de salida
 
 El Web y la API presentan el mismo contrato para los escenarios aceptados y toda diferencia conocida está documentada.

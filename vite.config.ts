@@ -50,7 +50,7 @@ export default defineConfig({
     hookTimeout: 15000,
     setupFiles: './src/test/setup.ts',
     include: ['src/**/*.{test,spec}.{ts,tsx}'],
-    exclude: ['node_modules/**', 'dist/**', 'coverage/**'],
+    exclude: ['node_modules/**', 'dist/**', 'coverage/**', 'src/integration/**'],
     coverage: {
       provider: 'v8',
       reporter: ['text', 'html', 'lcov'],

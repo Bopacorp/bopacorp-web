@@ -1,7 +1,7 @@
 # Matriz de casos de prueba del Web
 
 **Estado inicial:** casos definidos para implementación y ejecución; no marcar `Pass` hasta registrar una corrida real.
-**Leyenda:** `Pendiente` significa que el caso todavía debe implementarse, ejecutarse o contar con evidencia actual; `Not run` identifica una revisión que requiere ambiente o herramienta todavía no disponible.
+**Leyenda:** `Pendiente` significa que el caso todavía debe implementarse, ejecutarse o contar con evidencia actual; `Not run` identifica una revisión que requiere ambiente o herramienta todavía no disponible. Los casos read-only de Fase 7 pasan a `Pass` únicamente después de una corrida contra un API HTTP alcanzable; las mutaciones se ejecutan solo con flags explícitos y conservan su resultado real.
 
 ## 1. Baseline y configuración
 
@@ -154,7 +154,22 @@
 | WEB-UI-007 | Manual | Teclado, foco, idioma y modo oscuro no rompen acciones | P1 | Pendiente | [`REGISTRO_REVISION_MANUAL_UI.md`](./REGISTRO_REVISION_MANUAL_UI.md) |
 | WEB-UI-008 | Componente | Wildcard redirige a una ruta pública o CMS válida | P1 | Pass | `App.test.tsx` |
 
-## 9. End-to-end
+## 9. Integración HTTP con API
+
+| ID | Capa | Caso | Prioridad | Estado | Destino sugerido |
+|---|---|---|---|---|---|
+| WEB-API-014 | Integración | Catálogo, CMS público y vacantes devuelven sobres exitosos compatibles con `request` y `requestPaginated` | P0 | Pass | `src/integration/public-api.contract.test.ts` |
+| WEB-API-015 | Integración | `/auth/me` sin token devuelve 401 y CMS sin permiso devuelve 403; el cliente los transforma en `ApiError` | P0 | Pass | `src/integration/auth-permissions.contract.test.ts` |
+| WEB-API-016 | Integración | Recurso público inexistente devuelve 404 `RESOURCE_NOT_FOUND` | P0 | Pass | `src/integration/public-api.contract.test.ts` |
+| WEB-API-017 | Integración | Validación de contacto y postulación devuelve `details`/error envelope compatible | P0 | Pass | `src/integration/public-api.contract.test.ts` |
+| WEB-CON-013 | Integración | Contacto válido persiste y devuelve la respuesta consumida por el frontend | P0 | Pass | `src/integration/mutation-api.contract.test.ts` |
+| WEB-EMP-024 | Integración | Postulación válida envía multipart con PDF, candidato, vacante y carta | P0 | Pass | `src/integration/mutation-api.contract.test.ts` |
+| WEB-CMS-024 | Integración | CMS autorizado lista, actualiza, verifica y restaura un bloque de texto | P0 | Pass | `src/integration/mutation-api.contract.test.ts` |
+| WEB-CMS-025 | Integración | Upload de imagen actualiza el bloque y restaura el body usando storage de prueba | P1 | Pass | `src/integration/mutation-api.contract.test.ts` |
+
+La suite es opt-in. Requiere `VITE_API_URL`, una cuenta con permisos CMS (`VITE_WEB_TEST_CMS_EMAIL`/`VITE_WEB_TEST_CMS_PASSWORD`) y una cuenta sin permisos CMS (`VITE_WEB_TEST_LIMITED_EMAIL`/`VITE_WEB_TEST_LIMITED_PASSWORD`). Las mutaciones requieren además `VITE_WEB_TEST_ALLOW_MUTATIONS=true`; el upload requiere `VITE_WEB_TEST_ALLOW_STORAGE_MUTATIONS=true`. Ninguna credencial se versiona.
+
+## 10. End-to-end
 
 | ID | Capa | Perfil | Journey | Prioridad | Estado |
 |---|---|---|---|---|---|
@@ -165,6 +180,6 @@
 | WEB-E2E-005 | E2E | Sin permiso | Intentar `/admin/cms` y confirmar denegación/redirección | P0 | Pendiente |
 | WEB-E2E-006 | E2E | Visitante | Error de catálogo/contacto → retry → recuperación | P1 | Pendiente |
 
-## 10. Regla de estado
+## 11. Regla de estado
 
 Un caso solo puede marcarse `Pass` cuando el [registro de evidencia](./REGISTRO_EVIDENCIA_WEB.md) contiene comando o pasos reales, revisión/SHA, fecha, ambiente, resultado observado y artifact asociado.

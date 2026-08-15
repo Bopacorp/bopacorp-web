@@ -12,6 +12,7 @@
     "format": "biome format --write .",
     "test:run": "vitest run",
     "test:coverage": "vitest run --coverage",
+    "test:integration": "vitest run --config vitest.integration.config.ts",
     "preview": "vite preview",
     "prepare": "husky"
   },
