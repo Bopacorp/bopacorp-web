@@ -1,7 +1,7 @@
 # Matriz de casos de prueba del Web
 
 **Estado inicial:** casos definidos para implementación y ejecución; no marcar `Pass` hasta registrar una corrida real.
-**Leyenda:** `Pendiente` significa que el caso todavía debe implementarse, ejecutarse o contar con evidencia actual.
+**Leyenda:** `Pendiente` significa que el caso todavía debe implementarse, ejecutarse o contar con evidencia actual; `Not run` identifica una revisión que requiere ambiente o herramienta todavía no disponible.
 
 ## 1. Baseline y configuración
 
@@ -145,14 +145,14 @@
 
 | ID | Capa | Caso | Prioridad | Estado | Destino sugerido |
 |---|---|---|---|---|---|
-| WEB-UI-001 | Unitario | `PageLoader` muestra mensaje o skeleton según props | P1 | Pendiente | `page-loader.test.tsx` |
-| WEB-UI-002 | Componente | `ErrorState` traduce códigos conocidos | P1 | Pendiente | `error-state.test.tsx` |
-| WEB-UI-003 | Componente | Retry de `ErrorState` ejecuta callback | P1 | Pendiente | `error-state.test.tsx` |
-| WEB-UI-004 | Componente | Inputs y dialogs tienen labels/títulos accesibles | P0 | Pendiente | Tests de componentes |
-| WEB-UI-005 | Componente | Errores exponen estado inválido observable | P1 | Pendiente | Tests de formularios |
-| WEB-UI-006 | Manual | Flujos principales funcionan en móvil y escritorio | P1 | Pendiente | Registro manual |
-| WEB-UI-007 | Manual | Teclado, foco, idioma y modo oscuro no rompen acciones | P1 | Pendiente | Registro manual |
-| WEB-UI-008 | Componente | Wildcard redirige a una ruta pública o CMS válida | P1 | Pendiente | `App.test.tsx` |
+| WEB-UI-001 | Unitario | `PageLoader` muestra mensaje o skeleton según props | P1 | Pass | `page-loader.test.tsx` |
+| WEB-UI-002 | Componente | `ErrorState` traduce códigos conocidos | P1 | Pass | `error-state.test.tsx` |
+| WEB-UI-003 | Componente | Retry de `ErrorState` ejecuta callback | P1 | Pass | `error-state.test.tsx` |
+| WEB-UI-004 | Componente | Inputs y dialogs tienen labels/títulos accesibles | P0 | Pass | `App.test.tsx`, layouts y dialogs |
+| WEB-UI-005 | Componente | Errores exponen estado inválido observable | P1 | Pass | `ContactRequestDialog.test.tsx`, `ApplyDialog.test.tsx`, `CmsEditDialog.test.tsx` |
+| WEB-UI-006 | Manual | Flujos principales funcionan en móvil y escritorio | P1 | Pendiente | [`REGISTRO_REVISION_MANUAL_UI.md`](./REGISTRO_REVISION_MANUAL_UI.md) |
+| WEB-UI-007 | Manual | Teclado, foco, idioma y modo oscuro no rompen acciones | P1 | Pendiente | [`REGISTRO_REVISION_MANUAL_UI.md`](./REGISTRO_REVISION_MANUAL_UI.md) |
+| WEB-UI-008 | Componente | Wildcard redirige a una ruta pública o CMS válida | P1 | Pass | `App.test.tsx` |
 
 ## 9. End-to-end
 

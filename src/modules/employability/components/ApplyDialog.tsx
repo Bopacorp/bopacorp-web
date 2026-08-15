@@ -161,6 +161,7 @@ export function ApplyDialog({ open, onOpenChange, vacancy, onSuccess }: ApplyDia
                   placeholder="1712345678"
                   maxLength={10}
                   disabled={submitting}
+                  aria-invalid={Boolean(form.formState.errors.nationalId)}
                   {...form.register('nationalId')}
                 />
                 {form.formState.errors.nationalId && (
@@ -176,6 +177,7 @@ export function ApplyDialog({ open, onOpenChange, vacancy, onSuccess }: ApplyDia
                     maxLength={50}
                     placeholder="Juan"
                     disabled={submitting}
+                    aria-invalid={Boolean(form.formState.errors.firstName)}
                     {...form.register('firstName')}
                   />
                   {form.formState.errors.firstName && (
@@ -189,6 +191,7 @@ export function ApplyDialog({ open, onOpenChange, vacancy, onSuccess }: ApplyDia
                     maxLength={50}
                     placeholder="Perez"
                     disabled={submitting}
+                    aria-invalid={Boolean(form.formState.errors.lastName)}
                     {...form.register('lastName')}
                   />
                   {form.formState.errors.lastName && (
@@ -205,6 +208,7 @@ export function ApplyDialog({ open, onOpenChange, vacancy, onSuccess }: ApplyDia
                   placeholder="tu@correo.com.ec"
                   maxLength={150}
                   disabled={submitting}
+                  aria-invalid={Boolean(form.formState.errors.email)}
                   {...form.register('email')}
                 />
                 {form.formState.errors.email && (
@@ -220,6 +224,7 @@ export function ApplyDialog({ open, onOpenChange, vacancy, onSuccess }: ApplyDia
                   placeholder="0991234567"
                   maxLength={10}
                   disabled={submitting}
+                  aria-invalid={Boolean(form.formState.errors.phone)}
                   {...form.register('phone', {
                     setValueAs: (value) => (value === '' ? undefined : value),
                   })}
@@ -235,6 +240,7 @@ export function ApplyDialog({ open, onOpenChange, vacancy, onSuccess }: ApplyDia
                   id="apply-address"
                   maxLength={255}
                   disabled={submitting}
+                  aria-invalid={Boolean(form.formState.errors.address)}
                   {...form.register('address')}
                 />
                 {form.formState.errors.address && (
@@ -252,6 +258,7 @@ export function ApplyDialog({ open, onOpenChange, vacancy, onSuccess }: ApplyDia
                   maxLength={2000}
                   placeholder="Cuentanos por que te interesa este rol"
                   disabled={submitting}
+                  aria-invalid={Boolean(form.formState.errors.coverLetter)}
                   {...form.register('coverLetter')}
                 />
                 {form.formState.errors.coverLetter && (

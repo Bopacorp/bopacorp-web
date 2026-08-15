@@ -57,6 +57,23 @@ describe('ApplyDialog', () => {
 
     expect(applyMocks.submit).not.toHaveBeenCalled();
     expect(screen.getAllByRole('alert').length).toBeGreaterThanOrEqual(5);
+    expect(
+      screen.getByRole('dialog', { name: 'Postular a Frontend Developer' }),
+    ).toBeInTheDocument();
+    expect(screen.getByLabelText('Cedula')).toHaveAttribute('aria-invalid', 'true');
+    expect(screen.getByLabelText('Correo electronico')).toHaveAttribute('aria-invalid', 'true');
+    expect(screen.getByLabelText('CV en PDF')).toHaveAttribute('aria-invalid', 'true');
+  });
+
+  it('does not submit when Enter is pressed with required fields missing', async () => {
+    renderDialog();
+    const user = userEvent.setup();
+
+    await user.click(screen.getByLabelText('Cedula'));
+    await user.keyboard('{Enter}');
+
+    expect(applyMocks.submit).not.toHaveBeenCalled();
+    expect(screen.getByLabelText('Cedula')).toHaveAttribute('aria-invalid', 'true');
   });
 
   it('rejects invalid candidate fields', async () => {
@@ -174,6 +191,14 @@ describe('ApplyDialog', () => {
     expect(onOpenChange).toHaveBeenCalledWith(false);
     rerender(<ApplyDialog open={false} onOpenChange={onOpenChange} vacancy={vacancy} />);
     await waitFor(() => expect(applyMocks.reset).toHaveBeenCalledTimes(1));
+  });
+
+  it('closes a clean form when Escape is pressed', async () => {
+    const { onOpenChange } = renderDialog();
+
+    await userEvent.keyboard('{Escape}');
+
+    await waitFor(() => expect(onOpenChange).toHaveBeenCalledWith(false));
   });
 });
 

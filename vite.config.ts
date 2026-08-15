@@ -5,6 +5,8 @@ import { defineConfig } from 'vitest/config';
 
 const coverageInclude = [
   'src/App.tsx',
+  'src/app/{AdminLayout,MainLayout}.tsx',
+  'src/components/ScrollToTop.tsx',
   'src/services/**/*.ts',
   'src/modules/auth/**/*.{ts,tsx}',
   'src/modules/admin/components/PermissionRoute.tsx',
@@ -21,6 +23,7 @@ const coverageInclude = [
   'src/shared/ui/page-loader.tsx',
   'src/shared/ui/error-state.tsx',
   'src/shared/ui/empty-state.tsx',
+  'src/shared/ui/ModeToggle.tsx',
   'src/lib/sanitize.ts',
 ];
 

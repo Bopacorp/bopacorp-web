@@ -136,6 +136,7 @@ export function ContactRequestDialog({
                   autoComplete="name"
                   maxLength={50}
                   disabled={submitting}
+                  aria-invalid={Boolean(form.formState.errors.clientName)}
                   {...form.register('clientName')}
                 />
                 {form.formState.errors.clientName && (
@@ -152,6 +153,7 @@ export function ContactRequestDialog({
                   autoComplete="email"
                   maxLength={150}
                   disabled={submitting}
+                  aria-invalid={Boolean(form.formState.errors.clientEmail)}
                   {...form.register('clientEmail')}
                 />
                 {form.formState.errors.clientEmail && (
@@ -168,6 +170,7 @@ export function ContactRequestDialog({
                   autoComplete="tel"
                   maxLength={10}
                   disabled={submitting}
+                  aria-invalid={Boolean(form.formState.errors.clientPhone)}
                   {...form.register('clientPhone', {
                     setValueAs: (value) => (value === '' ? undefined : value),
                   })}
@@ -185,6 +188,7 @@ export function ContactRequestDialog({
                   maxLength={1000}
                   placeholder="Cuentanos que necesitas para tu empresa"
                   disabled={submitting}
+                  aria-invalid={Boolean(form.formState.errors.message)}
                   {...form.register('message')}
                 />
                 {form.formState.errors.message && (

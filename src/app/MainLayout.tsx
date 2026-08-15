@@ -102,6 +102,7 @@ function MainLayoutInner() {
                 size="icon"
                 onClick={() => openContactDialog()}
                 className="sm:hidden"
+                aria-label="Cotizar Servicios"
               >
                 <MessageCircle />
               </Button>

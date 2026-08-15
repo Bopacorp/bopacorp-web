@@ -56,6 +56,7 @@ export function UploadResumeField({ value, onChange, error, disabled }: UploadRe
           accept="application/pdf"
           onChange={handleChange}
           disabled={disabled}
+          aria-invalid={Boolean(error)}
           className="hidden"
         />
       </label>

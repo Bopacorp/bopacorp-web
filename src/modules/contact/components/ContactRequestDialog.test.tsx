@@ -50,6 +50,9 @@ describe('ContactRequestDialog', () => {
     await user.click(screen.getByRole('button', { name: 'Enviar solicitud' }));
     expect(contactMocks.submit).not.toHaveBeenCalled();
     expect(screen.getAllByRole('alert').length).toBeGreaterThanOrEqual(2);
+    expect(screen.getByRole('dialog', { name: 'Solicitar Cotizacion' })).toBeInTheDocument();
+    expect(screen.getByLabelText('Nombre completo')).toHaveAttribute('aria-invalid', 'true');
+    expect(screen.getByLabelText('Correo electronico')).toHaveAttribute('aria-invalid', 'true');
 
     await user.type(screen.getByLabelText('Nombre completo'), 'Ana Pérez');
     await user.type(screen.getByLabelText('Correo electronico'), 'invalid-email');
@@ -57,6 +60,17 @@ describe('ContactRequestDialog', () => {
 
     expect(contactMocks.submit).not.toHaveBeenCalled();
     expect(onOpenChange).not.toHaveBeenCalled();
+  });
+
+  it('does not submit when Enter is pressed with required fields missing', async () => {
+    renderDialog();
+    const user = userEvent.setup();
+
+    await user.click(screen.getByLabelText('Nombre completo'));
+    await user.keyboard('{Enter}');
+
+    expect(contactMocks.submit).not.toHaveBeenCalled();
+    expect(screen.getByLabelText('Nombre completo')).toHaveAttribute('aria-invalid', 'true');
   });
 
   it('submits trimmed required values and preserves the selected item', async () => {
@@ -156,5 +170,13 @@ describe('ContactRequestDialog', () => {
 
     expect(onOpenChange).toHaveBeenCalledWith(false);
     expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument();
+  });
+
+  it('closes a clean form when Escape is pressed', async () => {
+    const { onOpenChange } = renderDialog();
+
+    await userEvent.keyboard('{Escape}');
+
+    await waitFor(() => expect(onOpenChange).toHaveBeenCalledWith(false));
   });
 });

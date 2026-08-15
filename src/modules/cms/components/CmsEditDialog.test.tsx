@@ -57,6 +57,7 @@ describe('CmsEditDialog', () => {
     renderWithProviders(<CmsEditDialog {...props} />, { withAuth: false });
 
     expect(screen.getByText('Formato no válido.')).toBeInTheDocument();
+    expect(screen.getByLabelText('Imagen')).toHaveAttribute('aria-invalid', 'true');
     expect(screen.getByRole('button', { name: 'Cancelar' })).toBeDisabled();
     expect(screen.getByRole('button', { name: 'Guardando…' })).toBeDisabled();
     expect(screen.getByLabelText('Imagen')).toBeDisabled();

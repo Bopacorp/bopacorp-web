@@ -110,6 +110,7 @@ export function CmsImageUploadField({
           accept="image/png,image/jpeg,image/webp,image/avif"
           onChange={handleChange}
           disabled={disabled}
+          aria-invalid={Boolean(error)}
           className="hidden"
         />
       </label>
