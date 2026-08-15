@@ -117,29 +117,29 @@
 
 | ID | Capa | Caso | Prioridad | Estado | Destino sugerido |
 |---|---|---|---|---|---|
-| WEB-CMS-001 | Unitario | Servicio lista secciones con endpoint correcto | P0 | Pendiente | `cms.service.test.ts` |
-| WEB-CMS-002 | Componente | Loading inicial muestra skeleton | P1 | Pendiente | `CmsAdminPage.test.tsx` |
-| WEB-CMS-003 | Componente | Error inicial muestra retry | P0 | Pendiente | `CmsAdminPage.test.tsx` |
-| WEB-CMS-004 | Componente | Primera sección se selecciona automáticamente | P1 | Pendiente | `CmsAdminPage.test.tsx` |
-| WEB-CMS-005 | Unitario | Listado envía página, límite, sección y búsqueda | P0 | Pendiente | `cms.service.test.ts` |
-| WEB-CMS-006 | Componente | Búsqueda espera el debounce de 300 ms | P1 | Pendiente | `CmsAdminPage.test.tsx` |
-| WEB-CMS-007 | Componente | Limpiar búsqueda elimina el filtro | P1 | Pendiente | `CmsSearchBar.test.tsx` |
-| WEB-CMS-008 | Componente | Vacío y sin resultados muestran mensajes distintos | P1 | Pendiente | `CmsArchiveEmpty.test.tsx` |
-| WEB-CMS-009 | Componente | Abrir bloque carga contenido actual | P0 | Pendiente | `CmsEditDialog.test.tsx` |
-| WEB-CMS-010 | Componente | Texto se limita a 10 000 caracteres | P1 | Pendiente | `CmsEditDialog.test.tsx` |
-| WEB-CMS-011 | Integración | Guardar texto usa PATCH y actualiza el bloque | P0 | Pendiente | `CmsAdminPage.test.tsx` |
-| WEB-CMS-012 | Componente | Error de actualización conserva diálogo y muestra feedback | P0 | Pendiente | `CmsAdminPage.test.tsx` |
-| WEB-CMS-013 | Componente | Bloque visual muestra carga de imagen | P0 | Pendiente | `CmsImageUploadField.test.tsx` |
-| WEB-CMS-014 | Componente | PNG, JPEG, WEBP y AVIF son aceptados | P0 | Pendiente | `CmsAdminPage.test.tsx` |
-| WEB-CMS-015 | Componente | Formato no permitido se rechaza | P0 | Pendiente | `CmsAdminPage.test.tsx` |
-| WEB-CMS-016 | Componente | Imagen mayor a 5 MB se rechaza | P0 | Pendiente | `CmsAdminPage.test.tsx` |
-| WEB-CMS-017 | Componente | Preview y limpiar imagen funcionan | P1 | Pendiente | `CmsImageUploadField.test.tsx` |
-| WEB-CMS-018 | Integración | Upload envía `contentKey` y FormData | P0 | Pendiente | `cms.service.test.ts` |
-| WEB-CMS-019 | Integración | Upload exitoso refresca bloques y muestra toast | P0 | Pendiente | `CmsAdminPage.test.tsx` |
-| WEB-CMS-020 | Componente | Guardar se deshabilita sin archivo o con error de imagen | P0 | Pendiente | `CmsEditDialog.test.tsx` |
-| WEB-CMS-021 | Componente | Descarte conserva o elimina edición según decisión | P1 | Pendiente | `CmsAdminPage.test.tsx` |
-| WEB-CMS-022 | Unitario | Contenido público pasa por sanitización | P0 | Pendiente | `sanitize.test.ts` |
-| WEB-CMS-023 | Seguridad | HTML malicioso no queda ejecutable en la landing | P0 | Pendiente | `use-cms-landing.test.ts` |
+| WEB-CMS-001 | Unitario | Servicio lista secciones con endpoint correcto | P0 | Pass | `cms.service.test.ts` |
+| WEB-CMS-002 | Componente | Loading inicial muestra skeleton | P1 | Pass | `CmsAdminPage.test.tsx` |
+| WEB-CMS-003 | Componente | Error inicial muestra retry | P0 | Pass | `CmsAdminPage.test.tsx` |
+| WEB-CMS-004 | Componente | Primera sección se selecciona automáticamente | P1 | Pass | `CmsAdminPage.test.tsx` |
+| WEB-CMS-005 | Unitario | Listado envía página, límite, sección y búsqueda | P0 | Pass | `cms.service.test.ts` |
+| WEB-CMS-006 | Componente | Búsqueda espera el debounce de 300 ms | P1 | Pass | `CmsAdminPage.test.tsx` |
+| WEB-CMS-007 | Componente | Limpiar búsqueda elimina el filtro | P1 | Pass | `CmsSearchBar.test.tsx` |
+| WEB-CMS-008 | Componente | Vacío y sin resultados muestran mensajes distintos | P1 | Pass | `CmsArchiveEmpty.test.tsx` |
+| WEB-CMS-009 | Componente | Abrir bloque carga contenido actual | P0 | Pass | `CmsEditDialog.test.tsx` |
+| WEB-CMS-010 | Componente | Texto se limita a 10 000 caracteres | P1 | Pass | `CmsEditDialog.test.tsx` |
+| WEB-CMS-011 | Integración | Guardar texto usa PATCH y actualiza el bloque | P0 | Pass | `CmsAdminPage.test.tsx` |
+| WEB-CMS-012 | Componente | Error de actualización conserva diálogo y muestra feedback | P0 | Pass | `CmsAdminPage.test.tsx` |
+| WEB-CMS-013 | Componente | Bloque visual muestra carga de imagen | P0 | Pass | `CmsImageUploadField.test.tsx` |
+| WEB-CMS-014 | Componente | PNG, JPEG, WEBP y AVIF son aceptados | P0 | Pass | `CmsImageUploadField.test.tsx` |
+| WEB-CMS-015 | Componente | Formato no permitido se rechaza | P0 | Pass | `CmsAdminPage.test.tsx` |
+| WEB-CMS-016 | Componente | Imagen mayor a 5 MB se rechaza | P0 | Pass | `CmsAdminPage.test.tsx` |
+| WEB-CMS-017 | Componente | Preview y limpiar imagen funcionan | P1 | Pass | `CmsImageUploadField.test.tsx` |
+| WEB-CMS-018 | Integración | Upload envía `contentKey` y FormData | P0 | Pass | `cms.service.test.ts` |
+| WEB-CMS-019 | Integración | Upload exitoso refresca bloques y muestra toast | P0 | Pass | `CmsAdminPage.test.tsx` |
+| WEB-CMS-020 | Componente | Guardar se deshabilita sin archivo o con error de imagen | P0 | Pass | `CmsEditDialog.test.tsx` |
+| WEB-CMS-021 | Componente | Descarte conserva o elimina edición según decisión | P1 | Pass | `CmsAdminPage.test.tsx` |
+| WEB-CMS-022 | Unitario | Contenido público pasa por sanitización | P0 | Pass | `sanitize.test.ts` |
+| WEB-CMS-023 | Seguridad | HTML malicioso no queda ejecutable en la landing | P0 | Pass | `LandingPage.test.tsx` |
 
 ## 8. Estados, accesibilidad y navegación
 
