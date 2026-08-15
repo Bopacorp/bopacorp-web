@@ -36,6 +36,23 @@ Object.defineProperty(URL, 'revokeObjectURL', {
   value: vi.fn(),
 });
 
+Object.defineProperty(HTMLElement.prototype, 'hasPointerCapture', {
+  configurable: true,
+  value: vi.fn(() => false),
+});
+Object.defineProperty(HTMLElement.prototype, 'releasePointerCapture', {
+  configurable: true,
+  value: vi.fn(),
+});
+Object.defineProperty(HTMLElement.prototype, 'setPointerCapture', {
+  configurable: true,
+  value: vi.fn(),
+});
+Object.defineProperty(HTMLElement.prototype, 'scrollIntoView', {
+  configurable: true,
+  value: vi.fn(),
+});
+
 afterEach(() => {
   cleanup();
   localStorage.clear();

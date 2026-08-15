@@ -54,64 +54,64 @@
 
 | ID | Capa | Caso | Prioridad | Estado | Destino sugerido |
 |---|---|---|---|---|---|
-| WEB-CAT-001 | Unitario | Servicio solicita `/public/catalog/items` | P0 | Pendiente | `catalog.service.test.ts` |
-| WEB-CAT-002 | Unitario | Categoría y segmento se envían como filtros | P1 | Pendiente | `catalog.service.test.ts` |
-| WEB-CAT-003 | Unitario | Precio mínimo/máximo, incluido `0`, se conserva | P0 | Pendiente | `catalog.service.test.ts` |
-| WEB-CAT-004 | Componente | Catálogo muestra loading inicial | P1 | Pendiente | `ServicesPage.test.tsx` |
-| WEB-CAT-005 | Componente | Error de catálogo muestra retry | P0 | Pendiente | `ServicesPage.test.tsx` |
-| WEB-CAT-006 | Componente | Lista vacía muestra estado vacío | P1 | Pendiente | `ServicesPage.test.tsx` |
-| WEB-CAT-007 | Componente | Cambiar categoría/segmento actualiza resultados | P0 | Pendiente | `ServicesPage.test.tsx` |
-| WEB-CAT-008 | Componente | Filtros mantienen la navegación esperada en URL | P1 | Pendiente | `ServicesPage.test.tsx` |
-| WEB-CAT-009 | Integración | Respuesta tardía cancelada no sobrescribe filtros actuales | P1 | Pendiente | `use-public-catalog-items.test.ts` |
-| WEB-CAT-010 | Componente | Recarga con datos muestra estado de reloading | P1 | Pendiente | `ServicesPage.test.tsx` |
-| WEB-CAT-011 | Componente | Tarjeta muestra precio, beneficios y detalles disponibles | P1 | Pendiente | `PlanCard.test.tsx` |
-| WEB-CAT-012 | Componente | Cotización conserva el servicio seleccionado | P0 | Pendiente | `PlanCard.test.tsx` |
-| WEB-CAT-013 | Componente | Enlace de WhatsApp contiene la información esperada | P1 | Pendiente | `PlanCard.test.tsx` |
+| WEB-CAT-001 | Unitario | Servicio solicita `/public/catalog/items` | P0 | Pass | `catalog.service.test.ts` |
+| WEB-CAT-002 | Unitario | Categoría y segmento se envían como filtros | P1 | Pass | `catalog.service.test.ts` |
+| WEB-CAT-003 | Unitario | Precio mínimo/máximo, incluido `0`, se conserva | P0 | Pass | `catalog.service.test.ts` |
+| WEB-CAT-004 | Componente | Catálogo muestra loading inicial | P1 | Pass | `ServicesPage.test.tsx` |
+| WEB-CAT-005 | Componente | Error de catálogo muestra retry | P0 | Pass | `ServicesPage.test.tsx` |
+| WEB-CAT-006 | Componente | Lista vacía muestra estado vacío | P1 | Pass | `ServicesPage.test.tsx` |
+| WEB-CAT-007 | Componente | Cambiar categoría/segmento actualiza resultados | P0 | Pass | `ServicesPage.test.tsx` |
+| WEB-CAT-008 | Componente | Filtros mantienen la navegación esperada en URL | P1 | Pass | `ServicesPage.test.tsx` |
+| WEB-CAT-009 | Integración | Respuesta tardía cancelada no sobrescribe filtros actuales | P1 | Pass | `use-public-catalog-items.test.ts` |
+| WEB-CAT-010 | Componente | Recarga con datos muestra estado de reloading | P1 | Pass | `use-public-catalog-items.test.ts` |
+| WEB-CAT-011 | Componente | Tarjeta muestra precio, beneficios y detalles disponibles | P1 | Pass | `PlanCard.test.tsx` |
+| WEB-CAT-012 | Componente | Cotización conserva el servicio seleccionado | P0 | Pass | `PlanCard.test.tsx` |
+| WEB-CAT-013 | Componente | Enlace de WhatsApp contiene la información esperada | P1 | Pass | `PlanCard.test.tsx` |
 
 ## 5. Contacto y cotización
 
 | ID | Capa | Caso | Prioridad | Estado | Destino sugerido |
 |---|---|---|---|---|---|
-| WEB-CON-001 | Componente | Nombre y correo obligatorios muestran errores | P0 | Pendiente | `ContactRequestDialog.test.tsx` |
-| WEB-CON-002 | Componente | Correo inválido no permite submit | P0 | Pendiente | `ContactRequestDialog.test.tsx` |
-| WEB-CON-003 | Componente | Teléfono y mensaje opcionales pueden omitirse | P1 | Pendiente | `ContactRequestDialog.test.tsx` |
-| WEB-CON-004 | Componente | Límites visibles de campos se respetan | P1 | Pendiente | `ContactRequestDialog.test.tsx` |
-| WEB-CON-005 | Integración | Submit recorta textos y conserva `itemId` | P0 | Pendiente | `ContactRequestDialog.test.tsx` |
-| WEB-CON-006 | Unitario | Servicio usa `/contact-requests` y payload esperado | P0 | Pendiente | `contact.service.test.ts` |
-| WEB-CON-007 | Componente | Submit deshabilita controles mientras envía | P1 | Pendiente | `ContactRequestDialog.test.tsx` |
-| WEB-CON-008 | Componente | Error general conserva formulario y muestra feedback | P0 | Pendiente | `ContactRequestDialog.test.tsx` |
-| WEB-CON-009 | Componente | Errores API por campo se asignan al control correcto | P0 | Pendiente | `ContactRequestDialog.test.tsx` |
-| WEB-CON-010 | Componente | Éxito muestra nombre, correo y fecha recibidos | P1 | Pendiente | `ContactSuccessDialog.test.tsx` |
-| WEB-CON-011 | Componente | Formulario modificado pide confirmar descarte | P1 | Pendiente | `ContactRequestDialog.test.tsx` |
-| WEB-CON-012 | Componente | Cerrar reinicia formulario y estado de envío | P1 | Pendiente | `ContactRequestDialog.test.tsx` |
+| WEB-CON-001 | Componente | Nombre y correo obligatorios muestran errores | P0 | Pass | `ContactRequestDialog.test.tsx` |
+| WEB-CON-002 | Componente | Correo inválido no permite submit | P0 | Pass | `ContactRequestDialog.test.tsx` |
+| WEB-CON-003 | Componente | Teléfono y mensaje opcionales pueden omitirse | P1 | Pass | `ContactRequestDialog.test.tsx` |
+| WEB-CON-004 | Componente | Límites visibles de campos se respetan | P1 | Pass | `ContactRequestDialog.test.tsx` |
+| WEB-CON-005 | Integración | Submit recorta textos y conserva `itemId` | P0 | Pass | `ContactRequestDialog.test.tsx` |
+| WEB-CON-006 | Unitario | Servicio usa `/contact-requests` y payload esperado | P0 | Pass | `contact.service.test.ts` |
+| WEB-CON-007 | Componente | Submit deshabilita controles mientras envía | P1 | Pass | `ContactRequestDialog.test.tsx` |
+| WEB-CON-008 | Componente | Error general conserva formulario y muestra feedback | P0 | Pass | `ContactRequestDialog.test.tsx` |
+| WEB-CON-009 | Componente | Errores API por campo se asignan al control correcto | P0 | Pass | `ContactRequestDialog.test.tsx` |
+| WEB-CON-010 | Componente | Éxito muestra nombre, correo y fecha recibidos | P1 | Pass | `ContactSuccessDialog.test.tsx` |
+| WEB-CON-011 | Componente | Formulario modificado pide confirmar descarte | P1 | Pass | `ContactRequestDialog.test.tsx` |
+| WEB-CON-012 | Componente | Cerrar reinicia formulario y estado de envío | P1 | Pass | `ContactRequestDialog.test.tsx` |
 
 ## 6. Empleabilidad y postulación
 
 | ID | Capa | Caso | Prioridad | Estado | Destino sugerido |
 |---|---|---|---|---|---|
-| WEB-EMP-001 | Unitario | Listado usa endpoint de vacantes publicadas y query | P0 | Pendiente | `employability.service.test.ts` |
-| WEB-EMP-002 | Componente | Listado conserva metadata de paginación | P1 | Pendiente | `JobsPage.test.tsx` |
-| WEB-EMP-003 | Componente | Loading, vacío, error y retry funcionan | P0 | Pendiente | `JobsPage.test.tsx` |
-| WEB-EMP-004 | Unitario | Detalle sin id no solicita la API | P1 | Pendiente | `use-public-job-vacancy.test.ts` |
-| WEB-EMP-005 | Componente | Detalle válido muestra la vacante | P0 | Pendiente | `JobDetailPage.test.tsx` |
-| WEB-EMP-006 | Componente | Vacante inexistente muestra error y retry | P0 | Pendiente | `JobDetailPage.test.tsx` |
-| WEB-EMP-007 | Componente | Campos obligatorios del formulario se validan | P0 | Pendiente | `ApplyDialog.test.tsx` |
-| WEB-EMP-008 | Componente | Cédula, nombres, apellidos y correo inválidos muestran error | P0 | Pendiente | `ApplyDialog.test.tsx` |
-| WEB-EMP-009 | Componente | No se puede enviar sin CV | P0 | Pendiente | `ApplyDialog.test.tsx` |
-| WEB-EMP-010 | Componente | Se acepta PDF y se muestra su nombre | P0 | Pendiente | `UploadResumeField.test.tsx` |
-| WEB-EMP-011 | Componente | Se rechaza MIME distinto de PDF | P0 | Pendiente | `ApplyDialog.test.tsx` |
-| WEB-EMP-012 | Componente | Se rechaza PDF mayor a 20 MB | P0 | Pendiente | `ApplyDialog.test.tsx` |
-| WEB-EMP-013 | Integración | `FormData` contiene archivo, vacante, candidato y carta | P0 | Pendiente | `use-apply-job-vacancy.test.ts` |
-| WEB-EMP-014 | Integración | Submit recorta campos antes de enviar | P1 | Pendiente | `ApplyDialog.test.tsx` |
-| WEB-EMP-015 | Componente | Estado submitting bloquea formulario | P1 | Pendiente | `ApplyDialog.test.tsx` |
-| WEB-EMP-016 | Unitario | `NOT_FOUND` se transforma en mensaje de vacante no disponible | P0 | Pendiente | `use-apply-job-vacancy.test.ts` |
-| WEB-EMP-017 | Unitario | `RATE_LIMITED` se transforma en mensaje de límite | P1 | Pendiente | `use-apply-job-vacancy.test.ts` |
-| WEB-EMP-018 | Unitario | `MULTER_ERROR` distingue tamaño y tipo | P0 | Pendiente | `use-apply-job-vacancy.test.ts` |
-| WEB-EMP-019 | Unitario | `CONFLICT` se transforma en duplicado de postulación | P0 | Pendiente | `use-apply-job-vacancy.test.ts` |
-| WEB-EMP-020 | Componente | Errores de campos API se asignan al formulario | P0 | Pendiente | `ApplyDialog.test.tsx` |
-| WEB-EMP-021 | Componente | Éxito muestra vacante, candidato y fecha | P1 | Pendiente | `ApplySuccessDialog.test.tsx` |
-| WEB-EMP-022 | Componente | Cierre o éxito reinicia estado y formulario | P1 | Pendiente | `ApplyDialog.test.tsx` |
-| WEB-EMP-023 | Componente | Cambios sin guardar piden confirmación | P1 | Pendiente | `ApplyDialog.test.tsx` |
+| WEB-EMP-001 | Unitario | Listado usa endpoint de vacantes publicadas y query | P0 | Pass | `employability.service.test.ts` |
+| WEB-EMP-002 | Componente | Listado conserva metadata de paginación | P1 | Pass | `JobsPage.test.tsx` |
+| WEB-EMP-003 | Componente | Loading, vacío, error y retry funcionan | P0 | Pass | `JobsPage.test.tsx` |
+| WEB-EMP-004 | Unitario | Detalle sin id no solicita la API | P1 | Pass | `use-public-job-vacancy.test.ts` |
+| WEB-EMP-005 | Componente | Detalle válido muestra la vacante | P0 | Pass | `JobDetailPage.test.tsx` |
+| WEB-EMP-006 | Componente | Vacante inexistente muestra error y retry | P0 | Pass | `JobDetailPage.test.tsx` |
+| WEB-EMP-007 | Componente | Campos obligatorios del formulario se validan | P0 | Pass | `ApplyDialog.test.tsx` |
+| WEB-EMP-008 | Componente | Cédula, nombres, apellidos y correo inválidos muestran error | P0 | Pass | `ApplyDialog.test.tsx` |
+| WEB-EMP-009 | Componente | No se puede enviar sin CV | P0 | Pass | `ApplyDialog.test.tsx` |
+| WEB-EMP-010 | Componente | Se acepta PDF y se muestra su nombre | P0 | Pass | `UploadResumeField.test.tsx` |
+| WEB-EMP-011 | Componente | Se rechaza MIME distinto de PDF | P0 | Pass | `ApplyDialog.test.tsx` |
+| WEB-EMP-012 | Componente | Se rechaza PDF mayor a 20 MB | P0 | Pass | `ApplyDialog.test.tsx` |
+| WEB-EMP-013 | Integración | `FormData` contiene archivo, vacante, candidato y carta | P0 | Pass | `use-apply-job-vacancy.test.ts` |
+| WEB-EMP-014 | Integración | Submit recorta campos antes de enviar | P1 | Pass | `ApplyDialog.test.tsx` |
+| WEB-EMP-015 | Componente | Estado submitting bloquea formulario | P1 | Pass | `ApplyDialog.test.tsx` |
+| WEB-EMP-016 | Unitario | `NOT_FOUND` se transforma en mensaje de vacante no disponible | P0 | Pass | `use-apply-job-vacancy.test.ts` |
+| WEB-EMP-017 | Unitario | `RATE_LIMITED` se transforma en mensaje de límite | P1 | Pass | `use-apply-job-vacancy.test.ts` |
+| WEB-EMP-018 | Unitario | `MULTER_ERROR` distingue tamaño y tipo | P0 | Pass | `use-apply-job-vacancy.test.ts` |
+| WEB-EMP-019 | Unitario | `CONFLICT` se transforma en duplicado de postulación | P0 | Pass | `use-apply-job-vacancy.test.ts` |
+| WEB-EMP-020 | Componente | Errores de campos API se asignan al formulario | P0 | Pass | `ApplyDialog.test.tsx` |
+| WEB-EMP-021 | Componente | Éxito muestra vacante, candidato y fecha | P1 | Pass | `ApplySuccessDialog.test.tsx` |
+| WEB-EMP-022 | Componente | Cierre o éxito reinicia estado y formulario | P1 | Pass | `ApplyDialog.test.tsx` |
+| WEB-EMP-023 | Componente | Cambios sin guardar piden confirmación | P1 | Pass | `ApplyDialog.test.tsx` |
 
 ## 7. CMS y contenido
 

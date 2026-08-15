@@ -19,7 +19,8 @@ export function useApplyJobVacancy() {
       const form = new FormData();
       form.append('file', submission.file);
       form.append('vacancyId', submission.vacancyId);
-      if (submission.coverLetter.trim()) form.append('coverLetter', submission.coverLetter);
+      const coverLetter = submission.coverLetter.trim();
+      if (coverLetter) form.append('coverLetter', coverLetter);
       form.append('candidate', JSON.stringify(submission.candidate));
       const data = await applyJobVacancy(form);
       setState({ kind: 'success', data });

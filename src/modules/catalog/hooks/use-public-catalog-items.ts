@@ -24,6 +24,7 @@ export function usePublicCatalogItems(
   const [retryCount, setRetryCount] = useState(0);
 
   const categoryId = filters?.categoryId;
+  const categorySlug = filters?.categorySlug;
   const segmentId = filters?.segmentId;
   const minPrice = filters?.minPrice;
   const maxPrice = filters?.maxPrice;
@@ -33,6 +34,7 @@ export function usePublicCatalogItems(
       try {
         const params: ListPublicCatalogQuery = {};
         if (categoryId) params.categoryId = categoryId;
+        if (!categoryId && categorySlug) params.categorySlug = categorySlug;
         if (segmentId) params.segmentId = segmentId;
         if (minPrice !== undefined) params.minPrice = minPrice;
         if (maxPrice !== undefined) params.maxPrice = maxPrice;
@@ -51,7 +53,7 @@ export function usePublicCatalogItems(
         if (!state.cancelled) setLoading(false);
       }
     },
-    [categoryId, segmentId, minPrice, maxPrice],
+    [categoryId, categorySlug, segmentId, minPrice, maxPrice],
   );
 
   const enabled = filters !== undefined;

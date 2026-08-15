@@ -108,7 +108,7 @@ export function ApplyDialog({ open, onOpenChange, vacancy, onSuccess }: ApplyDia
         phone: values.phone.trim(),
         address: values.address?.trim() || undefined,
       },
-      coverLetter: values.coverLetter || '',
+      coverLetter: values.coverLetter?.trim() ?? '',
       file: values.file,
     });
   };
