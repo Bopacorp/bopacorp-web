@@ -16,27 +16,30 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+          cache: npm
           registry-url: https://npm.pkg.github.com
           scope: '@bopacorp'
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-      - name: Debug dependency
-        run: |
-          cat package.json
-          npm pkg get dependencies.@bopacorp/shared
-          npm view @bopacorp/shared versions --json
-
       - name: Install dependencies
         run: npm ci
 
-      - name: Debug shared package
-        run: |
-          npm view @bopacorp/shared version
-          npm ls @bopacorp/shared
+      - name: Lint
+        run: npm run lint
 
-      - name: Lint, format & typecheck
-        run: npm run check
+      - name: Typecheck
+        run: npx tsc -b --noEmit
+
+      - name: Coverage tests
+        run: npm run test:coverage
 
       - name: Build
         run: npm run build
+
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage/
+          if-no-files-found: error
