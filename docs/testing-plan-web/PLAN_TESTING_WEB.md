@@ -5,7 +5,7 @@
 **Repositorios relacionados:** `bopacorp-api`, `bopacorp-shared`
 **Fecha base:** 15 de agosto de 2026
 **Responsable:** equipo de desarrollo/testing del proyecto
-**Estado:** Fase 8 implementada; smoke E2E reducido ejecutado y documentado. Fases 9–10 quedan pendientes.
+**Estado:** Fase 9 cerrada para el alcance de la demo; cobertura crítica y quality gate ejecutados. Fase 10 queda pendiente.
 
 ---
 
@@ -571,7 +571,7 @@ Los journeys mínimos seleccionados para la demo pasan en un ambiente reproducib
 8. Ejecutar E2E en ambiente de prueba estable.
 9. Guardar artifacts y actualizar matriz/registro.
 
-### Gate propuesto
+### Gate aplicado
 
 | Métrica | Gate final |
 |---|---:|
@@ -585,6 +585,17 @@ Los journeys mínimos seleccionados para la demo pasan en un ambiente reproducib
 | E2E mínimos | Todos pasan en ambiente de prueba |
 
 El porcentaje global puede reportarse como información adicional, pero no reemplaza el gate del conjunto crítico.
+
+### Resultado observado — 2026-08-15
+
+- `npm run test:coverage`: `54` archivos y `198/198` tests pasan.
+- Cobertura del conjunto crítico: `91.82%` de líneas (`989/1077`), `91.21%` de funciones, `78.65%` de branches y `89.69%` de statements.
+- `vite.config.ts` aplica `thresholds.lines: 80`; el mismo comando ejecutado por CI falla si el conjunto crítico queda debajo del mínimo.
+- Lint y typecheck pasan. El build pasa; conserva únicamente el warning informativo de Vite por el chunk JavaScript mayor a 500 kB.
+- Smoke E2E seleccionado: `3/3` journeys pasan en Chromium contra Web/API local.
+- Artifacts generados: `coverage/` y `playwright-report/`; ambos directorios quedan fuera del commit.
+
+La Fase 9 queda cerrada para la demostración. La revisión manual responsive/foco/contraste y los E2E opcionales permanecen explícitamente fuera del alcance reducido; la Fase 10 consolidará la evidencia final para el informe.
 
 ### Fase 10 — Evidencia para informe, manual y rúbrica
 

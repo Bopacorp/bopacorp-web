@@ -11,6 +11,7 @@
 | WEB-BASE-002 | Configuración | Alias `@/` funciona dentro de los tests | P0 | Pass | `vite.config.ts` / tests |
 | WEB-BASE-003 | Configuración | Cobertura genera text, LCOV y HTML | P0 | Pass | `coverage/` |
 | WEB-BASE-004 | Calidad | Lint, typecheck y build pasan en la revisión base | P0 | Pass | CI |
+| WEB-BASE-005 | Calidad | El gate de cobertura del código crítico exige al menos 80% de líneas | P0 | Pass | `vite.config.ts` / CI |
 
 ## 2. Autenticación y autorización
 

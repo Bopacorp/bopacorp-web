@@ -57,6 +57,9 @@ export default defineConfig({
       reportsDirectory: './coverage',
       include: coverageInclude,
       exclude: coverageExclude,
+      thresholds: {
+        lines: 80,
+      },
     },
   },
   server: {

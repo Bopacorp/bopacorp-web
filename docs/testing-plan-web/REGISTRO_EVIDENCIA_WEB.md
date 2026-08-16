@@ -2,6 +2,7 @@
 
 **Estado de Fase 7:** harness y casos de integración HTTP implementados; corrida read-only contra el API real: contratos públicos `7/7` y auth/RBAC `4/4`. La corrida final de mutaciones terminó `4/4`: contacto, postulación multipart, CMS y upload pasan. Se conserva la evidencia de Fases 1–6.
 **Estado de Fase 8:** Playwright implementado y smoke E2E reducido ejecutado contra Web `http://localhost:5174` y API local; `WEB-E2E-001..003` pasan `3/3`. `WEB-E2E-004..006` permanecen `Not run` por alcance de demostración.
+**Estado de Fase 9:** gate de cobertura crítica implementado y ejecutado; `198/198` tests pasan, líneas `91.82%` superan el mínimo de `80%`, y lint/typecheck/build/E2E seleccionado pasan.
 **Regla:** `Existente` o `Implementado` no significa `Pass`; el resultado debe observarse en una ejecución reproducible.
 
 ## 1. Identificación de la ejecución
@@ -9,11 +10,11 @@
 | Campo | Valor |
 |---|---|
 | Repositorio Web | `bopacorp-web` |
-| SHA Web | `bf0d29b` + working tree de Fase 8 |
+| SHA Web | `32ea028` + working tree de Fase 9 |
 | SHA API | `4018bd5` inspeccionado; sin cambios del agente |
 | SHA Shared | `0.3.2` instalado; no modificado |
 | Rama | `main` |
-| Fecha y hora | `2026-08-15T20:38:30-05:00` |
+| Fecha y hora | `2026-08-15T20:53:05-05:00` |
 | Responsable | Agente Codex |
 | Sistema operativo | Linux |
 | Node | `v22.22.2` |
@@ -52,6 +53,9 @@ Copiar una fila por corrida significativa y conservar el log o artifact.
 | WEB-RUN-007 | `npm run test:integration` + selección de suites | Contratos HTTP públicos y auth/RBAC read-only | 2026-08-15 | `cf33057` + WT / API `4018bd5` | Pass | Público `7/7` y auth/RBAC `4/4` pasan; las mutaciones no se ejecutaron por no ser necesarias para la demo | Consola Vitest; suites en `src/integration/` |
 | WEB-RUN-008 | `npm run test:integration` + flags de mutación | Contacto, postulación multipart, CMS y storage contra API real | 2026-08-15 | `cf33057` + WT / API `4018bd5` | Pass | `4/4` pasan; el PDF sintético de 10 KB evita el redondeo a `0.00 MB` y la postulación devuelve `PENDING` | Consola Vitest; `src/integration/mutation-api.contract.test.ts` |
 | WEB-RUN-009 | `npm run test:e2e` | Tres journeys E2E reducidos contra Web/API local | 2026-08-15 | `bf0d29b` + WT / API `4018bd5` | Pass | Visitante, candidato y administrador pasan `3/3` en Chromium; CMS queda restaurado | `playwright-report/`; `test-results/` solo para fallos |
+| WEB-RUN-010 | `npm run test:coverage` | Regresión completa y gate del conjunto crítico | 2026-08-15 | `32ea028` + WT | Pass | `54` archivos y `198/198` tests pasan; líneas `91.82%` superan `thresholds.lines: 80` | `coverage/index.html`, `coverage/lcov.info` |
+| WEB-RUN-011 | `npm run lint` + `npx tsc -b --noEmit` + `npm run build` | Quality checks del frontend | 2026-08-15 | `32ea028` + WT | Pass | Lint, typecheck y build pasan; Vite deja warning informativo por chunk mayor a 500 kB | Consola; `dist/` |
+| WEB-RUN-012 | `npm run test:e2e` | Smoke E2E seleccionado después del gate | 2026-08-15 | `32ea028` + WT / API `4018bd5` | Pass | Visitante, candidato y administrador pasan `3/3` en Chromium; CMS queda restaurado | `playwright-report/` |
 
 ## 4. Registro de cobertura
 
@@ -65,15 +69,16 @@ La cobertura debe indicar exactamente qué archivos fueron incluidos. No reporta
 | WEB-COV-004 | `npm run test:coverage` | Mismo conjunto crítico; suites de Fase 4 agregadas | 66.10% (669/1012) | 64.28% (198/308) | 63.14% (502/795) | 64.71% (717/1108) | `b9078e7` + WT | `coverage/lcov-report/index.html`, `coverage/lcov.info` |
 | WEB-COV-005 | `npm run test:coverage` | Mismo conjunto crítico; suites de Fase 5 agregadas | 89.82% (909/1012) | 89.61% (276/308) | 78.61% (625/795) | 87.81% (973/1108) | `a89b0b7` + WT | `coverage/lcov-report/index.html`, `coverage/lcov.info` |
 | WEB-COV-006 | `npm run test:coverage` | Conjunto crítico ampliado con `AdminLayout`, `MainLayout`, `ScrollToTop` y `ModeToggle`; suites de Fase 6 agregadas | 91.82% (989/1077) | 91.21% (301/330) | 78.65% (667/848) | 89.69% (1053/1174) | `f527679` + WT | `coverage/lcov-report/index.html`, `coverage/lcov.info` |
+| WEB-COV-007 | `npm run test:coverage` | Mismo conjunto crítico; gate de líneas `80%` aplicado en `vite.config.ts` y ejecutado en Fase 9 | 91.82% (989/1077) | 91.21% (301/330) | 78.65% (667/848) | 89.69% (1053/1174) | `32ea028` + WT | `coverage/index.html`, `coverage/lcov.info` |
 
-El `include` de cobertura comprende `src/App.tsx`, `src/app/{AdminLayout,MainLayout}.tsx`, `src/components/ScrollToTop.tsx`, `src/services/**/*.ts`, los módulos de autenticación, administración, catálogo, contacto, empleabilidad y CMS, las páginas/hooks públicos priorizados y los helpers compartidos listados en `vite.config.ts`. El `exclude` omite `src/test/**`, tests, declaraciones, assets y primitivas `src/components/ui/**`. La cobertura de Fase 6 queda en 91.82% de líneas (989/1077), 89.69% de statements (1053/1174), 91.21% de funciones (301/330) y 78.65% de branches (667/848); continúa como métrica informativa hasta cerrar revisión visual, contratos coordinados y E2E en las fases posteriores.
+El `include` de cobertura comprende `src/App.tsx`, `src/app/{AdminLayout,MainLayout}.tsx`, `src/components/ScrollToTop.tsx`, `src/services/**/*.ts`, los módulos de autenticación, administración, catálogo, contacto, empleabilidad y CMS, las páginas/hooks públicos priorizados y los helpers compartidos listados en `vite.config.ts`. El `exclude` omite `src/test/**`, tests, declaraciones, assets y primitivas `src/components/ui/**`. La corrida de Fase 9 mantiene 91.82% de líneas (989/1077), 89.69% de statements (1053/1174), 91.21% de funciones (301/330) y 78.65% de branches (667/848); el gate aplicado exige únicamente al menos 80% de líneas del conjunto crítico, mientras branches continúa como métrica informativa.
 
 ### Archivos críticos no cubiertos
 
 | Archivo | Líneas/decisiones | Riesgo | Caso pendiente | Acción |
 |---|---|---|---|---|
-| `src/App.tsx`, `src/services/**` y módulos críticos incluidos | Líneas globales en 91.82% después de Fase 6, pero branches globales en 78.65% y sin E2E/API coordinado | Responsive visual, contratos reales y journeys de navegador aún no tienen evidencia | Completar revisión manual UI, contratos coordinados y WEB-E2E; revisar decisiones restantes | Completar Fases 7–8 y activar el gate final en Fase 9 |
-| `AuthContext.tsx`, `LoginPage.tsx`, `api.ts`, `auth.service.ts` | Ramas restantes: AuthContext 79.16%, LoginPage 78.26%, API 72.22%; `auth.service.ts` cubre wrappers parcialmente | Decisiones residuales de transporte y errores no cambian el resultado de los casos P0 ejecutados | Revisar líneas no cubiertas antes del gate final | Mantener gate informativo en Fase 2 y cerrar cobertura crítica en Fase 9 |
+| `src/App.tsx`, `src/services/**` y módulos críticos incluidos | Líneas globales en 91.82% y gate de líneas activo; branches globales en 78.65% | Responsive visual y algunas decisiones residuales aún requieren revisión manual | Completar Fase 10 y resolver los casos opcionales si el alcance crece | Mantener branches como métrica informativa y no ampliar el scope de la demo |
+| `AuthContext.tsx`, `LoginPage.tsx`, `api.ts`, `auth.service.ts` | Ramas restantes: AuthContext 79.16%, LoginPage 78.26%, API 72.22%; `auth.service.ts` cubre wrappers parcialmente | Decisiones residuales de transporte y errores no cambian el resultado de los casos P0 ejecutados | Revisar si el alcance de la demo crece; branches permanecen informativas | Mantener el gate de líneas y no ampliar el scope sin un caso de negocio adicional |
 
 ## 5. Registro de aceptación E2E
 
@@ -101,6 +106,7 @@ Cada ejecución debe registrar precondiciones y resultado observado, no solo una
 | WEB-UI-001..005, WEB-UI-008 | Estados, accesibilidad observable y navegación | P0/P1 | `page-loader.test.tsx`, `error-state.test.tsx`, `empty-state.test.tsx`, `ModeToggle.test.tsx`, `use-unsaved-guard.test.ts`, `App.test.tsx`, `ScrollToTop.test.tsx`, `MainLayout.test.tsx`, `AdminLayout.test.tsx`, dialogs de contacto/postulación/CMS | 2026-08-15 | `f527679` + WT | Loader, errores, vacío, retry, títulos/labels, `aria-invalid`, Enter inválido, Escape, descarte, rutas wildcard, scroll, navegación, idioma y tema se comportan según la matriz | 9 suites nuevas más regresión de formularios; 198/198 pasan | Pass | `WEB-RUN-006`, `WEB-COV-006` |
 | WEB-UI-006..007 | Responsive, foco visual, teclado y revisión de idioma/tema en navegador | P1 | [`REGISTRO_REVISION_MANUAL_UI.md`](./REGISTRO_REVISION_MANUAL_UI.md) | 2026-08-15 | `f527679` + WT | Flujos principales utilizables en 375×812 y 1280×800, con foco, contraste y copy estable | Playwright cubre journeys en Chromium, pero no reemplaza la revisión manual de viewport, foco visual, contraste y tema | Not run | `REGISTRO_REVISION_MANUAL_UI.md` |
 | WEB-E2E-001..003 | Smoke E2E reducido | P0 | `e2e/phase8.spec.ts` | 2026-08-15 | `bf0d29b` + WT / API `4018bd5` | Visitante, candidato y administrador completan los journeys mínimos | Los tres journeys pasan en Chromium; reportes HTML y artifacts de fallo configurados | Pass | `WEB-RUN-009` |
+| WEB-GATE-001 | Quality gate | P0 | `vite.config.ts`, `.github/workflows/ci.yml` y suites Vitest | 2026-08-15 | `32ea028` + WT | El conjunto crítico supera 80% de líneas y todos los checks requeridos pasan | `91.82%` de líneas, `198/198` tests, lint/typecheck/build/E2E seleccionado pasan | Pass | `WEB-RUN-010..012`, `WEB-COV-007` |
 | WEB-API-014..017 | Contratos HTTP públicos y errores de auth/RBAC | P0 | `src/integration/public-api.contract.test.ts`, `src/integration/auth-permissions.contract.test.ts` | 2026-08-15 | `cf33057` + WT / API `4018bd5` | Catálogo, CMS público, vacantes, 401, 403, 404, 422 y detalles llegan en envelopes compatibles con el cliente | Público `7/7` y auth/RBAC `4/4` pasan | Pass | `WEB-RUN-007` |
 | WEB-CON-013 | Persistencia de contacto válido | P0 | `src/integration/mutation-api.contract.test.ts` | 2026-08-15 | `cf33057` + WT / API `4018bd5` | El servicio crea una solicitud y recibe la respuesta persistida | La solicitud sintética se crea y devuelve la respuesta esperada | Pass | `WEB-RUN-008` |
 | WEB-EMP-024 | Postulación multipart válida | P0 | `src/integration/mutation-api.contract.test.ts` | 2026-08-15 | `cf33057` + WT / API `4018bd5` | PDF, candidato, vacante y carta son aceptados y devuelven `PENDING` | El frontend envía un PDF sintético de 10 KB, el API persiste la postulación y devuelve `PENDING`; el PDF de 4 bytes inicial provocaba `0.00 MB` y violaba `chk_file_size` | Pass | `WEB-RUN-008` |
