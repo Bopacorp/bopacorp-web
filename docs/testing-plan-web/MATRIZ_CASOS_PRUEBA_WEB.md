@@ -1,6 +1,6 @@
 # Matriz de casos de prueba del Web
 
-**Estado inicial:** casos definidos para implementación y ejecución; no marcar `Pass` hasta registrar una corrida real.
+**Estado:** casos definidos y resultados actualizados con las corridas disponibles; no marcar `Pass` sin evidencia reproducible.
 **Leyenda:** `Pendiente` significa que el caso todavía debe implementarse, ejecutarse o contar con evidencia actual; `Not run` identifica una revisión que requiere ambiente o herramienta todavía no disponible. Los casos read-only de Fase 7 pasan a `Pass` únicamente después de una corrida contra un API HTTP alcanzable; las mutaciones se ejecutan solo con flags explícitos y conservan su resultado real.
 
 ## 1. Baseline y configuración
@@ -173,12 +173,14 @@ La suite es opt-in. Requiere `VITE_API_URL`, una cuenta con permisos CMS (`VITE_
 
 | ID | Capa | Perfil | Journey | Prioridad | Estado |
 |---|---|---|---|---|---|
-| WEB-E2E-001 | E2E | Visitante | Catálogo → filtros → cotización/contacto | P0 | Pendiente |
-| WEB-E2E-002 | E2E | Candidato | Vacantes → detalle → formulario inválido → PDF válido | P0 | Pendiente |
-| WEB-E2E-003 | E2E | Administrador | Login → CMS → editar texto → verificar vista pública | P0 | Pendiente |
-| WEB-E2E-004 | E2E | Administrador | CMS → imagen válida → guardar → verificar resultado | P1 | Pendiente |
-| WEB-E2E-005 | E2E | Sin permiso | Intentar `/admin/cms` y confirmar denegación/redirección | P0 | Pendiente |
-| WEB-E2E-006 | E2E | Visitante | Error de catálogo/contacto → retry → recuperación | P1 | Pendiente |
+| WEB-E2E-001 | E2E | Visitante | Catálogo → filtros → cotización/contacto | P0 | Pass |
+| WEB-E2E-002 | E2E | Candidato | Vacantes → detalle → formulario inválido → PDF válido | P0 | Pass |
+| WEB-E2E-003 | E2E | Administrador | Login → CMS → editar texto → verificar vista pública | P0 | Pass |
+| WEB-E2E-004 | E2E | Administrador | CMS → imagen válida → guardar → verificar resultado | P1 | Not run |
+| WEB-E2E-005 | E2E | Sin permiso | Intentar `/admin/cms` y confirmar denegación/redirección | P0 | Not run |
+| WEB-E2E-006 | E2E | Visitante | Error de catálogo/contacto → retry → recuperación | P1 | Not run |
+
+La demo ejecuta el alcance reducido `WEB-E2E-001..003` con Playwright; `WEB-E2E-004..006` quedan `Not run` para evitar ampliar innecesariamente la cobertura.
 
 ## 11. Regla de estado
 

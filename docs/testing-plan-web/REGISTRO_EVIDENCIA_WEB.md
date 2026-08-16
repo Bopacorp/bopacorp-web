@@ -1,6 +1,7 @@
 # Registro de evidencia de testing — BOPACORP Web
 
 **Estado de Fase 7:** harness y casos de integración HTTP implementados; corrida read-only contra el API real: contratos públicos `7/7` y auth/RBAC `4/4`. La corrida final de mutaciones terminó `4/4`: contacto, postulación multipart, CMS y upload pasan. Se conserva la evidencia de Fases 1–6.
+**Estado de Fase 8:** Playwright implementado y smoke E2E reducido ejecutado contra Web `http://localhost:5174` y API local; `WEB-E2E-001..003` pasan `3/3`. `WEB-E2E-004..006` permanecen `Not run` por alcance de demostración.
 **Regla:** `Existente` o `Implementado` no significa `Pass`; el resultado debe observarse en una ejecución reproducible.
 
 ## 1. Identificación de la ejecución
@@ -8,19 +9,19 @@
 | Campo | Valor |
 |---|---|
 | Repositorio Web | `bopacorp-web` |
-| SHA Web | `cf33057` + working tree de Fase 7 |
+| SHA Web | `bf0d29b` + working tree de Fase 8 |
 | SHA API | `4018bd5` inspeccionado; sin cambios del agente |
 | SHA Shared | `0.3.2` instalado; no modificado |
 | Rama | `main` |
-| Fecha y hora | `2026-08-15T18:44:18-05:00` |
+| Fecha y hora | `2026-08-15T20:38:30-05:00` |
 | Responsable | Agente Codex |
 | Sistema operativo | Linux |
 | Node | `v22.22.2` |
 | npm | `10.9.7` |
-| Navegador | Pendiente / no aplica |
-| Ambiente | Local, Vitest con `jsdom`; la suite de integración requiere API HTTP alcanzable |
-| Base URL | `VITE_API_URL` inyectada al proceso; objetivo de prueba local `http://localhost:3000/api/v1` |
-| Datos usados | Fixtures sintéticas para la suite determinista e integración; contacto y postulación generan registros de prueba, CMS y body de upload se restauran, sin guardar credenciales |
+| Navegador | Chromium mediante Playwright |
+| Ambiente | Local, Vite en `http://localhost:5174` y API en `http://localhost:3000`; servidores levantados por el usuario |
+| Base URL | Web `E2E_BASE_URL=http://localhost:5174`; API consumida por `VITE_API_URL` del Web |
+| Datos usados | Fixtures sintéticas; contacto y postulación generan registros de prueba, CMS se actualiza/verifica/restaura, sin guardar credenciales |
 
 ## 2. Línea base de comandos
 
@@ -32,7 +33,7 @@
 | `npm run build` | Pendiente | 2026-08-15 | `1311e685edfc` | Pass | `dist/` y log |
 | `npm run test:run` | No configurado en baseline | 2026-08-15 | `1311e685edfc` | Pass | 1 archivo / 2 tests |
 | `npm run test:coverage` | No configurado en baseline | 2026-08-15 | `1311e685edfc` | Pass | `coverage/index.html`, `coverage/lcov.info` |
-| `npm run test:e2e` | No configurado en baseline | — | — | Not run | Pendiente de Fase 8 |
+| `npm run test:e2e` | No configurado en baseline | 2026-08-15 | `bf0d29b` + WT | Pass | `playwright-report/`; consola: 3 tests |
 
 La instalación de Fase 1 se realizó con `npm install --save-dev vitest @vitest/coverage-v8 jsdom @testing-library/react @testing-library/user-event @testing-library/jest-dom`: agregó 94 paquetes y terminó correctamente. npm reportó 12 vulnerabilidades de auditoría (3 moderate, 9 high); no se ejecutó `npm audit fix` porque queda fuera del alcance de esta fase.
 
@@ -50,6 +51,7 @@ Copiar una fila por corrida significativa y conservar el log o artifact.
 | WEB-RUN-006 | `npm run test:run` | Regresión completa más estados compartidos, layouts, rutas, scroll, accesibilidad, teclado, idioma y tema | 2026-08-15 | `f527679` + WT | Pass | — | Consola: 54 archivos, 198 tests |
 | WEB-RUN-007 | `npm run test:integration` + selección de suites | Contratos HTTP públicos y auth/RBAC read-only | 2026-08-15 | `cf33057` + WT / API `4018bd5` | Pass | Público `7/7` y auth/RBAC `4/4` pasan; las mutaciones no se ejecutaron por no ser necesarias para la demo | Consola Vitest; suites en `src/integration/` |
 | WEB-RUN-008 | `npm run test:integration` + flags de mutación | Contacto, postulación multipart, CMS y storage contra API real | 2026-08-15 | `cf33057` + WT / API `4018bd5` | Pass | `4/4` pasan; el PDF sintético de 10 KB evita el redondeo a `0.00 MB` y la postulación devuelve `PENDING` | Consola Vitest; `src/integration/mutation-api.contract.test.ts` |
+| WEB-RUN-009 | `npm run test:e2e` | Tres journeys E2E reducidos contra Web/API local | 2026-08-15 | `bf0d29b` + WT / API `4018bd5` | Pass | Visitante, candidato y administrador pasan `3/3` en Chromium; CMS queda restaurado | `playwright-report/`; `test-results/` solo para fallos |
 
 ## 4. Registro de cobertura
 
@@ -79,12 +81,12 @@ Cada ejecución debe registrar precondiciones y resultado observado, no solo una
 
 | ID | Rol | Ambiente | Precondiciones | Resultado esperado | Resultado observado | Estado | Evidencia | Retest |
 |---|---|---|---|---|---|---|---|---|
-| WEB-E2E-001 | Visitante | Pendiente | Catálogo sembrado | Filtra y envía contacto | Pendiente | Not run | — | — |
-| WEB-E2E-002 | Candidato | Pendiente | Vacante y PDF de prueba | Valida y recibe confirmación | Pendiente | Not run | — | — |
-| WEB-E2E-003 | Administrador | Pendiente | Cuenta CMS y bloque de prueba | Edita texto y se refleja | Pendiente | Not run | — | — |
-| WEB-E2E-004 | Administrador | Pendiente | Bloque visual y storage | Sube imagen y refresca | Pendiente | Not run | — | — |
-| WEB-E2E-005 | Sin permiso | Pendiente | Usuario sin permiso CMS | Deniega o redirige | Pendiente | Not run | — | — |
-| WEB-E2E-006 | Visitante | Pendiente | Error controlado/retry | Recupera el flujo | Pendiente | Not run | — | — |
+| WEB-E2E-001 | Visitante | Vite `5174` + API local | Catálogo sembrado | Filtra y envía contacto | Filtro de precio aplicado y solicitud sintética confirmada | Pass | `WEB-RUN-009`, `playwright-report/` | — |
+| WEB-E2E-002 | Candidato | Vite `5174` + API local | Vacante publicada y PDF sintético | Valida y recibe confirmación | Formulario vacío muestra `aria-invalid`; PDF válido de 10 KB recibe confirmación | Pass | `WEB-RUN-009`, `playwright-report/` | — |
+| WEB-E2E-003 | Administrador | Vite `5174` + API local | Cuenta CMS y bloque `hero.description` | Edita texto y se refleja | Login, edición, verificación pública y restauración completados | Pass | `WEB-RUN-009`, `playwright-report/` | — |
+| WEB-E2E-004 | Administrador | No ejecutado | Bloque visual y storage | Sube imagen y refresca | Fuera del alcance reducido de la demo | Not run | — | — |
+| WEB-E2E-005 | Sin permiso | No ejecutado | Usuario sin permiso CMS | Deniega o redirige | RBAC ya está cubierto por integración API; E2E fuera del alcance reducido | Not run | — | — |
+| WEB-E2E-006 | Visitante | No ejecutado | Error controlado/retry | Recupera el flujo | Fuera del alcance reducido de la demo | Not run | — | — |
 
 ## 6. Registro de casos ejecutados
 
@@ -97,7 +99,8 @@ Cada ejecución debe registrar precondiciones y resultado observado, no solo una
 | WEB-EMP-001..023 | Empleabilidad y postulación | P0/P1 | `employability.service.test.ts`, hooks de vacantes/postulación, `JobsPage.test.tsx`, `JobDetailPage.test.tsx`, `ApplyDialog.test.tsx`, `UploadResumeField.test.tsx`, `ApplySuccessDialog.test.tsx` | 2026-08-15 | `b9078e7` + WT | Endpoint y query, paginación, loading/vacío/error/retry, detalle, validación, PDF, tamaño, FormData, trim, submitting, errores API, éxito, reset y descarte se comportan según la matriz | 9 suites nuevas dentro de 33 archivos; los 23 casos de empleabilidad pasan | Pass | `WEB-RUN-004`, `WEB-COV-004` |
 | WEB-CMS-001..023 | CMS, contenido, imágenes y sanitización | P0/P1 | `cms.service.test.ts`, hooks CMS, `CmsAdminPage.test.tsx`, componentes CMS, `sanitize.test.ts`, `use-cms-landing.test.ts`, `LandingPage.test.tsx` | 2026-08-15 | `a89b0b7` + WT | Secciones, paginación, búsqueda/debounce, estados vacío/error, edición de texto, límites, descarte, validación y upload de imágenes, refresh, toasts y seguridad de contenido se comportan según la matriz | 12 suites nuevas dentro de 45 archivos; los 23 casos CMS pasan | Pass | `WEB-RUN-005`, `WEB-COV-005` |
 | WEB-UI-001..005, WEB-UI-008 | Estados, accesibilidad observable y navegación | P0/P1 | `page-loader.test.tsx`, `error-state.test.tsx`, `empty-state.test.tsx`, `ModeToggle.test.tsx`, `use-unsaved-guard.test.ts`, `App.test.tsx`, `ScrollToTop.test.tsx`, `MainLayout.test.tsx`, `AdminLayout.test.tsx`, dialogs de contacto/postulación/CMS | 2026-08-15 | `f527679` + WT | Loader, errores, vacío, retry, títulos/labels, `aria-invalid`, Enter inválido, Escape, descarte, rutas wildcard, scroll, navegación, idioma y tema se comportan según la matriz | 9 suites nuevas más regresión de formularios; 198/198 pasan | Pass | `WEB-RUN-006`, `WEB-COV-006` |
-| WEB-UI-006..007 | Responsive, foco visual, teclado y revisión de idioma/tema en navegador | P1 | [`REGISTRO_REVISION_MANUAL_UI.md`](./REGISTRO_REVISION_MANUAL_UI.md) | 2026-08-15 | `f527679` + WT | Flujos principales utilizables en 375×812 y 1280×800, con foco, contraste y copy estable | No se inició servidor ni navegador; queda checklist preparada | Not run | `REGISTRO_REVISION_MANUAL_UI.md` |
+| WEB-UI-006..007 | Responsive, foco visual, teclado y revisión de idioma/tema en navegador | P1 | [`REGISTRO_REVISION_MANUAL_UI.md`](./REGISTRO_REVISION_MANUAL_UI.md) | 2026-08-15 | `f527679` + WT | Flujos principales utilizables en 375×812 y 1280×800, con foco, contraste y copy estable | Playwright cubre journeys en Chromium, pero no reemplaza la revisión manual de viewport, foco visual, contraste y tema | Not run | `REGISTRO_REVISION_MANUAL_UI.md` |
+| WEB-E2E-001..003 | Smoke E2E reducido | P0 | `e2e/phase8.spec.ts` | 2026-08-15 | `bf0d29b` + WT / API `4018bd5` | Visitante, candidato y administrador completan los journeys mínimos | Los tres journeys pasan en Chromium; reportes HTML y artifacts de fallo configurados | Pass | `WEB-RUN-009` |
 | WEB-API-014..017 | Contratos HTTP públicos y errores de auth/RBAC | P0 | `src/integration/public-api.contract.test.ts`, `src/integration/auth-permissions.contract.test.ts` | 2026-08-15 | `cf33057` + WT / API `4018bd5` | Catálogo, CMS público, vacantes, 401, 403, 404, 422 y detalles llegan en envelopes compatibles con el cliente | Público `7/7` y auth/RBAC `4/4` pasan | Pass | `WEB-RUN-007` |
 | WEB-CON-013 | Persistencia de contacto válido | P0 | `src/integration/mutation-api.contract.test.ts` | 2026-08-15 | `cf33057` + WT / API `4018bd5` | El servicio crea una solicitud y recibe la respuesta persistida | La solicitud sintética se crea y devuelve la respuesta esperada | Pass | `WEB-RUN-008` |
 | WEB-EMP-024 | Postulación multipart válida | P0 | `src/integration/mutation-api.contract.test.ts` | 2026-08-15 | `cf33057` + WT / API `4018bd5` | PDF, candidato, vacante y carta son aceptados y devuelven `PENDING` | El frontend envía un PDF sintético de 10 KB, el API persiste la postulación y devuelve `PENDING`; el PDF de 4 bytes inicial provocaba `0.00 MB` y violaba `chk_file_size` | Pass | `WEB-RUN-008` |
@@ -118,8 +121,8 @@ Cada ejecución debe registrar precondiciones y resultado observado, no solo una
 | ID | Limitación/bloqueo | Impacto | Responsable | Mitigación | Estado |
 |---|---|---|---|---|---|
 | WEB-BLOCK-001 | No existe runner de pruebas en la línea base | No se podía medir cobertura | Equipo Web | Ejecutar Fase 1 | Cerrado en Fase 1 |
-| WEB-BLOCK-002 | Ambiente/API/storage de prueba no confirmado | Bloquea integración y E2E | Equipo API/Infra | Crear ambiente reproducible | Abierto |
-| WEB-BLOCK-003 | Cuentas CMS de prueba no confirmadas | Bloquea RBAC y E2E administrativo | Equipo Web | Crear cuentas temporales | Abierto |
+| WEB-BLOCK-002 | Ambiente/API/storage de prueba no confirmado | No bloqueó la corrida local de integración ni el smoke E2E | Equipo API/Infra | Mantener ambiente local reproducible y no usar producción como gate | Cerrado para las corridas locales; ambiente CI/E2E separado sigue pendiente |
+| WEB-BLOCK-003 | Cuentas CMS de prueba no confirmadas | Admin fue inyectado temporalmente para el smoke E2E | Equipo Web | Mantener credenciales fuera del repositorio y usar secretos del ambiente | Cerrado para esta corrida; no versionar credenciales |
 | WEB-BLOCK-004 | Correo real no verificado | No permite afirmar confirmación posterior | Equipo API | Probar proveedor o declarar futuro | Abierto |
 | WEB-BLOCK-005 | La etiqueta de teléfono del diálogo indica “opcional”, pero `ApplyJobVacancyFormSchema` del paquete shared lo exige | La prueba local sigue el contrato instalado; requiere decisión de contrato/copy antes de afirmar opcionalidad | Equipo Web/API/Shared | Mantener la validación requerida y resolver la discrepancia antes de E2E | Abierto |
 | WEB-BLOCK-006 | `jsdom` no valida viewport, CSS responsive, foco visual, contraste ni render final de tema | UI-006/UI-007 no pueden marcarse `Pass` con la corrida automatizada | Equipo Web | Ejecutar [`REGISTRO_REVISION_MANUAL_UI.md`](./REGISTRO_REVISION_MANUAL_UI.md) en navegador con ambiente de prueba | Abierto |

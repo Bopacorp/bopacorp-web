@@ -5,7 +5,7 @@
 **Repositorios relacionados:** `bopacorp-api`, `bopacorp-shared`
 **Fecha base:** 15 de agosto de 2026
 **Responsable:** equipo de desarrollo/testing del proyecto
-**Estado:** plan definido; ejecución pendiente de registrar.
+**Estado:** Fase 8 implementada; smoke E2E reducido ejecutado y documentado. Fases 9–10 quedan pendientes.
 
 ---
 
@@ -500,7 +500,7 @@ La primera corrida debe ejecutarse desde un entorno que pueda resolver la URL de
 - Mutaciones: `4/4` passed: contacto, postulación multipart, actualización/restauración CMS y upload/restauración de imagen.
 - Resultado acumulado de la fase para el alcance HTTP ejecutado: `15/15` passed.
 - El fixture de PDF usa 10 KB para satisfacer el contrato de tamaño mínimo del API; el PDF sintético inicial de 4 bytes producía `0.00 MB` y fue corregido en el test.
-- Fase 8 — E2E en navegador, revisión visual y responsive — permanece pendiente.
+- Fase 8 — smoke E2E reducido en navegador — `3/3` journeys pasan; imagen E2E, usuario sin permiso y retry permanecen fuera de esta demo.
 
 ### Criterio de salida
 
@@ -534,11 +534,26 @@ El Web y la API presentan el mismo contrato para los escenarios aceptados y toda
 | WEB-E2E-05 | Usuario sin permiso | Intentar `/admin/cms` → confirmar redirección o acceso denegado. |
 | WEB-E2E-06 | Visitante | Forzar error de catálogo/contacto → usar retry → confirmar recuperación. |
 
+### Implementación ejecutada
+
+- `@playwright/test` quedó configurado en `playwright.config.ts` con Chromium, base URL configurable y reportes HTML, screenshots, videos y traces retenidos cuando corresponda.
+- `npm run test:e2e` ejecuta `e2e/phase8.spec.ts` contra servidores ya levantados; no inicia un `webServer` automáticamente.
+- La URL por defecto es `http://localhost:5174` y puede cambiarse con `E2E_BASE_URL`.
+- El journey administrativo usa `E2E_ADMIN_EMAIL` y `E2E_ADMIN_PASSWORD`, con fallback a las variables de integración; los valores no se versionan.
+
+### Resultado observado — 2026-08-15
+
+- `npm run test:e2e`: **3/3 passed** en Chromium contra Web `http://localhost:5174` y API local.
+- Visitante: filtra catálogo por precio y envía contacto sintético.
+- Candidato: recibe errores del formulario vacío y luego envía un PDF válido de 10 KB.
+- Administrador: inicia sesión, edita `hero.description`, verifica el texto público y restaura el bloque.
+- Artifact local: `playwright-report/`; los artifacts de fallo se guardan en `test-results/` y no se versionan.
+
 No se debe convertir en E2E el CRUD de productos, negociaciones, visitas o reportes porque no son rutas de este repo.
 
 ### Criterio de salida
 
-Los journeys mínimos pasan en un ambiente reproducible y el reporte HTML identifica cualquier fallo, screenshot y trace.
+Los journeys mínimos seleccionados para la demo pasan en un ambiente reproducible y el reporte HTML identifica cualquier fallo, screenshot y trace.
 
 ### Fase 9 — Cerrar cobertura y quality gate
 
